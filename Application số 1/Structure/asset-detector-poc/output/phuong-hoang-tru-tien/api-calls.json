@@ -1,0 +1,62 @@
+[
+  {
+    "file": "src/services/index.ts",
+    "line": 30,
+    "endpoint": "/api/frontend/config",
+    "baseUrlEnv": "VITE_APP_HUB",
+    "method": "GET",
+    "rawCode": "    const response = await axios.get(`${BASE_API_HUB}/api/frontend/config`, {\r\n      headers: {\r\n        Accept: 'application/json', // định dạng dữ liệu trả về\r\n      },\r\n      params: {\r\n        game_id: GAME_ID,\r\n        language_name: localStorage.getItem('lang') || 'vi',\r\n      },\r",
+    "functionName": "getSiteConfig",
+    "thunkName": "siteConfig"
+  },
+  {
+    "file": "src/services/index.ts",
+    "line": 111,
+    "endpoint": "/api/frontend/posts",
+    "baseUrlEnv": "VITE_APP_HUB",
+    "method": "GET",
+    "rawCode": "      const response = await axios.get(`${BASE_API_HUB}/api/frontend/posts`, {\r\n        params: {\r\n          game_id: GAME_ID,\r\n          category_id: category_id,\r\n          limit: limit,\r\n          language_name: localStorage.getItem('lang') || 'vi',\r\n        },\r\n        validateStatus: (status) => status === 200,\r",
+    "functionName": "getpostNews",
+    "thunkName": "postNews"
+  },
+  {
+    "file": "src/services/index.ts",
+    "line": 129,
+    "endpoint": "/api/frontend/slides",
+    "baseUrlEnv": "VITE_APP_HUB",
+    "method": "GET",
+    "rawCode": "    const response = await axios.get(`${BASE_API_HUB}/api/frontend/slides`, {\r\n      headers: {\r\n        Accept: 'application/json', // định dạng dữ liệu trả về\r\n      },\r\n      params: {\r\n        game_id: GAME_ID,\r\n        language_name: localStorage.getItem('lang') || 'vi',\r\n      },\r",
+    "functionName": "getSiteSlide",
+    "thunkName": "siteSlide"
+  },
+  {
+    "file": "src/services/index.ts",
+    "line": 83,
+    "endpoint": "/api/frontend/home-categories",
+    "baseUrlEnv": "VITE_APP_HUB",
+    "method": "GET",
+    "rawCode": "getCategories\nparams: {\r\n          game_id: GAME_ID,\r\n          language_name: localStorage.getItem('lang') || 'vi',\r\n        }",
+    "functionName": "getCategories",
+    "thunkName": "categories"
+  },
+  {
+    "file": "src/services/index.ts",
+    "line": 144,
+    "endpoint": "/api/frontend/posts/${slug}",
+    "baseUrlEnv": "VITE_APP_HUB",
+    "method": "GET",
+    "rawCode": "getDetailPost\nparams: {\r\n            game_id: GAME_ID,\r\n            language_name: localStorage.getItem('lang') || 'vi',\r\n          }",
+    "functionName": "getDetailPost",
+    "thunkName": "detailPost"
+  },
+  {
+    "file": "src/services/index.ts",
+    "line": 166,
+    "endpoint": "/Ranking/GetRanking",
+    "baseUrlEnv": "VITE_APP_API_GAME_SERVICES",
+    "method": "GET",
+    "rawCode": "getRanking\nparams: {\r\n            gameId: GAME_ID,\r\n            mode: mode,\r\n            scope: scope,\r\n          }",
+    "functionName": "getRanking",
+    "thunkName": "ranking"
+  }
+]

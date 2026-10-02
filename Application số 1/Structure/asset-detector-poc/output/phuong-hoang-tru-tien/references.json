@@ -1,0 +1,1003 @@
+[
+  {
+    "file": "src/layout/FloatBxh.tsx",
+    "line": 10,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/float-home/btn-bxh.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/layout/FloatHome.tsx",
+    "line": 18,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/float-home/float-right.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/layout/FloatHome.tsx",
+    "line": 27,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/icon-app.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/layout/FloatHome.tsx",
+    "line": 41,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/float-home/btn-store.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/layout/FloatHome.tsx",
+    "line": 59,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/float-home/btn-ggplay.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/layout/FloatHome.tsx",
+    "line": 75,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/float-home/btn-apk.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/layout/FloatHome.tsx",
+    "line": 91,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/float-home/btn-pc.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/layout/FloatHome.tsx",
+    "line": 105,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/float-home/btn-fanpage.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/layout/FloatHome.tsx",
+    "line": 120,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/float-home/btn-group.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/layout/FloatHome.tsx",
+    "line": 137,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/float-home/nap.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/layout/FloatHome.tsx",
+    "line": 147,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/float-home/nap.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/layout/HeaderHome.tsx",
+    "line": 40,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/header/logo-game.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/layout/HeaderHome.tsx",
+    "line": 45,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/header/logo-game.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/layout/HeaderHome.tsx",
+    "line": 62,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/header/btn-download.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/layout/HeaderHome.tsx",
+    "line": 113,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/header/logo-game.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/layout/Logo18.tsx",
+    "line": 10,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/banner/1920/logo-18.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/layout/Logo18.tsx",
+    "line": 16,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/banner/1920/logo-18.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/layout/Logo18.tsx",
+    "line": 21,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/banner/1920/logo-18.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/Pagination.tsx",
+    "line": 13,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/1920/chevrons-left.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/Pagination.tsx",
+    "line": 32,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/1920/chevrons-right.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/utils/constant.ts",
+    "line": 21,
+    "type": "jsx-attr",
+    "attribute": "imageArt",
+    "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-1.jpg",
+    "usage": "{ imageArt: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/utils/constant.ts",
+    "line": 25,
+    "type": "jsx-attr",
+    "attribute": "imageArt",
+    "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-2.jpg",
+    "usage": "{ imageArt: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/utils/constant.ts",
+    "line": 29,
+    "type": "jsx-attr",
+    "attribute": "imageArt",
+    "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-3.jpg",
+    "usage": "{ imageArt: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/utils/constant.ts",
+    "line": 33,
+    "type": "jsx-attr",
+    "attribute": "imageArt",
+    "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-4.jpg",
+    "usage": "{ imageArt: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/utils/constant.ts",
+    "line": 37,
+    "type": "jsx-attr",
+    "attribute": "imageArt",
+    "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-5.jpg",
+    "usage": "{ imageArt: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/home/Banner.tsx",
+    "line": 25,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/banner/768/banner.jpg",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/home/Banner.tsx",
+    "line": 41,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/homepage/homepage.mp4",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/home/Banner.tsx",
+    "line": 48,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/banner/logo-game.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/home/Banner.tsx",
+    "line": 54,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/banner/logo-game.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/home/Banner.tsx",
+    "line": 59,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/banner/logo-game.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/home/Rank.tsx",
+    "line": 41,
+    "type": "jsx-attr",
+    "attribute": "image",
+    "assetPath": "/assets/home/rank/all.png",
+    "usage": "{ image: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/home/Rank.tsx",
+    "line": 46,
+    "type": "jsx-attr",
+    "attribute": "image",
+    "assetPath": "/assets/home/rank/custom.png",
+    "usage": "{ image: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/home/Rank.tsx",
+    "line": 84,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/rank/768/bg-rank.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/home/Rank.tsx",
+    "line": 90,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/rank/1920/bg-rank.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/home/Rank.tsx",
+    "line": 95,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/rank/1920/bg-rank.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/home/Rank.tsx",
+    "line": 105,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/rank/1920/title-rank.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/home/Rank.tsx",
+    "line": 111,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/rank/1920/bg-rank.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/home/Rank.tsx",
+    "line": 161,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/rank/top${}.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/home/Rank.tsx",
+    "line": 161,
+    "type": "template-literal",
+    "assetPath": "/assets/home/rank/top${}.png",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/components/home/Rank.tsx",
+    "line": 191,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/rank/768/title-rank.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/home/Rank.tsx",
+    "line": 239,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/rank/top${}.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/home/Rank.tsx",
+    "line": 239,
+    "type": "template-literal",
+    "assetPath": "/assets/home/rank/top${}.png",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/page/LandingH5/Choigame1.tsx",
+    "line": 15,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-1.mp4",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/page/LandingH5/Choigame1.tsx",
+    "line": 15,
+    "type": "template-literal",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-1.mp4",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/page/LandingH5/Choigame1.tsx",
+    "line": 23,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-1.mp4",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/page/LandingH5/Choigame1.tsx",
+    "line": 23,
+    "type": "template-literal",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-1.mp4",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/page/LandingH5/Choigame2.tsx",
+    "line": 15,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-2.mp4",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/page/LandingH5/Choigame2.tsx",
+    "line": 15,
+    "type": "template-literal",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-2.mp4",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/page/LandingH5/Choigame2.tsx",
+    "line": 23,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-2.mp4",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/page/LandingH5/Choigame2.tsx",
+    "line": 23,
+    "type": "template-literal",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-2.mp4",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/page/LandingH5/Choigame3.tsx",
+    "line": 15,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-3.mp4",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/page/LandingH5/Choigame3.tsx",
+    "line": 15,
+    "type": "template-literal",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-3.mp4",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/page/LandingH5/Choigame3.tsx",
+    "line": 23,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-3.mp4",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/page/LandingH5/Choigame3.tsx",
+    "line": 23,
+    "type": "template-literal",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-3.mp4",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/page/LandingH5/Choigame4.tsx",
+    "line": 15,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-4.mp4",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/page/LandingH5/Choigame4.tsx",
+    "line": 15,
+    "type": "template-literal",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-4.mp4",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/page/LandingH5/Choigame4.tsx",
+    "line": 23,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-4.mp4",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/page/LandingH5/Choigame4.tsx",
+    "line": 23,
+    "type": "template-literal",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-4.mp4",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/page/LandingH5/Choigame5.tsx",
+    "line": 15,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-5.mp4",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/page/LandingH5/Choigame5.tsx",
+    "line": 15,
+    "type": "template-literal",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-5.mp4",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/page/LandingH5/Choigame5.tsx",
+    "line": 23,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-5.mp4",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/page/LandingH5/Choigame5.tsx",
+    "line": 23,
+    "type": "template-literal",
+    "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-5.mp4",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/components/news/News.tsx",
+    "line": 28,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/768/banner.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/News.tsx",
+    "line": 34,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/banner.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/News.tsx",
+    "line": 39,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/banner.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/NewsActionButtons.tsx",
+    "line": 15,
+    "type": "template-literal",
+    "attribute": "image",
+    "assetPath": "${}/btn-nap.png",
+    "usage": "{ image: ... }",
+    "confidence": 0.7
+  },
+  {
+    "file": "src/components/news/NewsActionButtons.tsx",
+    "line": 15,
+    "type": "template-literal",
+    "assetPath": "${}/btn-nap.png",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/components/news/NewsActionButtons.tsx",
+    "line": 20,
+    "type": "template-literal",
+    "attribute": "image",
+    "assetPath": "${}/btn-giftcode.png",
+    "usage": "{ image: ... }",
+    "confidence": 0.7
+  },
+  {
+    "file": "src/components/news/NewsActionButtons.tsx",
+    "line": 20,
+    "type": "template-literal",
+    "assetPath": "${}/btn-giftcode.png",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/components/news/NewsActionButtons.tsx",
+    "line": 25,
+    "type": "template-literal",
+    "attribute": "image",
+    "assetPath": "${}/btn-fanpage.png",
+    "usage": "{ image: ... }",
+    "confidence": 0.7
+  },
+  {
+    "file": "src/components/news/NewsActionButtons.tsx",
+    "line": 25,
+    "type": "template-literal",
+    "assetPath": "${}/btn-fanpage.png",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/components/news/NewsActionButtons.tsx",
+    "line": 30,
+    "type": "template-literal",
+    "attribute": "image",
+    "assetPath": "${}/btn-cskh.png",
+    "usage": "{ image: ... }",
+    "confidence": 0.7
+  },
+  {
+    "file": "src/components/news/NewsActionButtons.tsx",
+    "line": 30,
+    "type": "template-literal",
+    "assetPath": "${}/btn-cskh.png",
+    "usage": "dynamic",
+    "confidence": 0.5
+  },
+  {
+    "file": "src/components/news/NewsDesktop.tsx",
+    "line": 32,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/768/frame.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/NewsDesktop.tsx",
+    "line": 38,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/frame.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/NewsDesktop.tsx",
+    "line": 43,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/frame.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/NewsDesktop.tsx",
+    "line": 66,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/frame-right.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/NewsDownloadPanel.tsx",
+    "line": 23,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/frame-middle.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/NewsDownloadPanel.tsx",
+    "line": 33,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/icon-app.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/news/NewsDownloadPanel.tsx",
+    "line": 41,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/icon-app.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/news/NewsDownloadPanel.tsx",
+    "line": 58,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/ios.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/NewsDownloadPanel.tsx",
+    "line": 76,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/android.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/NewsDownloadPanel.tsx",
+    "line": 92,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/apk.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/NewsDownloadPanel.tsx",
+    "line": 108,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/pc.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/NewsMobile.tsx",
+    "line": 38,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/768/frame-right.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/SliderPC.tsx",
+    "line": 84,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/btn-prev.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/news/SliderPC.tsx",
+    "line": 101,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/btn-next.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Contents.tsx",
+    "line": 85,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/768/banner_trang2.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Contents.tsx",
+    "line": 91,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Contents.tsx",
+    "line": 96,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Contents.tsx",
+    "line": 107,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/frame-middle.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Contents.tsx",
+    "line": 115,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/icon-app.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/tintuc/Contents.tsx",
+    "line": 122,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/icon-app.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/tintuc/Contents.tsx",
+    "line": 137,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/ios.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/tintuc/Contents.tsx",
+    "line": 149,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/android.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/tintuc/Contents.tsx",
+    "line": 161,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/apk.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/tintuc/Contents.tsx",
+    "line": 173,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/pc.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/tintuc/Contents.tsx",
+    "line": 183,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/768/frame-tab-content.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Contents.tsx",
+    "line": 189,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/1920/frame-tab-content.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Contents.tsx",
+    "line": 194,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/1920/frame-tab-content.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Detail.tsx",
+    "line": 86,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/768/banner_trang2.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Detail.tsx",
+    "line": 92,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Detail.tsx",
+    "line": 97,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Detail.tsx",
+    "line": 109,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/home/news/1920/frame-middle.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Detail.tsx",
+    "line": 117,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/icon-app.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/tintuc/Detail.tsx",
+    "line": 124,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/icon-app.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/tintuc/Detail.tsx",
+    "line": 139,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/ios.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/tintuc/Detail.tsx",
+    "line": 151,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/android.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/tintuc/Detail.tsx",
+    "line": 163,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/apk.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/tintuc/Detail.tsx",
+    "line": 175,
+    "type": "jsx-attr",
+    "attribute": "src",
+    "assetPath": "/assets/home/news/1920/pc.png",
+    "usage": "jsx",
+    "confidence": 1
+  },
+  {
+    "file": "src/components/tintuc/Detail.tsx",
+    "line": 185,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/768/frame-tab-detail.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Detail.tsx",
+    "line": 191,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/1920/frame-tab-detail.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  },
+  {
+    "file": "src/components/tintuc/Detail.tsx",
+    "line": 196,
+    "type": "jsx-attr",
+    "attribute": "path",
+    "assetPath": "/assets/tintuc/1920/frame-tab-detail.png",
+    "usage": "{ path: ... }",
+    "confidence": 0.9
+  }
+]

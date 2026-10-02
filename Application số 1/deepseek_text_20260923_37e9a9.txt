@@ -1,0 +1,16 @@
+asset-detector-plan/
+├── README.md
+├── 00-CONTEXT.md
+├── 01-PHASE-scaffolding.md
+├── 02-PHASE-framework-detector.md
+├── 03-PHASE-layer1-filesystem.md
+├── 04-PHASE-layer2-nextjs.md
+├── 05-PHASE-layer2-dotnet.md
+├── 06-PHASE-layer3-runtime.md
+├── 07-PHASE-layer4-merge-db.md
+├── 08-PHASE-api-cli.md
+├── 09-PHASE-integration-test.md
+├── 10-PHASE-real-world-sections.md
+├── APPENDIX-A-schema.md
+├── APPENDIX-B-constants.md
+└── APPENDIX-C-checklists.md

@@ -1,0 +1,152 @@
+
+---
+
+## 📄 File: `APPENDIX-C-checklists.md`
+
+```markdown
+# APPENDIX C — Detection Checklists
+
+## Checklist Khi Gặp 1 Section Mới
+
+Khi agent scan 1 section, tự hỏi:
+
+### 1. Section này có gì?
+- [ ] Có ảnh không? (background, character, logo, icon, frame)
+- [ ] Có video không? (`<video>`, `<source>`)
+- [ ] Có swiper/carousel không? (Swiper, Slider, Carousel)
+- [ ] Có dynamic block không? (`/api/config/buttons`, `/api/leaderboard`)
+- [ ] Có chart không? (pentagon, radar, bar)
+- [ ] Có animation không? (framer-motion, gsap, CSS)
+
+### 2. Asset nào là static?
+- [ ] Ảnh trong `public/` (Next.js) hoặc `wwwroot/` (.NET)
+- [ ] Video trong repo
+- [ ] Font (nhưng thường không cần thay)
+
+### 3. Asset nào là dynamic?
+- [ ] Render từ API → dynamic block
+- [ ] Chart data-driven → chart data
+- [ ] QR code generated → dynamic flag
+
+### 4. Asset nào là text HTML?
+- [ ] Text thường → HTML
+- [ ] Text với font đặc biệt → có thể là ảnh PNG
+- [ ] Text với gradient/glow → có thể là ảnh PNG
+
+### 5. Asset nào là inline SVG?
+- [ ] Icon hệ thống → inline SVG → không cần thay
+- [ ] SVG file trong `public/` → có thể thay
+
+### 6. Có footer không?
+- [ ] Nếu có → skip hoàn toàn
+
+### 7. Có sticky/reusable không?
+- [ ] Sidebar xuất hiện ở nhiều section → flag isReusable
+- [ ] Position fixed/sticky → flag isSticky
+
+## Checklist Khi Gặp Swiper
+
+### 1. Detect library
+- [ ] Check `package.json` cho swiper library
+- [ ] Nếu không có → có thể là custom slider
+
+### 2. Detect config
+- [ ] `effect` (slide/fade/coverflow/cards)
+- [ ] `slidesPerView` (1/3/auto)
+- [ ] `centeredSlides`
+- [ ] `spaceBetween`
+- [ ] `loop`
+- [ ] `autoplay`
+
+### 3. Detect slides
+- [ ] Hardcode JSX `<SwiperSlide>` hoặc
+- [ ] Data-driven `.map()`
+
+### 4. Detect slide composition
+- [ ] Đếm số `<Image>` trong slide
+- [ ] Nếu ≥ 2 → composite
+- [ ] Extract layer roles
+
+### 5. Capture slides
+- [ ] Layer 3 phải dùng `swiper.slideTo(index)` cho coverflow
+- [ ] Pause autoplay trước khi capture
+- [ ] Chờ animation settle (1500ms)
+
+## Checklist Khi Gặp Leaderboard
+
+### 1. Detect API
+- [ ] Scan code tìm fetch `/api/leaderboard`
+- [ ] Extract query params (mode, scope, limit)
+
+### 2. Detect tabs
+- [ ] Tìm `<Tab>` elements
+- [ ] Extract label + infer mode/scope
+
+### 3. Detect columns
+- [ ] Tìm `<th>` hoặc `<TableHeader>`
+- [ ] Extract label + infer key/type
+
+### 4. Detect rank icons
+- [ ] Glob files có pattern `rank-1.png`, `top-2.svg`
+- [ ] Sort by rank
+
+### 5. Detect frame
+- [ ] CSS `border-image-source: url(...)`
+- [ ] Hoặc 9-slice với 9 `<Image>`
+- [ ] Hoặc 1 ảnh frame đơn
+
+### 6. Verify API
+- [ ] Layer 3 gọi API thật
+- [ ] So sánh với DOM render
+- [ ] Flag inconsistent nếu có
+
+## Checklist Khi Gặp Composite Slide
+
+### 1. Detect composite
+- [ ] Đếm số Image elements trong slide
+- [ ] Nếu ≥ 4 → composite
+
+### 2. Extract layers
+- [ ] Mỗi `<Image>` là 1 layer
+- [ ] Extract `role` từ `alt`, `className`, `src`
+- [ ] Extract `zIndex` từ className hoặc style
+- [ ] Extract `position` từ className
+
+### 3. Layer roles
+- [ ] background: alt/class chứa "bg" hoặc "background"
+- [ ] character: alt/class chứa "char" hoặc "character"
+- [ ] title: alt/class chứa "title"
+- [ ] frame: alt/class chứa "frame"
+- [ ] ui-screenshot: class chứa "screenshot" hoặc "ui"
+
+### 4. Upload mode
+- [ ] Default = Simple (1 ảnh flat)
+- [ ] Cho phép chuyển Advanced (từng layer)
+
+## Checklist Confidence Score
+
+| Confidence | Điều kiện | Action |
+|---|---|---|
+| 1.0 | Có `data-slot` hoặc ≥ 2 references | Auto-accept |
+| 0.9 | Có 1 reference + runtime match | Auto-accept |
+| 0.7-0.9 | Có 1 reference | Auto-accept |
+| 0.5-0.7 | Template literal, dynamic import | Flag manual review |
+| < 0.5 | Không có reference | Manual annotate |
+
+## Checklist Footer Exclusion
+
+- [ ] Layer 1: skip files trong `footer/`, `sdk/`
+- [ ] Layer 2: skip references từ footer files
+- [ ] Layer 4: flag `footerOnly` nếu asset chỉ dùng trong footer
+- [ ] Manifest: loại asset `footerOnly = true`
+- [ ] Verify: mask footer region khi so screenshot
+
+## Checklist Trước Khi Kết Thúc Phase
+
+- [ ] Tất cả tests pass
+- [ ] Coverage > ngưỡng yêu cầu
+- [ ] Build thành công
+- [ ] Typecheck pass
+- [ ] Lint pass
+- [ ] Report generated theo OUTPUT FORMAT
+- [ ] Commit với message rõ ràng

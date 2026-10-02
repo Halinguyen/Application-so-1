@@ -1,0 +1,178 @@
+{
+  "generated": "2026-09-30",
+  "source": "asset-detector-web /api/detect on the -web folders",
+  "games": {
+    "huyen-anh-volam": {
+      "original": "t027-huyen-anh-vo-lam-homepage",
+      "web": "t027-huyen-anh-vo-lam-homepage-web",
+      "structure": "separate-mobile",
+      "mobile": "Pages/Mobile/*",
+      "routes": [
+        "/",
+        "/tin-tuc",
+        "/tin-tuc/[id]",
+        "/bang-xep-hang"
+      ],
+      "gameId": null,
+      "excluded": [
+        "Jobs/"
+      ],
+      "detect": {
+        "framework": "nextjs",
+        "version": "14.2.35",
+        "router": "app",
+        "styling": "tailwind",
+        "totalAssets": 161,
+        "totalReferences": 79,
+        "totalDynamicBlocks": 2,
+        "totalSwipers": 2,
+        "avgConfidence": 0.616410256410256,
+        "needsReview": 138
+      }
+    },
+    "giang-ho-ky-ngo": {
+      "original": "t030-giang-ho-ky-ngo-website",
+      "web": "t030-giang-ho-ky-ngo-website-web",
+      "structure": "single-responsive",
+      "mobile": null,
+      "routes": [
+        "/",
+        "/News",
+        "/News/[[...slug]]",
+        "/NewsDetail/[...params]",
+        "/Landing"
+      ],
+      "gameId": 36,
+      "excluded": [
+        "Privacy",
+        "Error"
+      ],
+      "detect": {
+        "framework": "nextjs",
+        "version": "14.2.35",
+        "router": "app",
+        "styling": "tailwind",
+        "totalAssets": 249,
+        "totalReferences": 154,
+        "totalDynamicBlocks": 2,
+        "totalSwipers": 0,
+        "avgConfidence": 0.7265060240963862,
+        "needsReview": 102
+      }
+    },
+    "quy-mon-quan": {
+      "original": "homepage-va-conhan",
+      "web": "homepage-va-conhan-web",
+      "structure": "single-responsive",
+      "mobile": null,
+      "routes": [
+        "/",
+        "/tin-tuc",
+        "/tin-tuc/[slug]"
+      ],
+      "gameId": 1036,
+      "rankingGameId": 29,
+      "excluded": [
+        "Conhan",
+        "/landing (gift-code)",
+        "Jobs/"
+      ],
+      "detect": {
+        "framework": "nextjs",
+        "version": "14.2.35",
+        "router": "app",
+        "styling": "tailwind",
+        "totalAssets": 112,
+        "totalReferences": 105,
+        "totalDynamicBlocks": 2,
+        "totalSwipers": 0,
+        "avgConfidence": 0.7669642857142845,
+        "needsReview": 17
+      }
+    },
+    "samkok-tamquoc": {
+      "original": "t028-samkok-tam-qu-c-home-and-landing",
+      "web": "t028-samkok-tam-qu-c-home-and-landing-web",
+      "structure": "single-responsive",
+      "mobile": null,
+      "routes": [
+        "/",
+        "/landing",
+        "/news?cid=",
+        "/newsdetail?id=",
+        "/ranking"
+      ],
+      "gameId": 34,
+      "excluded": [],
+      "detect": {
+        "framework": "nextjs",
+        "version": "14.2.35",
+        "router": "app",
+        "styling": "unknown",
+        "totalAssets": 123,
+        "totalReferences": 74,
+        "totalDynamicBlocks": 2,
+        "totalSwipers": 0,
+        "avgConfidence": 0.9528455284552845,
+        "needsReview": 10
+      }
+    },
+    "ta-la-hac-ngokhong": {
+      "original": "t031-home-page",
+      "web": "t031-home-page-web",
+      "structure": "single-responsive",
+      "mobile": null,
+      "routes": [
+        "/",
+        "/danh-muc/[[...tab]]",
+        "/tin-tuc/[slug]",
+        "/landing"
+      ],
+      "gameId": 1044,
+      "note": "appsettings=1052, deploy develop=1044 (chosen), production=43",
+      "excluded": [],
+      "detect": {
+        "framework": "nextjs",
+        "version": "14.2.35",
+        "router": "app",
+        "styling": "tailwind",
+        "totalAssets": 248,
+        "totalReferences": 168,
+        "totalDynamicBlocks": 2,
+        "totalSwipers": 0,
+        "avgConfidence": 0.8669354838709677,
+        "needsReview": 60
+      }
+    },
+    "thoi-khong-chi-mong": {
+      "original": "t022-web",
+      "web": "t022-web-web",
+      "structure": "single-responsive",
+      "mobile": null,
+      "routes": [
+        "/",
+        "/tin-tuc",
+        "/tin-tuc/[slug]"
+      ],
+      "gameId": 1036,
+      "rankingGameId": 29,
+      "excluded": [
+        "Conhan",
+        "/landing (login/check-in/gift-code)"
+      ],
+      "detect": {
+        "framework": "nextjs",
+        "version": "14.2.35",
+        "router": "app",
+        "styling": "unknown",
+        "totalAssets": 113,
+        "totalReferences": 83,
+        "totalDynamicBlocks": 2,
+        "totalSwipers": 0,
+        "avgConfidence": 0.9159292035398221,
+        "needsReview": 0
+      }
+    }
+  },
+  "note": "thao-tung-tamquoc removed from the tool 2026-09-30 (obsolete game)"
+}

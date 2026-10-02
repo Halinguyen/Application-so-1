@@ -1,0 +1,86 @@
+[
+  {
+    "id": "dynamic.buttons",
+    "type": "api-buttons",
+    "label": "Site Config (Buttons)",
+    "section": "global",
+    "source": "src/services/index.ts:30",
+    "apiEndpoint": "/api/frontend/config",
+    "baseUrlEnv": "VITE_APP_HUB",
+    "params": [
+      {
+        "name": "game_id",
+        "envKey": "VITE_APP_GAME_ID",
+        "type": "string",
+        "required": true,
+        "description": "Mã game"
+      },
+      {
+        "name": "language_name",
+        "envKey": "",
+        "type": "string",
+        "default": "vi",
+        "description": "Ngôn ngữ"
+      }
+    ],
+    "injectVia": "env-inject",
+    "confidence": 0.95,
+    "detectionMethod": "grep"
+  },
+  {
+    "id": "dynamic.leaderboard",
+    "type": "api-leaderboard",
+    "label": "Bảng Xếp Hạng",
+    "section": "home-rank",
+    "source": "src/services/index.ts:166",
+    "apiEndpoint": "/Ranking/GetRanking",
+    "baseUrlEnv": "VITE_APP_API_GAME_SERVICES",
+    "params": [
+      {
+        "name": "gameId",
+        "envKey": "VITE_APP_GAME_ID",
+        "type": "string",
+        "required": true,
+        "description": "Mã game"
+      },
+      {
+        "name": "mode",
+        "envKey": "VITE_LB_MODE",
+        "type": "enum",
+        "options": [
+          "user"
+        ],
+        "required": true,
+        "description": "Chế độ xếp hạng"
+      },
+      {
+        "name": "scope",
+        "envKey": "VITE_LB_SCOPE",
+        "type": "enum",
+        "options": [
+          "all",
+          "area"
+        ],
+        "required": true,
+        "description": "Phạm vi xếp hạng"
+      }
+    ],
+    "tabs": [
+      {
+        "id": "tab-all",
+        "label": "BXH All Server",
+        "mode": "user",
+        "scope": "all"
+      },
+      {
+        "id": "tab-area",
+        "label": "BXH Cụm Server",
+        "mode": "user",
+        "scope": "area"
+      }
+    ],
+    "injectVia": "env-inject",
+    "confidence": 0.95,
+    "detectionMethod": "grep"
+  }
+]

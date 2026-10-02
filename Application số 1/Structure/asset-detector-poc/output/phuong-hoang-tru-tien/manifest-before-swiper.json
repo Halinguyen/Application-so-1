@@ -1,0 +1,5545 @@
+{
+  "gameId": "phuong-hoang-tru-tien",
+  "repoPath": "D:\\Application số 1\\Structure\\game-template-repo\\phuong-hoang-tru-tien\\home-page",
+  "framework": {
+    "framework": "vite-spa",
+    "version": "^6.3.5",
+    "router": "spa",
+    "packageManager": "npm",
+    "styling": "tailwind",
+    "confidence": 0.9
+  },
+  "assets": [
+    {
+      "id": "asset.public-assets-rank-bg-rank",
+      "canonicalPath": "public/assets/rank/1920/bg-rank.png",
+      "publicPath": "/assets/rank/1920/bg-rank.png",
+      "type": "image",
+      "fileName": "bg-rank.png",
+      "extension": "png",
+      "size": 9049,
+      "hash": "f2f44fe80e766efee18f3f7e833a754de7aaec8edcbc1f5e9dabe517b6c9922a",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 90,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/rank/1920/bg-rank.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 95,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/rank/1920/bg-rank.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 2,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "rank",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/rank/1920/bg-rank.png",
+          "publicPath": "/assets/rank/1920/bg-rank.png",
+          "fileName": "bg-rank.png",
+          "size": 9049,
+          "hash": "f2f44fe80e766efee18f3f7e833a754de7aaec8edcbc1f5e9dabe517b6c9922a"
+        },
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/rank/768/bg-rank.png",
+          "publicPath": "/assets/rank/768/bg-rank.png",
+          "fileName": "bg-rank.png",
+          "size": 5836,
+          "hash": "dff9b7bc9ce22f77b7ccf4505c67d99f9e56f1cd986d442033818bf75dfe333d"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 1920,
+        "height": 968
+      },
+      "constraints": {
+        "ratio": "240:121",
+        "recommendedWidth": 1920,
+        "recommendedHeight": 968,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Bg Rank",
+        "description": "Section: rank · 9 KB · 2 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "background"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/rank/1920/bg-rank.png",
+          "public/assets/rank/768/bg-rank.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.public-assets-rank-title-rank",
+      "canonicalPath": "public/assets/rank/1920/title-rank.png",
+      "publicPath": "/assets/rank/1920/title-rank.png",
+      "type": "image",
+      "fileName": "title-rank.png",
+      "extension": "png",
+      "size": 45126,
+      "hash": "81ae77eedd1b377b6d60813a844b4aec124fb2fae1771d3064f1d69da5c9db6b",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 105,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/rank/1920/title-rank.png",
+          "usage": "jsx",
+          "confidence": 1
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.9,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "rank",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/rank/1920/title-rank.png",
+          "publicPath": "/assets/rank/1920/title-rank.png",
+          "fileName": "title-rank.png",
+          "size": 45126,
+          "hash": "81ae77eedd1b377b6d60813a844b4aec124fb2fae1771d3064f1d69da5c9db6b"
+        },
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/rank/768/title-rank.png",
+          "publicPath": "/assets/rank/768/title-rank.png",
+          "fileName": "title-rank.png",
+          "size": 45026,
+          "hash": "814d6ae766b606a123d1abf268190b451267d448707b0ca815cc5d930d004bf1"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 467,
+        "height": 82
+      },
+      "constraints": {
+        "ratio": "467:82",
+        "recommendedWidth": 467,
+        "recommendedHeight": 82,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Title Rank",
+        "description": "Section: rank · 44 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "rank"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/rank/1920/title-rank.png",
+          "public/assets/rank/768/title-rank.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.public-assets-tintuc-banner_trang2",
+      "canonicalPath": "public/assets/tintuc/1920/banner_trang2.png",
+      "publicPath": "/assets/tintuc/1920/banner_trang2.png",
+      "type": "image",
+      "fileName": "banner_trang2.png",
+      "extension": "png",
+      "size": 12960,
+      "hash": "57a53c4a11a07b78178a2b8ecd70755012b55c7e493909452cc37146f9dcd4bf",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/tintuc/Contents.tsx",
+          "line": 91,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/tintuc/Contents.tsx",
+          "line": 96,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/tintuc/Detail.tsx",
+          "line": 92,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/tintuc/Detail.tsx",
+          "line": 97,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 4,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "tintuc",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/tintuc/768/banner_trang2.png",
+          "publicPath": "/assets/tintuc/768/banner_trang2.png",
+          "fileName": "banner_trang2.png",
+          "size": 8061,
+          "hash": "d813410d929b72efc2cc7734eef976c919cdb0e2e284e127bd291f801e60c1b2"
+        },
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/tintuc/1920/banner_trang2.png",
+          "publicPath": "/assets/tintuc/1920/banner_trang2.png",
+          "fileName": "banner_trang2.png",
+          "size": 12960,
+          "hash": "57a53c4a11a07b78178a2b8ecd70755012b55c7e493909452cc37146f9dcd4bf"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 1920,
+        "height": 1328
+      },
+      "constraints": {
+        "ratio": "120:83",
+        "recommendedWidth": 1920,
+        "recommendedHeight": 1328,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Banner Trang2",
+        "description": "Section: tintuc · 13 KB · 4 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "banner"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/tintuc/768/banner_trang2.png",
+          "public/assets/tintuc/1920/banner_trang2.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.public-assets-tintuc-frame-tab-content",
+      "canonicalPath": "public/assets/tintuc/1920/frame-tab-content.png",
+      "publicPath": "/assets/tintuc/1920/frame-tab-content.png",
+      "type": "image",
+      "fileName": "frame-tab-content.png",
+      "extension": "png",
+      "size": 8998,
+      "hash": "5288e182c7ba5109effed69e036d256d2a4f9206a0246488e675df3862e8d75a",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/tintuc/Contents.tsx",
+          "line": 189,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/tintuc/1920/frame-tab-content.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/tintuc/Contents.tsx",
+          "line": 194,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/tintuc/1920/frame-tab-content.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 2,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "tintuc",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/tintuc/768/frame-tab-content.png",
+          "publicPath": "/assets/tintuc/768/frame-tab-content.png",
+          "fileName": "frame-tab-content.png",
+          "size": 9115,
+          "hash": "b09d4f16d9d75554d4db76a6916be44310aaf6684daf0851b4b250ee43e8b400"
+        },
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/tintuc/1920/frame-tab-content.png",
+          "publicPath": "/assets/tintuc/1920/frame-tab-content.png",
+          "fileName": "frame-tab-content.png",
+          "size": 8998,
+          "hash": "5288e182c7ba5109effed69e036d256d2a4f9206a0246488e675df3862e8d75a"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 1161,
+        "height": 976
+      },
+      "constraints": {
+        "ratio": "1161:976",
+        "recommendedWidth": 1161,
+        "recommendedHeight": 976,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Frame Tab Content",
+        "description": "Section: tintuc · 9 KB · 2 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "frame"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/tintuc/768/frame-tab-content.png",
+          "public/assets/tintuc/1920/frame-tab-content.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.public-assets-tintuc-frame-tab-detail",
+      "canonicalPath": "public/assets/tintuc/1920/frame-tab-detail.png",
+      "publicPath": "/assets/tintuc/1920/frame-tab-detail.png",
+      "type": "image",
+      "fileName": "frame-tab-detail.png",
+      "extension": "png",
+      "size": 10499,
+      "hash": "a7c3318d35ad893abd5883581c198130e559a1989e5a693632e3a56c0c87ebf8",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/tintuc/Detail.tsx",
+          "line": 191,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/tintuc/1920/frame-tab-detail.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/tintuc/Detail.tsx",
+          "line": 196,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/tintuc/1920/frame-tab-detail.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 2,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "tintuc",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/tintuc/768/frame-tab-detail.png",
+          "publicPath": "/assets/tintuc/768/frame-tab-detail.png",
+          "fileName": "frame-tab-detail.png",
+          "size": 9025,
+          "hash": "2628bb0ba182431640d1b66e717ecea78903543064035d9c1fb26f5120f5f040"
+        },
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/tintuc/1920/frame-tab-detail.png",
+          "publicPath": "/assets/tintuc/1920/frame-tab-detail.png",
+          "fileName": "frame-tab-detail.png",
+          "size": 10499,
+          "hash": "a7c3318d35ad893abd5883581c198130e559a1989e5a693632e3a56c0c87ebf8"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 1161,
+        "height": 1250
+      },
+      "constraints": {
+        "ratio": "1161:1250",
+        "recommendedWidth": 1161,
+        "recommendedHeight": 1250,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Frame Tab Detail",
+        "description": "Section: tintuc · 10 KB · 2 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "frame"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/tintuc/768/frame-tab-detail.png",
+          "public/assets/tintuc/1920/frame-tab-detail.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.public-assets-tintuc-chevrons-left",
+      "canonicalPath": "public/assets/tintuc/1920/chevrons-left.png",
+      "publicPath": "/assets/tintuc/1920/chevrons-left.png",
+      "type": "image",
+      "fileName": "chevrons-left.png",
+      "extension": "png",
+      "size": 274,
+      "hash": "5b34234f9075c97df092559320442042385a579b1534fa454d526328d803589f",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/Pagination.tsx",
+          "line": 13,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/tintuc/1920/chevrons-left.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.9,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "tintuc",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/tintuc/1920/chevrons-left.png",
+          "publicPath": "/assets/tintuc/1920/chevrons-left.png",
+          "fileName": "chevrons-left.png",
+          "size": 274,
+          "hash": "5b34234f9075c97df092559320442042385a579b1534fa454d526328d803589f"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile",
+        "tablet"
+      ],
+      "dimensions": {
+        "width": 10,
+        "height": 8
+      },
+      "constraints": {
+        "ratio": "5:4",
+        "recommendedWidth": 10,
+        "recommendedHeight": 8,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Chevrons Left",
+        "description": "Section: tintuc · 0 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/tintuc/1920/chevrons-left.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.public-assets-tintuc-chevrons-right",
+      "canonicalPath": "public/assets/tintuc/1920/chevrons-right.png",
+      "publicPath": "/assets/tintuc/1920/chevrons-right.png",
+      "type": "image",
+      "fileName": "chevrons-right.png",
+      "extension": "png",
+      "size": 260,
+      "hash": "9d1136bf32a902eb0000737350b02ebc3fc405312e402245f2f7ab7913df68cd",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/Pagination.tsx",
+          "line": 32,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/tintuc/1920/chevrons-right.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.9,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "tintuc",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/tintuc/1920/chevrons-right.png",
+          "publicPath": "/assets/tintuc/1920/chevrons-right.png",
+          "fileName": "chevrons-right.png",
+          "size": 260,
+          "hash": "9d1136bf32a902eb0000737350b02ebc3fc405312e402245f2f7ab7913df68cd"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile",
+        "tablet"
+      ],
+      "dimensions": {
+        "width": 10,
+        "height": 8
+      },
+      "constraints": {
+        "ratio": "5:4",
+        "recommendedWidth": 10,
+        "recommendedHeight": 8,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Chevrons Right",
+        "description": "Section: tintuc · 0 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/tintuc/1920/chevrons-right.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-banner-banner",
+      "canonicalPath": "public/assets/home/banner/1920/banner.png",
+      "publicPath": "/assets/home/banner/1920/banner.png",
+      "type": "image",
+      "fileName": "banner.png",
+      "extension": "png",
+      "size": 3017906,
+      "hash": "3976b5b8a525a025c80de5b1db4b7b5521b7296a1442fe48c56fd093e2edd106",
+      "responsive": "per-breakpoint",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 0.9,
+      "needsManualReview": true,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-banner",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/banner/1920/banner.png",
+          "publicPath": "/assets/home/banner/1920/banner.png",
+          "fileName": "banner.png",
+          "size": 3017906,
+          "hash": "3976b5b8a525a025c80de5b1db4b7b5521b7296a1442fe48c56fd093e2edd106"
+        },
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/home/banner/768/banner.jpg",
+          "publicPath": "/assets/home/banner/768/banner.jpg",
+          "fileName": "banner.jpg",
+          "size": 667608,
+          "hash": "00179067306d835778d2a11ff9e3d9ce2ed700d29304e50dea636ce5380c888d"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 1920,
+        "height": 950
+      },
+      "constraints": {
+        "ratio": "192:95",
+        "recommendedWidth": 1920,
+        "recommendedHeight": 950,
+        "maxFileSize": 6035812,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Banner",
+        "description": "Section: home-banner · 2947 KB",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "banner"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/banner/1920/banner.png",
+          "public/assets/home/banner/768/banner.jpg"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-banner-logo-18",
+      "canonicalPath": "public/assets/home/banner/1920/logo-18.png",
+      "publicPath": "/assets/home/banner/1920/logo-18.png",
+      "type": "image",
+      "fileName": "logo-18.png",
+      "extension": "png",
+      "size": 17320,
+      "hash": "5e5da4bdbb9678e3ba03c0b968616bccdfac6e48dbb95d2b1fc06ff1bf645235",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/layout/Logo18.tsx",
+          "line": 10,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/banner/1920/logo-18.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/layout/Logo18.tsx",
+          "line": 16,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/banner/1920/logo-18.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/layout/Logo18.tsx",
+          "line": 21,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/banner/1920/logo-18.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 3,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-banner",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/banner/1920/logo-18.png",
+          "publicPath": "/assets/home/banner/1920/logo-18.png",
+          "fileName": "logo-18.png",
+          "size": 17320,
+          "hash": "5e5da4bdbb9678e3ba03c0b968616bccdfac6e48dbb95d2b1fc06ff1bf645235"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile",
+        "tablet"
+      ],
+      "dimensions": {
+        "width": 167,
+        "height": 100
+      },
+      "constraints": {
+        "ratio": "167:100",
+        "recommendedWidth": 167,
+        "recommendedHeight": 100,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Logo 18",
+        "description": "Section: home-banner · 17 KB · 3 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "logo"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/banner/1920/logo-18.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-banner-text-game",
+      "canonicalPath": "public/assets/home/banner/1920/text-game.png",
+      "publicPath": "/assets/home/banner/1920/text-game.png",
+      "type": "image",
+      "fileName": "text-game.png",
+      "extension": "png",
+      "size": 318439,
+      "hash": "a2017f8e8dcbc749051c30d574108cc20996e0c404624436b246c480c9f9f26a",
+      "responsive": "per-breakpoint",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 0.9,
+      "needsManualReview": true,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-banner",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/banner/1920/text-game.png",
+          "publicPath": "/assets/home/banner/1920/text-game.png",
+          "fileName": "text-game.png",
+          "size": 318439,
+          "hash": "a2017f8e8dcbc749051c30d574108cc20996e0c404624436b246c480c9f9f26a"
+        },
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/home/banner/768/text-game.png",
+          "publicPath": "/assets/home/banner/768/text-game.png",
+          "fileName": "text-game.png",
+          "size": 198809,
+          "hash": "25477f26d539dff06317de959070ca366ad1d85903ee35137faac760356123d6"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 985,
+        "height": 275
+      },
+      "constraints": {
+        "ratio": "197:55",
+        "recommendedWidth": 985,
+        "recommendedHeight": 275,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Text Game",
+        "description": "Section: home-banner · 311 KB",
+        "priority": "low",
+        "operatorEditable": true,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/banner/1920/text-game.png",
+          "public/assets/home/banner/768/text-game.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-banner",
+      "canonicalPath": "public/assets/home/news/1920/banner.png",
+      "publicPath": "/assets/home/news/1920/banner.png",
+      "type": "image",
+      "fileName": "banner.png",
+      "extension": "png",
+      "size": 12960,
+      "hash": "57a53c4a11a07b78178a2b8ecd70755012b55c7e493909452cc37146f9dcd4bf",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/News.tsx",
+          "line": 34,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/banner.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/news/News.tsx",
+          "line": 39,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/banner.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 2,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/home/news/768/banner.png",
+          "publicPath": "/assets/home/news/768/banner.png",
+          "fileName": "banner.png",
+          "size": 10060,
+          "hash": "2a91140822e28db4f95a248bd5a1ba958bcb04ad6f23cd91ab7e183a3bafb877"
+        },
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/banner.png",
+          "publicPath": "/assets/home/news/1920/banner.png",
+          "fileName": "banner.png",
+          "size": 12960,
+          "hash": "57a53c4a11a07b78178a2b8ecd70755012b55c7e493909452cc37146f9dcd4bf"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 1920,
+        "height": 1328
+      },
+      "constraints": {
+        "ratio": "120:83",
+        "recommendedWidth": 1920,
+        "recommendedHeight": 1328,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Banner",
+        "description": "Section: home-news · 13 KB · 2 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "banner"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/768/banner.png",
+          "public/assets/home/news/1920/banner.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-btn-cskh",
+      "canonicalPath": "public/assets/home/news/1920/btn-cskh.png",
+      "publicPath": "/assets/home/news/1920/btn-cskh.png",
+      "type": "image",
+      "fileName": "btn-cskh.png",
+      "extension": "png",
+      "size": 71784,
+      "hash": "d649611594eca2d405606892f54c55b51f20d761295bdf73acfecb117bb310dc",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/NewsActionButtons.tsx",
+          "line": 30,
+          "type": "template-literal",
+          "attribute": "image",
+          "assetPath": "${}/btn-cskh.png",
+          "usage": "{ image: ... }",
+          "confidence": 0.7
+        },
+        {
+          "file": "src/components/news/NewsActionButtons.tsx",
+          "line": 30,
+          "type": "template-literal",
+          "assetPath": "${}/btn-cskh.png",
+          "usage": "dynamic",
+          "confidence": 0.5
+        }
+      ],
+      "referenceCount": 2,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/home/news/768/btn-cskh.png",
+          "publicPath": "/assets/home/news/768/btn-cskh.png",
+          "fileName": "btn-cskh.png",
+          "size": 68580,
+          "hash": "a2fb586114396baadc2ea4aeca74c70865524d6c47eba6f093d53eb55ad30936"
+        },
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/btn-cskh.png",
+          "publicPath": "/assets/home/news/1920/btn-cskh.png",
+          "fileName": "btn-cskh.png",
+          "size": 71784,
+          "hash": "d649611594eca2d405606892f54c55b51f20d761295bdf73acfecb117bb310dc"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 325,
+        "height": 160
+      },
+      "constraints": {
+        "ratio": "65:32",
+        "recommendedWidth": 325,
+        "recommendedHeight": 160,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Cskh",
+        "description": "Section: home-news · 70 KB · 2 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/768/btn-cskh.png",
+          "public/assets/home/news/1920/btn-cskh.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-btn-fanpage",
+      "canonicalPath": "public/assets/home/news/1920/btn-fanpage.png",
+      "publicPath": "/assets/home/news/1920/btn-fanpage.png",
+      "type": "image",
+      "fileName": "btn-fanpage.png",
+      "extension": "png",
+      "size": 77883,
+      "hash": "d2213205880ce85f7d65a3b61f8c5d3025015ddd364dbb3b896290bbdae2e59f",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/NewsActionButtons.tsx",
+          "line": 25,
+          "type": "template-literal",
+          "attribute": "image",
+          "assetPath": "${}/btn-fanpage.png",
+          "usage": "{ image: ... }",
+          "confidence": 0.7
+        },
+        {
+          "file": "src/components/news/NewsActionButtons.tsx",
+          "line": 25,
+          "type": "template-literal",
+          "assetPath": "${}/btn-fanpage.png",
+          "usage": "dynamic",
+          "confidence": 0.5
+        }
+      ],
+      "referenceCount": 2,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/home/news/768/btn-fanpage.png",
+          "publicPath": "/assets/home/news/768/btn-fanpage.png",
+          "fileName": "btn-fanpage.png",
+          "size": 72691,
+          "hash": "dd040ef97bf2c4eb135b72fa0ee5864e8b7fb0b6f8b7fedab5c06c1a96f809e5"
+        },
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/btn-fanpage.png",
+          "publicPath": "/assets/home/news/1920/btn-fanpage.png",
+          "fileName": "btn-fanpage.png",
+          "size": 77883,
+          "hash": "d2213205880ce85f7d65a3b61f8c5d3025015ddd364dbb3b896290bbdae2e59f"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 325,
+        "height": 160
+      },
+      "constraints": {
+        "ratio": "65:32",
+        "recommendedWidth": 325,
+        "recommendedHeight": 160,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Fanpage",
+        "description": "Section: home-news · 76 KB · 2 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/768/btn-fanpage.png",
+          "public/assets/home/news/1920/btn-fanpage.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-btn-giftcode",
+      "canonicalPath": "public/assets/home/news/1920/btn-giftcode.png",
+      "publicPath": "/assets/home/news/1920/btn-giftcode.png",
+      "type": "image",
+      "fileName": "btn-giftcode.png",
+      "extension": "png",
+      "size": 68174,
+      "hash": "636e9a28ea60473e3192c42ece32f44fc0b60eaeb0c7fc3f94e90a67cdc12e5e",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/NewsActionButtons.tsx",
+          "line": 20,
+          "type": "template-literal",
+          "attribute": "image",
+          "assetPath": "${}/btn-giftcode.png",
+          "usage": "{ image: ... }",
+          "confidence": 0.7
+        },
+        {
+          "file": "src/components/news/NewsActionButtons.tsx",
+          "line": 20,
+          "type": "template-literal",
+          "assetPath": "${}/btn-giftcode.png",
+          "usage": "dynamic",
+          "confidence": 0.5
+        }
+      ],
+      "referenceCount": 2,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/home/news/768/btn-giftcode.png",
+          "publicPath": "/assets/home/news/768/btn-giftcode.png",
+          "fileName": "btn-giftcode.png",
+          "size": 65437,
+          "hash": "e90ded20e6ccfbc55e924d7d9c88bf68fc6760e75baf27ea9538a37af1ccf377"
+        },
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/btn-giftcode.png",
+          "publicPath": "/assets/home/news/1920/btn-giftcode.png",
+          "fileName": "btn-giftcode.png",
+          "size": 68174,
+          "hash": "636e9a28ea60473e3192c42ece32f44fc0b60eaeb0c7fc3f94e90a67cdc12e5e"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 325,
+        "height": 160
+      },
+      "constraints": {
+        "ratio": "65:32",
+        "recommendedWidth": 325,
+        "recommendedHeight": 160,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Giftcode",
+        "description": "Section: home-news · 67 KB · 2 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/768/btn-giftcode.png",
+          "public/assets/home/news/1920/btn-giftcode.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-btn-nap",
+      "canonicalPath": "public/assets/home/news/1920/btn-nap.png",
+      "publicPath": "/assets/home/news/1920/btn-nap.png",
+      "type": "image",
+      "fileName": "btn-nap.png",
+      "extension": "png",
+      "size": 71981,
+      "hash": "c452828c5b2ea7d214182f73d65105b3ef37108903648edefb96771d784e28a5",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/NewsActionButtons.tsx",
+          "line": 15,
+          "type": "template-literal",
+          "attribute": "image",
+          "assetPath": "${}/btn-nap.png",
+          "usage": "{ image: ... }",
+          "confidence": 0.7
+        },
+        {
+          "file": "src/components/news/NewsActionButtons.tsx",
+          "line": 15,
+          "type": "template-literal",
+          "assetPath": "${}/btn-nap.png",
+          "usage": "dynamic",
+          "confidence": 0.5
+        }
+      ],
+      "referenceCount": 2,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/home/news/768/btn-nap.png",
+          "publicPath": "/assets/home/news/768/btn-nap.png",
+          "fileName": "btn-nap.png",
+          "size": 67182,
+          "hash": "e9d83aa728437d6655abeb4d4287298549d6e58fba5e32677ade2c753439a5f1"
+        },
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/btn-nap.png",
+          "publicPath": "/assets/home/news/1920/btn-nap.png",
+          "fileName": "btn-nap.png",
+          "size": 71981,
+          "hash": "c452828c5b2ea7d214182f73d65105b3ef37108903648edefb96771d784e28a5"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 325,
+        "height": 160
+      },
+      "constraints": {
+        "ratio": "65:32",
+        "recommendedWidth": 325,
+        "recommendedHeight": 160,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Nap",
+        "description": "Section: home-news · 70 KB · 2 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/768/btn-nap.png",
+          "public/assets/home/news/1920/btn-nap.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-frame-right",
+      "canonicalPath": "public/assets/home/news/1920/frame-right.png",
+      "publicPath": "/assets/home/news/1920/frame-right.png",
+      "type": "image",
+      "fileName": "frame-right.png",
+      "extension": "png",
+      "size": 3268,
+      "hash": "f462290154fe71b6b991af021ee5dd56d81354cb39fb0caba862365bd9a6b1bb",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/NewsDesktop.tsx",
+          "line": 66,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/frame-right.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.9,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/home/news/768/frame-right.png",
+          "publicPath": "/assets/home/news/768/frame-right.png",
+          "fileName": "frame-right.png",
+          "size": 3607,
+          "hash": "d89f8d406f71efe46ab727d99c1f8ec3d613d2e5e697dd43fa2d072bba3f6628"
+        },
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/frame-right.png",
+          "publicPath": "/assets/home/news/1920/frame-right.png",
+          "fileName": "frame-right.png",
+          "size": 3268,
+          "hash": "f462290154fe71b6b991af021ee5dd56d81354cb39fb0caba862365bd9a6b1bb"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 564,
+        "height": 450
+      },
+      "constraints": {
+        "ratio": "94:75",
+        "recommendedWidth": 564,
+        "recommendedHeight": 450,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Frame Right",
+        "description": "Section: home-news · 3 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "frame"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/768/frame-right.png",
+          "public/assets/home/news/1920/frame-right.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-frame",
+      "canonicalPath": "public/assets/home/news/1920/frame.png",
+      "publicPath": "/assets/home/news/1920/frame.png",
+      "type": "image",
+      "fileName": "frame.png",
+      "extension": "png",
+      "size": 5248,
+      "hash": "1dc121fd44faf8c7a88a27bbdd3da3fe1d23748d37e6f4eaef9e2fd7c99a7821",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/NewsDesktop.tsx",
+          "line": 38,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/frame.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/news/NewsDesktop.tsx",
+          "line": 43,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/frame.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 2,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/home/news/768/frame.png",
+          "publicPath": "/assets/home/news/768/frame.png",
+          "fileName": "frame.png",
+          "size": 228562,
+          "hash": "ba955566b94485aca22a98251828e3e94a17d230751d2a36ff45528d237857f6"
+        },
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/frame.png",
+          "publicPath": "/assets/home/news/1920/frame.png",
+          "fileName": "frame.png",
+          "size": 5248,
+          "hash": "1dc121fd44faf8c7a88a27bbdd3da3fe1d23748d37e6f4eaef9e2fd7c99a7821"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 1920,
+        "height": 480
+      },
+      "constraints": {
+        "ratio": "4:1",
+        "recommendedWidth": 1920,
+        "recommendedHeight": 480,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Frame",
+        "description": "Section: home-news · 5 KB · 2 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "frame"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/768/frame.png",
+          "public/assets/home/news/1920/frame.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-android",
+      "canonicalPath": "public/assets/home/news/1920/android.png",
+      "publicPath": "/assets/home/news/1920/android.png",
+      "type": "image",
+      "fileName": "android.png",
+      "extension": "png",
+      "size": 3370,
+      "hash": "5cac82b3c6740e219f46bf487a09c9ed6cbeeaf2e50c9dda92889368b5844f6f",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/NewsDownloadPanel.tsx",
+          "line": 76,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/android.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/tintuc/Contents.tsx",
+          "line": 149,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/android.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/tintuc/Detail.tsx",
+          "line": 151,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/android.png",
+          "usage": "jsx",
+          "confidence": 1
+        }
+      ],
+      "referenceCount": 3,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/android.png",
+          "publicPath": "/assets/home/news/1920/android.png",
+          "fileName": "android.png",
+          "size": 3370,
+          "hash": "5cac82b3c6740e219f46bf487a09c9ed6cbeeaf2e50c9dda92889368b5844f6f"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile",
+        "tablet"
+      ],
+      "dimensions": {
+        "width": 94,
+        "height": 100
+      },
+      "constraints": {
+        "ratio": "47:50",
+        "recommendedWidth": 94,
+        "recommendedHeight": 100,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Android",
+        "description": "Section: home-news · 3 KB · 3 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/1920/android.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-apk",
+      "canonicalPath": "public/assets/home/news/1920/apk.png",
+      "publicPath": "/assets/home/news/1920/apk.png",
+      "type": "image",
+      "fileName": "apk.png",
+      "extension": "png",
+      "size": 3138,
+      "hash": "03501514da539c90c44b56033c9c74c7dc563963c6bfd64a7da1fd9e29d588e3",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/NewsDownloadPanel.tsx",
+          "line": 92,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/apk.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/tintuc/Contents.tsx",
+          "line": 161,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/apk.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/tintuc/Detail.tsx",
+          "line": 163,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/apk.png",
+          "usage": "jsx",
+          "confidence": 1
+        }
+      ],
+      "referenceCount": 3,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/apk.png",
+          "publicPath": "/assets/home/news/1920/apk.png",
+          "fileName": "apk.png",
+          "size": 3138,
+          "hash": "03501514da539c90c44b56033c9c74c7dc563963c6bfd64a7da1fd9e29d588e3"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile",
+        "tablet"
+      ],
+      "dimensions": {
+        "width": 94,
+        "height": 88
+      },
+      "constraints": {
+        "ratio": "47:44",
+        "recommendedWidth": 94,
+        "recommendedHeight": 88,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Apk",
+        "description": "Section: home-news · 3 KB · 3 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/1920/apk.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-btn-next",
+      "canonicalPath": "public/assets/home/news/1920/btn-next.png",
+      "publicPath": "/assets/home/news/1920/btn-next.png",
+      "type": "image",
+      "fileName": "btn-next.png",
+      "extension": "png",
+      "size": 8326,
+      "hash": "13e35fcb7499da6e569db6e866adb2cde906c9556b3d3c3c9a2ef48c1dcc4b6e",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/SliderPC.tsx",
+          "line": 101,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/btn-next.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.9,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/btn-next.png",
+          "publicPath": "/assets/home/news/1920/btn-next.png",
+          "fileName": "btn-next.png",
+          "size": 8326,
+          "hash": "13e35fcb7499da6e569db6e866adb2cde906c9556b3d3c3c9a2ef48c1dcc4b6e"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile",
+        "tablet"
+      ],
+      "dimensions": {
+        "width": 102,
+        "height": 76
+      },
+      "constraints": {
+        "ratio": "51:38",
+        "recommendedWidth": 102,
+        "recommendedHeight": 76,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Next",
+        "description": "Section: home-news · 8 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/1920/btn-next.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-btn-prev",
+      "canonicalPath": "public/assets/home/news/1920/btn-prev.png",
+      "publicPath": "/assets/home/news/1920/btn-prev.png",
+      "type": "image",
+      "fileName": "btn-prev.png",
+      "extension": "png",
+      "size": 8307,
+      "hash": "abb2d45c9b4dc7d4d599a47d7b92b22543c3296e2197afad89c9ed27a3de7cd2",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/SliderPC.tsx",
+          "line": 84,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/btn-prev.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.9,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/btn-prev.png",
+          "publicPath": "/assets/home/news/1920/btn-prev.png",
+          "fileName": "btn-prev.png",
+          "size": 8307,
+          "hash": "abb2d45c9b4dc7d4d599a47d7b92b22543c3296e2197afad89c9ed27a3de7cd2"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile",
+        "tablet"
+      ],
+      "dimensions": {
+        "width": 102,
+        "height": 76
+      },
+      "constraints": {
+        "ratio": "51:38",
+        "recommendedWidth": 102,
+        "recommendedHeight": 76,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Prev",
+        "description": "Section: home-news · 8 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/1920/btn-prev.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-frame-middle",
+      "canonicalPath": "public/assets/home/news/1920/frame-middle.png",
+      "publicPath": "/assets/home/news/1920/frame-middle.png",
+      "type": "image",
+      "fileName": "frame-middle.png",
+      "extension": "png",
+      "size": 2159,
+      "hash": "f3e769acbddbac3ef05aec7616c32a8b0ae9cfb71331374b6f9512f66398ede1",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/NewsDownloadPanel.tsx",
+          "line": 23,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/frame-middle.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/tintuc/Contents.tsx",
+          "line": 107,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/frame-middle.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/tintuc/Detail.tsx",
+          "line": 109,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/frame-middle.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 3,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/frame-middle.png",
+          "publicPath": "/assets/home/news/1920/frame-middle.png",
+          "fileName": "frame-middle.png",
+          "size": 2159,
+          "hash": "f3e769acbddbac3ef05aec7616c32a8b0ae9cfb71331374b6f9512f66398ede1"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile",
+        "tablet"
+      ],
+      "dimensions": {
+        "width": 250,
+        "height": 459
+      },
+      "constraints": {
+        "ratio": "250:459",
+        "recommendedWidth": 250,
+        "recommendedHeight": 459,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Frame Middle",
+        "description": "Section: home-news · 2 KB · 3 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "frame"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/1920/frame-middle.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-icon-app",
+      "canonicalPath": "public/assets/home/news/1920/icon-app.png",
+      "publicPath": "/assets/home/news/1920/icon-app.png",
+      "type": "image",
+      "fileName": "icon-app.png",
+      "extension": "png",
+      "size": 664257,
+      "hash": "a1db66e881267dd6e29e4bec24c3437e06f01fa9dfca05047f3496f51895a456",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/layout/FloatHome.tsx",
+          "line": 27,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/icon-app.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/news/NewsDownloadPanel.tsx",
+          "line": 33,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/icon-app.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/news/NewsDownloadPanel.tsx",
+          "line": 41,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/icon-app.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/tintuc/Contents.tsx",
+          "line": 115,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/icon-app.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/tintuc/Contents.tsx",
+          "line": 122,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/icon-app.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/tintuc/Detail.tsx",
+          "line": 117,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/icon-app.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/tintuc/Detail.tsx",
+          "line": 124,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/icon-app.png",
+          "usage": "jsx",
+          "confidence": 1
+        }
+      ],
+      "referenceCount": 7,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/icon-app.png",
+          "publicPath": "/assets/home/news/1920/icon-app.png",
+          "fileName": "icon-app.png",
+          "size": 664257,
+          "hash": "a1db66e881267dd6e29e4bec24c3437e06f01fa9dfca05047f3496f51895a456"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile",
+        "tablet"
+      ],
+      "dimensions": {
+        "width": 512,
+        "height": 512
+      },
+      "constraints": {
+        "ratio": "1:1",
+        "recommendedWidth": 512,
+        "recommendedHeight": 512,
+        "maxFileSize": 1328514,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Icon App",
+        "description": "Section: home-news · 649 KB · 7 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "icon"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/1920/icon-app.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-ios",
+      "canonicalPath": "public/assets/home/news/1920/ios.png",
+      "publicPath": "/assets/home/news/1920/ios.png",
+      "type": "image",
+      "fileName": "ios.png",
+      "extension": "png",
+      "size": 2862,
+      "hash": "aab6ef7bfdd0fd6c1e2cd471708a77ca07b05ee48046cb198e8f0be34745a381",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/NewsDownloadPanel.tsx",
+          "line": 58,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/ios.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/tintuc/Contents.tsx",
+          "line": 137,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/ios.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/tintuc/Detail.tsx",
+          "line": 139,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/ios.png",
+          "usage": "jsx",
+          "confidence": 1
+        }
+      ],
+      "referenceCount": 3,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/ios.png",
+          "publicPath": "/assets/home/news/1920/ios.png",
+          "fileName": "ios.png",
+          "size": 2862,
+          "hash": "aab6ef7bfdd0fd6c1e2cd471708a77ca07b05ee48046cb198e8f0be34745a381"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile",
+        "tablet"
+      ],
+      "dimensions": {
+        "width": 94,
+        "height": 99
+      },
+      "constraints": {
+        "ratio": "94:99",
+        "recommendedWidth": 94,
+        "recommendedHeight": 99,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Ios",
+        "description": "Section: home-news · 3 KB · 3 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/1920/ios.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-note",
+      "canonicalPath": "public/assets/home/news/1920/note.png",
+      "publicPath": "/assets/home/news/1920/note.png",
+      "type": "image",
+      "fileName": "note.png",
+      "extension": "png",
+      "size": 1392,
+      "hash": "5b1f19ba6e2d68078b600aee2c27accd19e4c67ac7b048f65ce76356ee9adb83",
+      "responsive": "per-breakpoint",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 0.9,
+      "needsManualReview": true,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/note.png",
+          "publicPath": "/assets/home/news/1920/note.png",
+          "fileName": "note.png",
+          "size": 1392,
+          "hash": "5b1f19ba6e2d68078b600aee2c27accd19e4c67ac7b048f65ce76356ee9adb83"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile",
+        "tablet"
+      ],
+      "dimensions": {
+        "width": 26,
+        "height": 26
+      },
+      "constraints": {
+        "ratio": "1:1",
+        "recommendedWidth": 26,
+        "recommendedHeight": 26,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Note",
+        "description": "Section: home-news · 1 KB",
+        "priority": "low",
+        "operatorEditable": true,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/1920/note.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-pc",
+      "canonicalPath": "public/assets/home/news/1920/pc.png",
+      "publicPath": "/assets/home/news/1920/pc.png",
+      "type": "image",
+      "fileName": "pc.png",
+      "extension": "png",
+      "size": 1688,
+      "hash": "ae2d073d8a2a5f301fea25911a57fbed7ce3e918361a46ce5aebbfedeaf6c7d2",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/news/NewsDownloadPanel.tsx",
+          "line": 108,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/news/1920/pc.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/tintuc/Contents.tsx",
+          "line": 173,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/pc.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/tintuc/Detail.tsx",
+          "line": 175,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/news/1920/pc.png",
+          "usage": "jsx",
+          "confidence": 1
+        }
+      ],
+      "referenceCount": 3,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/pc.png",
+          "publicPath": "/assets/home/news/1920/pc.png",
+          "fileName": "pc.png",
+          "size": 1688,
+          "hash": "ae2d073d8a2a5f301fea25911a57fbed7ce3e918361a46ce5aebbfedeaf6c7d2"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile",
+        "tablet"
+      ],
+      "dimensions": {
+        "width": 94,
+        "height": 80
+      },
+      "constraints": {
+        "ratio": "47:40",
+        "recommendedWidth": 94,
+        "recommendedHeight": 80,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Pc",
+        "description": "Section: home-news · 2 KB · 3 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/1920/pc.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-news-slide",
+      "canonicalPath": "public/assets/home/news/1920/slide.png",
+      "publicPath": "/assets/home/news/1920/slide.png",
+      "type": "image",
+      "fileName": "slide.png",
+      "extension": "png",
+      "size": 300458,
+      "hash": "34e92c1bdd432cf7365b7aff7c36b453ddd2cb0567cd629f85620d59ba7c4570",
+      "responsive": "per-breakpoint",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 0.9,
+      "needsManualReview": true,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-news",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/news/1920/slide.png",
+          "publicPath": "/assets/home/news/1920/slide.png",
+          "fileName": "slide.png",
+          "size": 300458,
+          "hash": "34e92c1bdd432cf7365b7aff7c36b453ddd2cb0567cd629f85620d59ba7c4570"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile",
+        "tablet"
+      ],
+      "dimensions": {
+        "width": 410,
+        "height": 375
+      },
+      "constraints": {
+        "ratio": "82:75",
+        "recommendedWidth": 410,
+        "recommendedHeight": 375,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Slide",
+        "description": "Section: home-news · 293 KB",
+        "priority": "low",
+        "operatorEditable": true,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/news/1920/slide.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.assets-home-rank-bg-rank",
+      "canonicalPath": "public/assets/home/rank/1920/bg-rank.png",
+      "publicPath": "/assets/home/rank/1920/bg-rank.png",
+      "type": "image",
+      "fileName": "bg-rank.png",
+      "extension": "png",
+      "size": 621638,
+      "hash": "00727fb501484a33c8016638fedc4633514f6f4b5fbaa7c99ecd2e976880d1b0",
+      "responsive": "per-breakpoint",
+      "references": [
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 111,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/rank/1920/bg-rank.png",
+          "usage": "jsx",
+          "confidence": 1
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.9,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-rank",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "variants": {
+        "desktop": {
+          "breakpoint": "desktop",
+          "path": "public/assets/home/rank/1920/bg-rank.png",
+          "publicPath": "/assets/home/rank/1920/bg-rank.png",
+          "fileName": "bg-rank.png",
+          "size": 621638,
+          "hash": "00727fb501484a33c8016638fedc4633514f6f4b5fbaa7c99ecd2e976880d1b0"
+        },
+        "tablet": {
+          "breakpoint": "tablet",
+          "path": "public/assets/home/rank/768/bg-rank.png",
+          "publicPath": "/assets/home/rank/768/bg-rank.png",
+          "fileName": "bg-rank.png",
+          "size": 73435,
+          "hash": "1c078b9aebe69c42bc87dfaebe7407802516f8da10627974663581ed2e2f9677"
+        }
+      },
+      "missingBreakpoints": [
+        "mobile"
+      ],
+      "dimensions": {
+        "width": 1205,
+        "height": 837
+      },
+      "constraints": {
+        "ratio": "1205:837",
+        "recommendedWidth": 1205,
+        "recommendedHeight": 837,
+        "maxFileSize": 1243276,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Bg Rank",
+        "description": "Section: home-rank · 607 KB · 1 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "background"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/rank/1920/bg-rank.png",
+          "public/assets/home/rank/768/bg-rank.png"
+        ],
+        "postProcess": [
+          "resize",
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.vite",
+      "canonicalPath": "public/vite.svg",
+      "publicPath": "/vite.svg",
+      "type": "image",
+      "fileName": "vite.svg",
+      "extension": "svg",
+      "size": 1497,
+      "hash": "4a748afd443918bb16591c834c401dae33e87861ab5dbad0811c3a3b4a9214fb",
+      "responsive": "shared",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "favicon",
+      "isAutoManaged": true,
+      "isExternal": false,
+      "constraints": {
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "svg",
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Vite",
+        "description": "Section: favicon · 1 KB",
+        "priority": "low",
+        "operatorEditable": false,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/vite.svg"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.android-chrome-192x192",
+      "canonicalPath": "public/favicon/android-chrome-192x192.png",
+      "publicPath": "/favicon/android-chrome-192x192.png",
+      "type": "image",
+      "fileName": "android-chrome-192x192.png",
+      "extension": "png",
+      "size": 99638,
+      "hash": "b556508f658d40082dc0995be0038ac96f28be86dd3b6665a82ad3a42508a50c",
+      "responsive": "shared",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "favicon",
+      "isAutoManaged": true,
+      "isExternal": false,
+      "constraints": {
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Android Chrome 192x192",
+        "description": "Section: favicon · 97 KB",
+        "priority": "low",
+        "operatorEditable": false,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/favicon/android-chrome-192x192.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.android-chrome-512x512",
+      "canonicalPath": "public/favicon/android-chrome-512x512.png",
+      "publicPath": "/favicon/android-chrome-512x512.png",
+      "type": "image",
+      "fileName": "android-chrome-512x512.png",
+      "extension": "png",
+      "size": 664257,
+      "hash": "a1db66e881267dd6e29e4bec24c3437e06f01fa9dfca05047f3496f51895a456",
+      "responsive": "shared",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "favicon",
+      "isAutoManaged": true,
+      "isExternal": false,
+      "constraints": {
+        "maxFileSize": 1328514,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Android Chrome 512x512",
+        "description": "Section: favicon · 649 KB",
+        "priority": "high",
+        "operatorEditable": false,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/favicon/android-chrome-512x512.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.apple-touch-icon",
+      "canonicalPath": "public/favicon/apple-touch-icon.png",
+      "publicPath": "/favicon/apple-touch-icon.png",
+      "type": "image",
+      "fileName": "apple-touch-icon.png",
+      "extension": "png",
+      "size": 87951,
+      "hash": "d81ec001bc64dec65f0d7644c0469155147d0f3d005f33d880edf48b5c608c21",
+      "responsive": "shared",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "favicon",
+      "isAutoManaged": true,
+      "isExternal": false,
+      "constraints": {
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Apple Touch Icon",
+        "description": "Section: favicon · 86 KB",
+        "priority": "low",
+        "operatorEditable": false,
+        "group": "icon"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/favicon/apple-touch-icon.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.favicon-16x16",
+      "canonicalPath": "public/favicon/favicon-16x16.png",
+      "publicPath": "/favicon/favicon-16x16.png",
+      "type": "image",
+      "fileName": "favicon-16x16.png",
+      "extension": "png",
+      "size": 2786,
+      "hash": "6ee550cb0c8d77adab927694dcfc2f205bdfa2d66393a6691d5e42b48f9755cc",
+      "responsive": "shared",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "favicon",
+      "isAutoManaged": true,
+      "isExternal": false,
+      "constraints": {
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Favicon 16x16",
+        "description": "Section: favicon · 3 KB",
+        "priority": "low",
+        "operatorEditable": false,
+        "group": "icon"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/favicon/favicon-16x16.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.favicon-32x32",
+      "canonicalPath": "public/favicon/favicon-32x32.png",
+      "publicPath": "/favicon/favicon-32x32.png",
+      "type": "image",
+      "fileName": "favicon-32x32.png",
+      "extension": "png",
+      "size": 5136,
+      "hash": "1e7b0f6794a45d906613edf62c94878877d32ccfe2bb7c75353fa0e3f49b2b38",
+      "responsive": "shared",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "favicon",
+      "isAutoManaged": true,
+      "isExternal": false,
+      "constraints": {
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Favicon 32x32",
+        "description": "Section: favicon · 5 KB",
+        "priority": "low",
+        "operatorEditable": false,
+        "group": "icon"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/favicon/favicon-32x32.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.favicon",
+      "canonicalPath": "public/favicon/favicon.ico",
+      "publicPath": "/favicon/favicon.ico",
+      "type": "image",
+      "fileName": "favicon.ico",
+      "extension": "ico",
+      "size": 8829,
+      "hash": "eaec99f5fa1f0b48278d5ac5d601d6dd4127636b8ddcbba7dfec7a79283b3adb",
+      "responsive": "shared",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "favicon",
+      "isAutoManaged": true,
+      "isExternal": false,
+      "constraints": {
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": false
+      },
+      "metadata": {
+        "label": "Favicon",
+        "description": "Section: favicon · 9 KB",
+        "priority": "low",
+        "operatorEditable": false,
+        "group": "icon"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/favicon/favicon.ico"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.btn-apk",
+      "canonicalPath": "public/assets/float-home/btn-apk.png",
+      "publicPath": "/assets/float-home/btn-apk.png",
+      "type": "image",
+      "fileName": "btn-apk.png",
+      "extension": "png",
+      "size": 2732,
+      "hash": "514896087206446b27708a6bce4e7b2c0f549f84a497e2385ec4c61b808626de",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/layout/FloatHome.tsx",
+          "line": 75,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/float-home/btn-apk.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.8,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "float-home",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 123,
+        "height": 38
+      },
+      "constraints": {
+        "ratio": "123:38",
+        "recommendedWidth": 123,
+        "recommendedHeight": 38,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Apk",
+        "description": "Section: float-home · 3 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/float-home/btn-apk.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.btn-bxh",
+      "canonicalPath": "public/assets/float-home/btn-bxh.png",
+      "publicPath": "/assets/float-home/btn-bxh.png",
+      "type": "image",
+      "fileName": "btn-bxh.png",
+      "extension": "png",
+      "size": 66207,
+      "hash": "39afc80a3f64ad6dacff5bec8e8f111be2a4352dabb5cb6df7f97b5e35f7a2fc",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/layout/FloatBxh.tsx",
+          "line": 10,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/float-home/btn-bxh.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.8,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "float-home",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 159,
+        "height": 244
+      },
+      "constraints": {
+        "ratio": "159:244",
+        "recommendedWidth": 159,
+        "recommendedHeight": 244,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Bxh",
+        "description": "Section: float-home · 65 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/float-home/btn-bxh.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.btn-fanpage",
+      "canonicalPath": "public/assets/float-home/btn-fanpage.png",
+      "publicPath": "/assets/float-home/btn-fanpage.png",
+      "type": "image",
+      "fileName": "btn-fanpage.png",
+      "extension": "png",
+      "size": 8983,
+      "hash": "e6430dd9ee7ad1eb88a14c27252245ed101ebefc5fa7b098dc9b318c3fbfac29",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/layout/FloatHome.tsx",
+          "line": 105,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/float-home/btn-fanpage.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/news/NewsActionButtons.tsx",
+          "line": 25,
+          "type": "template-literal",
+          "attribute": "image",
+          "assetPath": "${}/btn-fanpage.png",
+          "usage": "{ image: ... }",
+          "confidence": 0.7
+        },
+        {
+          "file": "src/components/news/NewsActionButtons.tsx",
+          "line": 25,
+          "type": "template-literal",
+          "assetPath": "${}/btn-fanpage.png",
+          "usage": "dynamic",
+          "confidence": 0.5
+        }
+      ],
+      "referenceCount": 3,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "float-home",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 124,
+        "height": 39
+      },
+      "constraints": {
+        "ratio": "124:39",
+        "recommendedWidth": 124,
+        "recommendedHeight": 39,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Fanpage",
+        "description": "Section: float-home · 9 KB · 3 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/float-home/btn-fanpage.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.btn-ggplay",
+      "canonicalPath": "public/assets/float-home/btn-ggplay.png",
+      "publicPath": "/assets/float-home/btn-ggplay.png",
+      "type": "image",
+      "fileName": "btn-ggplay.png",
+      "extension": "png",
+      "size": 2945,
+      "hash": "fad537c5015dd68de6e8a98854bce5c803715e331aa60da33d8af909c05552d8",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/layout/FloatHome.tsx",
+          "line": 59,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/float-home/btn-ggplay.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.8,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "float-home",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 123,
+        "height": 38
+      },
+      "constraints": {
+        "ratio": "123:38",
+        "recommendedWidth": 123,
+        "recommendedHeight": 38,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Ggplay",
+        "description": "Section: float-home · 3 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/float-home/btn-ggplay.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.btn-group",
+      "canonicalPath": "public/assets/float-home/btn-group.png",
+      "publicPath": "/assets/float-home/btn-group.png",
+      "type": "image",
+      "fileName": "btn-group.png",
+      "extension": "png",
+      "size": 8808,
+      "hash": "882501ce92c1ebb0047b384800101f5f96b6822fdba3b6ab64c2fbe3e57d62e8",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/layout/FloatHome.tsx",
+          "line": 120,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/float-home/btn-group.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.8,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "float-home",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 124,
+        "height": 39
+      },
+      "constraints": {
+        "ratio": "124:39",
+        "recommendedWidth": 124,
+        "recommendedHeight": 39,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Group",
+        "description": "Section: float-home · 9 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/float-home/btn-group.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.btn-pc",
+      "canonicalPath": "public/assets/float-home/btn-pc.png",
+      "publicPath": "/assets/float-home/btn-pc.png",
+      "type": "image",
+      "fileName": "btn-pc.png",
+      "extension": "png",
+      "size": 1825,
+      "hash": "f93aba5d63825d421cbb929d46b6b07e5e98c4f5ebc03a9fd4c2da761b0f9bb5",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/layout/FloatHome.tsx",
+          "line": 91,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/float-home/btn-pc.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.8,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "float-home",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 125,
+        "height": 38
+      },
+      "constraints": {
+        "ratio": "125:38",
+        "recommendedWidth": 125,
+        "recommendedHeight": 38,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Pc",
+        "description": "Section: float-home · 2 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/float-home/btn-pc.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.btn-store",
+      "canonicalPath": "public/assets/float-home/btn-store.png",
+      "publicPath": "/assets/float-home/btn-store.png",
+      "type": "image",
+      "fileName": "btn-store.png",
+      "extension": "png",
+      "size": 2653,
+      "hash": "ded6268e93ff58efae0e51d7049f7c5aec176da37dd774eaa0023c9a0c903e16",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/layout/FloatHome.tsx",
+          "line": 41,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/float-home/btn-store.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.8,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "float-home",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 123,
+        "height": 38
+      },
+      "constraints": {
+        "ratio": "123:38",
+        "recommendedWidth": 123,
+        "recommendedHeight": 38,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Store",
+        "description": "Section: float-home · 3 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/float-home/btn-store.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.float-bg",
+      "canonicalPath": "public/assets/float-home/float-bg.png",
+      "publicPath": "/assets/float-home/float-bg.png",
+      "type": "image",
+      "fileName": "float-bg.png",
+      "extension": "png",
+      "size": 62796,
+      "hash": "ac51daf16035c256414b8c73a6e31300df3fb7b2de94c7c6be7487ee65ae1981",
+      "responsive": "shared",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 0.5,
+      "needsManualReview": true,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "float-home",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 155,
+        "height": 349
+      },
+      "constraints": {
+        "ratio": "155:349",
+        "recommendedWidth": 155,
+        "recommendedHeight": 349,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Float Bg",
+        "description": "Section: float-home · 61 KB",
+        "priority": "low",
+        "operatorEditable": true,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/float-home/float-bg.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.float-right",
+      "canonicalPath": "public/assets/float-home/float-right.png",
+      "publicPath": "/assets/float-home/float-right.png",
+      "type": "image",
+      "fileName": "float-right.png",
+      "extension": "png",
+      "size": 82063,
+      "hash": "228ab6f1c64a10bee00d46a4071efd446f5f66940d88c7e530fdc048960d3d94",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/layout/FloatHome.tsx",
+          "line": 18,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/float-home/float-right.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.8,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "float-home",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 168,
+        "height": 640
+      },
+      "constraints": {
+        "ratio": "21:80",
+        "recommendedWidth": 168,
+        "recommendedHeight": 640,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Float Right",
+        "description": "Section: float-home · 80 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/float-home/float-right.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.nap",
+      "canonicalPath": "public/assets/float-home/nap.png",
+      "publicPath": "/assets/float-home/nap.png",
+      "type": "image",
+      "fileName": "nap.png",
+      "extension": "png",
+      "size": 11654,
+      "hash": "6fad440d63cbbfb3e95cea531d64972822c51bc2a8fda71f48184a04ce6a1a0c",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/layout/FloatHome.tsx",
+          "line": 137,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/float-home/nap.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/layout/FloatHome.tsx",
+          "line": 147,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/float-home/nap.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 2,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "float-home",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 150,
+        "height": 49
+      },
+      "constraints": {
+        "ratio": "150:49",
+        "recommendedWidth": 150,
+        "recommendedHeight": 49,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Nap",
+        "description": "Section: float-home · 11 KB · 2 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/float-home/nap.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.qr-code",
+      "canonicalPath": "public/assets/float-home/qr-code.png",
+      "publicPath": "/assets/float-home/qr-code.png",
+      "type": "image",
+      "fileName": "qr-code.png",
+      "extension": "png",
+      "size": 12356,
+      "hash": "4dcf705e59a53ae74d5eb12a2641c12287607a6b2ad71424245249f4c0fd8a76",
+      "responsive": "shared",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 0.5,
+      "needsManualReview": true,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "float-home",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 100,
+        "height": 100
+      },
+      "constraints": {
+        "ratio": "1:1",
+        "recommendedWidth": 100,
+        "recommendedHeight": 100,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Qr Code",
+        "description": "Section: float-home · 12 KB",
+        "priority": "low",
+        "operatorEditable": true,
+        "group": "other"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/float-home/qr-code.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.btn-download",
+      "canonicalPath": "public/assets/header/btn-download.png",
+      "publicPath": "/assets/header/btn-download.png",
+      "type": "image",
+      "fileName": "btn-download.png",
+      "extension": "png",
+      "size": 24090,
+      "hash": "9a69f3a85be531a330af87c14f94e604d35c5a9e9643efec5749453498446829",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/layout/HeaderHome.tsx",
+          "line": 62,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/header/btn-download.png",
+          "usage": "jsx",
+          "confidence": 1
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.8,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "header",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 220,
+        "height": 70
+      },
+      "constraints": {
+        "ratio": "22:7",
+        "recommendedWidth": 220,
+        "recommendedHeight": 70,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Btn Download",
+        "description": "Section: header · 24 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "button"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/header/btn-download.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.logo-game",
+      "canonicalPath": "public/assets/header/logo-game.png",
+      "publicPath": "/assets/header/logo-game.png",
+      "type": "image",
+      "fileName": "logo-game.png",
+      "extension": "png",
+      "size": 664257,
+      "hash": "a1db66e881267dd6e29e4bec24c3437e06f01fa9dfca05047f3496f51895a456",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/layout/HeaderHome.tsx",
+          "line": 40,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/header/logo-game.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/layout/HeaderHome.tsx",
+          "line": 45,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/header/logo-game.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/layout/HeaderHome.tsx",
+          "line": 113,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/header/logo-game.png",
+          "usage": "jsx",
+          "confidence": 1
+        }
+      ],
+      "referenceCount": 3,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "header",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 512,
+        "height": 512
+      },
+      "constraints": {
+        "ratio": "1:1",
+        "recommendedWidth": 512,
+        "recommendedHeight": 512,
+        "maxFileSize": 1328514,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Logo Game",
+        "description": "Section: header · 649 KB · 3 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "logo"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/header/logo-game.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.apple-touch-icon",
+      "canonicalPath": "public/assets/tintuc/apple-touch-icon.png",
+      "publicPath": "/assets/tintuc/apple-touch-icon.png",
+      "type": "image",
+      "fileName": "apple-touch-icon.png",
+      "extension": "png",
+      "size": 89144,
+      "hash": "a400426a889dc9ac8cf70a06b4e04c60bb96b16a53f9771143dc3cdfb7875ff1",
+      "responsive": "shared",
+      "references": [],
+      "referenceCount": 0,
+      "detectedBy": [
+        "filesystem"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "favicon",
+      "isAutoManaged": true,
+      "isExternal": false,
+      "constraints": {
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Apple Touch Icon",
+        "description": "Section: favicon · 87 KB",
+        "priority": "low",
+        "operatorEditable": false,
+        "group": "icon"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/tintuc/apple-touch-icon.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.logo-game",
+      "canonicalPath": "public/assets/home/banner/logo-game.png",
+      "publicPath": "/assets/home/banner/logo-game.png",
+      "type": "image",
+      "fileName": "logo-game.png",
+      "extension": "png",
+      "size": 41563,
+      "hash": "23fd954805ef844e24298c79dc7f7a5b9f1f645d509c9aead4ceb84e06bf08da",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/components/home/Banner.tsx",
+          "line": 48,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/banner/logo-game.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/home/Banner.tsx",
+          "line": 54,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/banner/logo-game.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        },
+        {
+          "file": "src/components/home/Banner.tsx",
+          "line": 59,
+          "type": "jsx-attr",
+          "attribute": "path",
+          "assetPath": "/assets/home/banner/logo-game.png",
+          "usage": "{ path: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 3,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-banner",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 237,
+        "height": 152
+      },
+      "constraints": {
+        "ratio": "237:152",
+        "recommendedWidth": 237,
+        "recommendedHeight": 152,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Logo Game",
+        "description": "Section: home-banner · 41 KB · 3 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "logo"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/banner/logo-game.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.all",
+      "canonicalPath": "public/assets/home/rank/all.png",
+      "publicPath": "/assets/home/rank/all.png",
+      "type": "image",
+      "fileName": "all.png",
+      "extension": "png",
+      "size": 95765,
+      "hash": "809554df7385b598e0c92e535706c26dc43887c023404b5496f58c4d3f4e25a9",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 41,
+          "type": "jsx-attr",
+          "attribute": "image",
+          "assetPath": "/assets/home/rank/all.png",
+          "usage": "{ image: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.8,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-rank",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 564,
+        "height": 122
+      },
+      "constraints": {
+        "ratio": "282:61",
+        "recommendedWidth": 564,
+        "recommendedHeight": 122,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "All",
+        "description": "Section: home-rank · 94 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "rank"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/rank/all.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.custom",
+      "canonicalPath": "public/assets/home/rank/custom.png",
+      "publicPath": "/assets/home/rank/custom.png",
+      "type": "image",
+      "fileName": "custom.png",
+      "extension": "png",
+      "size": 95345,
+      "hash": "72d70ed821707acca07944bfa6078ba142ba533cc41158c1b0228d4e330b14ba",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 46,
+          "type": "jsx-attr",
+          "attribute": "image",
+          "assetPath": "/assets/home/rank/custom.png",
+          "usage": "{ image: ... }",
+          "confidence": 0.9
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 0.8,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-rank",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 564,
+        "height": 122
+      },
+      "constraints": {
+        "ratio": "282:61",
+        "recommendedWidth": 564,
+        "recommendedHeight": 122,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Custom",
+        "description": "Section: home-rank · 93 KB · 1 refs",
+        "priority": "medium",
+        "operatorEditable": true,
+        "group": "rank"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/rank/custom.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.top1",
+      "canonicalPath": "public/assets/home/rank/top1.png",
+      "publicPath": "/assets/home/rank/top1.png",
+      "type": "image",
+      "fileName": "top1.png",
+      "extension": "png",
+      "size": 4594,
+      "hash": "e6d086edc6105ee13a63edca5e4bca3303498e0422385423a45741af5849c775",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 161,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/rank/top${}.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 161,
+          "type": "template-literal",
+          "assetPath": "/assets/home/rank/top${}.png",
+          "usage": "dynamic",
+          "confidence": 0.5
+        },
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 239,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/rank/top${}.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 239,
+          "type": "template-literal",
+          "assetPath": "/assets/home/rank/top${}.png",
+          "usage": "dynamic",
+          "confidence": 0.5
+        }
+      ],
+      "referenceCount": 4,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-rank",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 50,
+        "height": 39
+      },
+      "constraints": {
+        "ratio": "50:39",
+        "recommendedWidth": 50,
+        "recommendedHeight": 39,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Top1",
+        "description": "Section: home-rank · 4 KB · 4 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "rank"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/rank/top1.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.top2",
+      "canonicalPath": "public/assets/home/rank/top2.png",
+      "publicPath": "/assets/home/rank/top2.png",
+      "type": "image",
+      "fileName": "top2.png",
+      "extension": "png",
+      "size": 4490,
+      "hash": "79eed726c7a76bae04bdd209cfd9746bb08b96da3d9c2a4d76f9fa26c96298cd",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 161,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/rank/top${}.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 161,
+          "type": "template-literal",
+          "assetPath": "/assets/home/rank/top${}.png",
+          "usage": "dynamic",
+          "confidence": 0.5
+        },
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 239,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/rank/top${}.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 239,
+          "type": "template-literal",
+          "assetPath": "/assets/home/rank/top${}.png",
+          "usage": "dynamic",
+          "confidence": 0.5
+        }
+      ],
+      "referenceCount": 4,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-rank",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 50,
+        "height": 39
+      },
+      "constraints": {
+        "ratio": "50:39",
+        "recommendedWidth": 50,
+        "recommendedHeight": 39,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Top2",
+        "description": "Section: home-rank · 4 KB · 4 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "rank"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/rank/top2.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "asset.top3",
+      "canonicalPath": "public/assets/home/rank/top3.png",
+      "publicPath": "/assets/home/rank/top3.png",
+      "type": "image",
+      "fileName": "top3.png",
+      "extension": "png",
+      "size": 4622,
+      "hash": "30c619edc0813fb3a7cdc32c9c8c914eb8755dc14f481c08a8b4ef051d461204",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 161,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/rank/top${}.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 161,
+          "type": "template-literal",
+          "assetPath": "/assets/home/rank/top${}.png",
+          "usage": "dynamic",
+          "confidence": 0.5
+        },
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 239,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "/assets/home/rank/top${}.png",
+          "usage": "jsx",
+          "confidence": 1
+        },
+        {
+          "file": "src/components/home/Rank.tsx",
+          "line": 239,
+          "type": "template-literal",
+          "assetPath": "/assets/home/rank/top${}.png",
+          "usage": "dynamic",
+          "confidence": 0.5
+        }
+      ],
+      "referenceCount": 4,
+      "detectedBy": [
+        "filesystem",
+        "static-ref"
+      ],
+      "confidence": 1,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "home-rank",
+      "isAutoManaged": false,
+      "isExternal": false,
+      "dimensions": {
+        "width": 50,
+        "height": 39
+      },
+      "constraints": {
+        "ratio": "50:39",
+        "recommendedWidth": 50,
+        "recommendedHeight": 39,
+        "maxFileSize": 1048576,
+        "allowedFormats": [
+          "png",
+          "jpg",
+          "jpeg",
+          "webp"
+        ],
+        "allowTransparent": true
+      },
+      "metadata": {
+        "label": "Top3",
+        "description": "Section: home-rank · 5 KB · 4 refs",
+        "priority": "high",
+        "operatorEditable": true,
+        "group": "rank"
+      },
+      "injection": {
+        "strategy": "file-override",
+        "targetPaths": [
+          "public/assets/home/rank/top3.png"
+        ],
+        "postProcess": [
+          "optimize"
+        ]
+      }
+    },
+    {
+      "id": "external.023ab7ab0850",
+      "canonicalPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/homepage/homepage.mp4",
+      "publicPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/homepage/homepage.mp4",
+      "type": "video",
+      "fileName": "homepage.mp4",
+      "extension": "mp4",
+      "size": 0,
+      "hash": "",
+      "responsive": "shared",
+      "references": [
+        {
+          "file": "src/components/home/Banner.tsx",
+          "line": 41,
+          "type": "jsx-attr",
+          "attribute": "src",
+          "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/homepage/homepage.mp4",
+          "usage": "jsx",
+          "confidence": 1
+        }
+      ],
+      "referenceCount": 1,
+      "detectedBy": [
+        "static-ref"
+      ],
+      "confidence": 0.9,
+      "needsManualReview": false,
+      "isVendor": false,
+      "isFooter": false,
+      "section": "external",
+      "isAutoManaged": false,
+      "isExternal": true,
+      "externalUrl": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/homepage/homepage.mp4",
+      "metadata": {
+        "label": "Homepage",
+        "description": "Section: external · 1 refs",
+        "priority": "low",
+        "operatorEditable": false,
+        "group": "other"
+      }
+    }
+  ],
+  "references": [
+    {
+      "file": "src/components/Pagination.tsx",
+      "line": 13,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/1920/chevrons-left.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/Pagination.tsx",
+      "line": 32,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/1920/chevrons-right.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/FloatBxh.tsx",
+      "line": 10,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/float-home/btn-bxh.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/FloatHome.tsx",
+      "line": 18,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/float-home/float-right.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/FloatHome.tsx",
+      "line": 27,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/icon-app.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/FloatHome.tsx",
+      "line": 41,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/float-home/btn-store.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/FloatHome.tsx",
+      "line": 59,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/float-home/btn-ggplay.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/FloatHome.tsx",
+      "line": 75,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/float-home/btn-apk.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/FloatHome.tsx",
+      "line": 91,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/float-home/btn-pc.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/FloatHome.tsx",
+      "line": 105,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/float-home/btn-fanpage.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/FloatHome.tsx",
+      "line": 120,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/float-home/btn-group.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/FloatHome.tsx",
+      "line": 137,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/float-home/nap.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/FloatHome.tsx",
+      "line": 147,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/float-home/nap.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/HeaderHome.tsx",
+      "line": 40,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/header/logo-game.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/layout/HeaderHome.tsx",
+      "line": 45,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/header/logo-game.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/layout/HeaderHome.tsx",
+      "line": 62,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/header/btn-download.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/layout/HeaderHome.tsx",
+      "line": 113,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/header/logo-game.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/layout/Logo18.tsx",
+      "line": 10,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/banner/1920/logo-18.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/Logo18.tsx",
+      "line": 16,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/banner/1920/logo-18.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/layout/Logo18.tsx",
+      "line": 21,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/banner/1920/logo-18.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/home/Banner.tsx",
+      "line": 25,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/banner/768/banner.jpg",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/home/Banner.tsx",
+      "line": 41,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/homepage/homepage.mp4",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/home/Banner.tsx",
+      "line": 48,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/banner/logo-game.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/home/Banner.tsx",
+      "line": 54,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/banner/logo-game.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/home/Banner.tsx",
+      "line": 59,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/banner/logo-game.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/home/Rank.tsx",
+      "line": 41,
+      "type": "jsx-attr",
+      "attribute": "image",
+      "assetPath": "/assets/home/rank/all.png",
+      "usage": "{ image: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/home/Rank.tsx",
+      "line": 46,
+      "type": "jsx-attr",
+      "attribute": "image",
+      "assetPath": "/assets/home/rank/custom.png",
+      "usage": "{ image: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/home/Rank.tsx",
+      "line": 84,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/rank/768/bg-rank.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/home/Rank.tsx",
+      "line": 90,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/rank/1920/bg-rank.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/home/Rank.tsx",
+      "line": 95,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/rank/1920/bg-rank.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/home/Rank.tsx",
+      "line": 105,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/rank/1920/title-rank.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/home/Rank.tsx",
+      "line": 111,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/rank/1920/bg-rank.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/home/Rank.tsx",
+      "line": 161,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/rank/top${}.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/home/Rank.tsx",
+      "line": 161,
+      "type": "template-literal",
+      "assetPath": "/assets/home/rank/top${}.png",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/components/home/Rank.tsx",
+      "line": 191,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/rank/768/title-rank.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/home/Rank.tsx",
+      "line": 239,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/rank/top${}.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/home/Rank.tsx",
+      "line": 239,
+      "type": "template-literal",
+      "assetPath": "/assets/home/rank/top${}.png",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/components/news/News.tsx",
+      "line": 28,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/768/banner.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/News.tsx",
+      "line": 34,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/banner.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/News.tsx",
+      "line": 39,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/banner.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/NewsActionButtons.tsx",
+      "line": 15,
+      "type": "template-literal",
+      "attribute": "image",
+      "assetPath": "${}/btn-nap.png",
+      "usage": "{ image: ... }",
+      "confidence": 0.7
+    },
+    {
+      "file": "src/components/news/NewsActionButtons.tsx",
+      "line": 15,
+      "type": "template-literal",
+      "assetPath": "${}/btn-nap.png",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/components/news/NewsActionButtons.tsx",
+      "line": 20,
+      "type": "template-literal",
+      "attribute": "image",
+      "assetPath": "${}/btn-giftcode.png",
+      "usage": "{ image: ... }",
+      "confidence": 0.7
+    },
+    {
+      "file": "src/components/news/NewsActionButtons.tsx",
+      "line": 20,
+      "type": "template-literal",
+      "assetPath": "${}/btn-giftcode.png",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/components/news/NewsActionButtons.tsx",
+      "line": 25,
+      "type": "template-literal",
+      "attribute": "image",
+      "assetPath": "${}/btn-fanpage.png",
+      "usage": "{ image: ... }",
+      "confidence": 0.7
+    },
+    {
+      "file": "src/components/news/NewsActionButtons.tsx",
+      "line": 25,
+      "type": "template-literal",
+      "assetPath": "${}/btn-fanpage.png",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/components/news/NewsActionButtons.tsx",
+      "line": 30,
+      "type": "template-literal",
+      "attribute": "image",
+      "assetPath": "${}/btn-cskh.png",
+      "usage": "{ image: ... }",
+      "confidence": 0.7
+    },
+    {
+      "file": "src/components/news/NewsActionButtons.tsx",
+      "line": 30,
+      "type": "template-literal",
+      "assetPath": "${}/btn-cskh.png",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/components/news/NewsDesktop.tsx",
+      "line": 32,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/768/frame.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/NewsDesktop.tsx",
+      "line": 38,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/frame.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/NewsDesktop.tsx",
+      "line": 43,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/frame.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/NewsDesktop.tsx",
+      "line": 66,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/frame-right.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/NewsDownloadPanel.tsx",
+      "line": 23,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/frame-middle.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/NewsDownloadPanel.tsx",
+      "line": 33,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/icon-app.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/news/NewsDownloadPanel.tsx",
+      "line": 41,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/icon-app.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/news/NewsDownloadPanel.tsx",
+      "line": 58,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/ios.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/NewsDownloadPanel.tsx",
+      "line": 76,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/android.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/NewsDownloadPanel.tsx",
+      "line": 92,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/apk.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/NewsDownloadPanel.tsx",
+      "line": 108,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/pc.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/NewsMobile.tsx",
+      "line": 38,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/768/frame-right.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/SliderPC.tsx",
+      "line": 84,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/btn-prev.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/news/SliderPC.tsx",
+      "line": 101,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/btn-next.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Contents.tsx",
+      "line": 85,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/768/banner_trang2.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Contents.tsx",
+      "line": 91,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Contents.tsx",
+      "line": 96,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Contents.tsx",
+      "line": 107,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/frame-middle.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Contents.tsx",
+      "line": 115,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/icon-app.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/tintuc/Contents.tsx",
+      "line": 122,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/icon-app.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/tintuc/Contents.tsx",
+      "line": 137,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/ios.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/tintuc/Contents.tsx",
+      "line": 149,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/android.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/tintuc/Contents.tsx",
+      "line": 161,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/apk.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/tintuc/Contents.tsx",
+      "line": 173,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/pc.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/tintuc/Contents.tsx",
+      "line": 183,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/768/frame-tab-content.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Contents.tsx",
+      "line": 189,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/1920/frame-tab-content.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Contents.tsx",
+      "line": 194,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/1920/frame-tab-content.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Detail.tsx",
+      "line": 86,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/768/banner_trang2.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Detail.tsx",
+      "line": 92,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Detail.tsx",
+      "line": 97,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Detail.tsx",
+      "line": 109,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/home/news/1920/frame-middle.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Detail.tsx",
+      "line": 117,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/icon-app.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/tintuc/Detail.tsx",
+      "line": 124,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/icon-app.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/tintuc/Detail.tsx",
+      "line": 139,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/ios.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/tintuc/Detail.tsx",
+      "line": 151,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/android.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/tintuc/Detail.tsx",
+      "line": 163,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/apk.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/tintuc/Detail.tsx",
+      "line": 175,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "/assets/home/news/1920/pc.png",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/components/tintuc/Detail.tsx",
+      "line": 185,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/768/frame-tab-detail.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Detail.tsx",
+      "line": 191,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/1920/frame-tab-detail.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/components/tintuc/Detail.tsx",
+      "line": 196,
+      "type": "jsx-attr",
+      "attribute": "path",
+      "assetPath": "/assets/tintuc/1920/frame-tab-detail.png",
+      "usage": "{ path: ... }",
+      "confidence": 0.9
+    },
+    {
+      "file": "src/page/LandingH5/Choigame1.tsx",
+      "line": 15,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-1.mp4",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/page/LandingH5/Choigame1.tsx",
+      "line": 15,
+      "type": "template-literal",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-1.mp4",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/page/LandingH5/Choigame1.tsx",
+      "line": 23,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-1.mp4",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/page/LandingH5/Choigame1.tsx",
+      "line": 23,
+      "type": "template-literal",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-1.mp4",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/page/LandingH5/Choigame2.tsx",
+      "line": 15,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-2.mp4",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/page/LandingH5/Choigame2.tsx",
+      "line": 15,
+      "type": "template-literal",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-2.mp4",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/page/LandingH5/Choigame2.tsx",
+      "line": 23,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-2.mp4",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/page/LandingH5/Choigame2.tsx",
+      "line": 23,
+      "type": "template-literal",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-2.mp4",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/page/LandingH5/Choigame3.tsx",
+      "line": 15,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-3.mp4",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/page/LandingH5/Choigame3.tsx",
+      "line": 15,
+      "type": "template-literal",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-3.mp4",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/page/LandingH5/Choigame3.tsx",
+      "line": 23,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-3.mp4",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/page/LandingH5/Choigame3.tsx",
+      "line": 23,
+      "type": "template-literal",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-3.mp4",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/page/LandingH5/Choigame4.tsx",
+      "line": 15,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-4.mp4",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/page/LandingH5/Choigame4.tsx",
+      "line": 15,
+      "type": "template-literal",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-4.mp4",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/page/LandingH5/Choigame4.tsx",
+      "line": 23,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-4.mp4",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/page/LandingH5/Choigame4.tsx",
+      "line": 23,
+      "type": "template-literal",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-4.mp4",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/page/LandingH5/Choigame5.tsx",
+      "line": 15,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-5.mp4",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/page/LandingH5/Choigame5.tsx",
+      "line": 15,
+      "type": "template-literal",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-pc-5.mp4",
+      "usage": "dynamic",
+      "confidence": 0.5
+    },
+    {
+      "file": "src/page/LandingH5/Choigame5.tsx",
+      "line": 23,
+      "type": "jsx-attr",
+      "attribute": "src",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-5.mp4",
+      "usage": "jsx",
+      "confidence": 1
+    },
+    {
+      "file": "src/page/LandingH5/Choigame5.tsx",
+      "line": 23,
+      "type": "template-literal",
+      "assetPath": "${}/t029/landing-h5/t029-landingH5-mb-5.mp4",
+      "usage": "dynamic",
+      "confidence": 0.5
+    }
+  ],
+  "dynamicBlocks": [
+    {
+      "id": "dynamic.buttons",
+      "type": "api-buttons",
+      "label": "Site Config (Buttons)",
+      "section": "other",
+      "source": "src/services/index.ts:30",
+      "apiEndpoint": "/api/frontend/config",
+      "baseUrlEnv": "VITE_APP_HUB",
+      "params": [
+        {
+          "name": "game_id",
+          "envKey": "VITE_APP_GAME_ID",
+          "type": "string",
+          "required": true,
+          "description": "Mã game"
+        },
+        {
+          "name": "language_name",
+          "envKey": "",
+          "type": "string",
+          "default": "vi",
+          "description": "Ngôn ngữ"
+        }
+      ],
+      "injectVia": "env-inject",
+      "confidence": 0.95,
+      "detectionMethod": "grep"
+    },
+    {
+      "id": "dynamic.leaderboard",
+      "type": "api-leaderboard",
+      "label": "Bảng Xếp Hạng",
+      "section": "other",
+      "source": "src/services/index.ts:166",
+      "apiEndpoint": "/Ranking/GetRanking",
+      "baseUrlEnv": "VITE_APP_API_GAME_SERVICES",
+      "params": [
+        {
+          "name": "gameId",
+          "envKey": "VITE_APP_GAME_ID",
+          "type": "string",
+          "required": true,
+          "description": "Mã game"
+        },
+        {
+          "name": "mode",
+          "envKey": "VITE_LB_MODE",
+          "type": "enum",
+          "options": [
+            "user"
+          ],
+          "required": true,
+          "description": "Chế độ xếp hạng"
+        },
+        {
+          "name": "scope",
+          "envKey": "VITE_LB_SCOPE",
+          "type": "enum",
+          "options": [
+            "all",
+            "area"
+          ],
+          "required": true,
+          "description": "Phạm vi xếp hạng"
+        }
+      ],
+      "tabs": [
+        {
+          "id": "tab-all",
+          "label": "BXH All Server",
+          "mode": "user",
+          "scope": "all"
+        },
+        {
+          "id": "tab-area",
+          "label": "BXH Cụm Server",
+          "mode": "user",
+          "scope": "area"
+        }
+      ],
+      "injectVia": "env-inject",
+      "confidence": 0.95,
+      "detectionMethod": "grep"
+    }
+  ],
+  "summary": {
+    "totalAssets": 56,
+    "totalReferences": 108,
+    "totalDynamicBlocks": 2,
+    "avgConfidence": 0.8718309859154927,
+    "needsReview": 8,
+    "byType": {
+      "image": 70,
+      "video": 0,
+      "audio": 0,
+      "font": 0,
+      "other": 0
+    },
+    "bySection": {
+      "rank": 2,
+      "tintuc": 5,
+      "home-banner": 4,
+      "home-news": 17,
+      "home-rank": 6,
+      "favicon": 8,
+      "float-home": 11,
+      "header": 2,
+      "external": 1
+    }
+  },
+  "detectedAt": "2026-09-23T10:53:38.411Z",
+  "durationMs": 904
+}

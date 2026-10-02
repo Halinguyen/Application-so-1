@@ -1,0 +1,24 @@
+{
+  "name": "asset-detector-poc",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "detect": "tsx src/index.ts",
+    "detect:phuong-hoang": "tsx src/index.ts --repo ../game-template-repo/phuong-hoang-tru-tien/home-page --game-id phuong-hoang-tru-tien",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@babel/parser": "^7.24.0",
+    "@babel/traverse": "^7.24.0",
+    "fast-glob": "^3.3.2",
+    "sharp": "^0.35.4"
+  },
+  "devDependencies": {
+    "@types/babel__traverse": "^7.20.5",
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0",
+    "vitest": "^4.1.11"
+  }
+}

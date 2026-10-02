@@ -1,0 +1,88 @@
+[
+  {
+    "id": "swiper.1",
+    "type": "swiper",
+    "source": "src/components/news/NewsMainSlider.tsx:19",
+    "library": "swiper",
+    "visualMode": "single",
+    "slidesPerView": 1,
+    "centeredSlides": false,
+    "spaceBetween": 10,
+    "slideCount": 0,
+    "navigation": {
+      "prev": "",
+      "next": ""
+    },
+    "indicators": [
+      "custom dot indicators (JS-rendered buttons, not image assets)"
+    ],
+    "config": {
+      "autoplay": true,
+      "loop": true,
+      "delay": 3000
+    },
+    "isDataDriven": true,
+    "dataSource": "prop: slides",
+    "hasEffect3D": false,
+    "uploadMode": "simple",
+    "confidence": 0.85,
+    "needsManualReview": false
+  },
+  {
+    "id": "swiper.2",
+    "type": "swiper",
+    "source": "src/components/news/SliderMB.tsx:13",
+    "library": "swiper",
+    "visualMode": "single",
+    "slidesPerView": 1,
+    "centeredSlides": false,
+    "spaceBetween": 10,
+    "slideCount": 5,
+    "navigation": {
+      "prev": "",
+      "next": ""
+    },
+    "indicators": [
+      "custom dot indicators (JS-rendered buttons, not image assets)"
+    ],
+    "config": {
+      "autoplay": true,
+      "loop": true,
+      "delay": 3000
+    },
+    "isDataDriven": false,
+    "dataSource": "static array: src/utils/constant.ts",
+    "hasEffect3D": false,
+    "uploadMode": "simple",
+    "confidence": 0.9,
+    "needsManualReview": false
+  },
+  {
+    "id": "swiper.3",
+    "type": "swiper",
+    "source": "src/components/news/SliderPC.tsx:29",
+    "library": "swiper",
+    "visualMode": "coverflow",
+    "effectType": "coverflow",
+    "slidesPerView": 1.3,
+    "centeredSlides": true,
+    "spaceBetween": 0,
+    "slideCount": 5,
+    "navigation": {
+      "prev": "/assets/home/news/1920/btn-prev.png",
+      "next": "/assets/home/news/1920/btn-next.png"
+    },
+    "indicators": [],
+    "config": {
+      "autoplay": true,
+      "loop": true,
+      "delay": 10000
+    },
+    "isDataDriven": false,
+    "dataSource": "static array: src/utils/constant.ts",
+    "hasEffect3D": true,
+    "uploadMode": "simple",
+    "confidence": 0.9,
+    "needsManualReview": false
+  }
+]

@@ -1,0 +1,3827 @@
+{
+  "templateId": "phuong-hoang-tru-tien-home-page",
+  "familyId": "phuong-hoang-tru-tien",
+  "sourceRepo": "game-template-repo/phuong-hoang-tru-tien/home-page",
+  "sourceRef": "working-tree",
+  "techStack": {
+    "framework": "vite-spa",
+    "version": "vite@^6.3.5 / react@^19.2.1 / react-router@^7.6.0",
+    "packageManager": "npm",
+    "styling": "tailwind",
+    "confidence": 0.95
+  },
+  "build": {
+    "tool": "vite",
+    "buildCommand": "tsc -b && vite build",
+    "devCommand": "vite",
+    "outputDir": "dist"
+  },
+  "deploy": {
+    "dockerfile": "Dockerfile",
+    "ciFile": "Jenkinsfile",
+    "deployConfigDir": "deploy/{develop,production}"
+  },
+  "breakpoints": {
+    "mobile": {
+      "width": 375,
+      "height": 812,
+      "deviceScaleFactor": 2,
+      "label": "mobile"
+    },
+    "tablet": {
+      "width": 768,
+      "height": 1024,
+      "deviceScaleFactor": 2,
+      "label": "tablet"
+    },
+    "desktop": {
+      "width": 1440,
+      "height": 900,
+      "deviceScaleFactor": 1,
+      "label": "desktop"
+    }
+  },
+  "slots": {
+    "staticAssets": [
+      {
+        "id": "asset-001",
+        "canonicalPath": "public/assets/float-home/btn-apk.png",
+        "publicPath": "/assets/float-home/btn-apk.png",
+        "type": "image",
+        "fileName": "btn-apk.png",
+        "extension": "png",
+        "size": 2732,
+        "hash": "87432136f5a1874dfff4b100e18743cb",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/layout/FloatHome.tsx",
+            "line": 75,
+            "type": "jsx-attr",
+            "assetPath": "/assets/float-home/btn-apk.png",
+            "usage": "oncatPathImage({ path: \"/assets/float-home/btn-apk.png\",",
+            "confidence": 0.9,
+            "section": "float-home"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "float-home",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": true,
+        "isReusable": false,
+        "appearsInSections": [
+          "float-home"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-002",
+        "canonicalPath": "public/assets/float-home/btn-bxh.png",
+        "publicPath": "/assets/float-home/btn-bxh.png",
+        "type": "image",
+        "fileName": "btn-bxh.png",
+        "extension": "png",
+        "size": 66207,
+        "hash": "cac2f7f373fdf47fa0a4e97fa6dd5a9e",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/layout/FloatBxh.tsx",
+            "line": 10,
+            "type": "jsx-attr",
+            "assetPath": "/assets/float-home/btn-bxh.png",
+            "usage": "dleConcatPathImage({ path: \"/assets/float-home/btn-bxh.png\",",
+            "confidence": 0.9,
+            "section": "float-home"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "float-home",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": true,
+        "isReusable": false,
+        "appearsInSections": [
+          "float-home"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-003",
+        "canonicalPath": "public/assets/float-home/btn-fanpage.png",
+        "publicPath": "/assets/float-home/btn-fanpage.png",
+        "type": "image",
+        "fileName": "btn-fanpage.png",
+        "extension": "png",
+        "size": 8983,
+        "hash": "eafda089d8f2ca5045b6c3092587019f",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/layout/FloatHome.tsx",
+            "line": 105,
+            "type": "jsx-attr",
+            "assetPath": "/assets/float-home/btn-fanpage.png",
+            "usage": "oncatPathImage({ path: \"/assets/float-home/btn-fanpage.png\",",
+            "confidence": 0.9,
+            "section": "float-home"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "float-home",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": true,
+        "isReusable": false,
+        "appearsInSections": [
+          "float-home"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-004",
+        "canonicalPath": "public/assets/float-home/btn-ggplay.png",
+        "publicPath": "/assets/float-home/btn-ggplay.png",
+        "type": "image",
+        "fileName": "btn-ggplay.png",
+        "extension": "png",
+        "size": 2945,
+        "hash": "23758d6901353ebb0990143cdad3685e",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/layout/FloatHome.tsx",
+            "line": 59,
+            "type": "jsx-attr",
+            "assetPath": "/assets/float-home/btn-ggplay.png",
+            "usage": "oncatPathImage({ path: \"/assets/float-home/btn-ggplay.png\",",
+            "confidence": 0.9,
+            "section": "float-home"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "float-home",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": true,
+        "isReusable": false,
+        "appearsInSections": [
+          "float-home"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-005",
+        "canonicalPath": "public/assets/float-home/btn-group.png",
+        "publicPath": "/assets/float-home/btn-group.png",
+        "type": "image",
+        "fileName": "btn-group.png",
+        "extension": "png",
+        "size": 8808,
+        "hash": "b86b166cbd61770d6895eeea7b6cab19",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/layout/FloatHome.tsx",
+            "line": 120,
+            "type": "jsx-attr",
+            "assetPath": "/assets/float-home/btn-group.png",
+            "usage": "oncatPathImage({ path: \"/assets/float-home/btn-group.png\",",
+            "confidence": 0.9,
+            "section": "float-home"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "float-home",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": true,
+        "isReusable": false,
+        "appearsInSections": [
+          "float-home"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-006",
+        "canonicalPath": "public/assets/float-home/btn-pc.png",
+        "publicPath": "/assets/float-home/btn-pc.png",
+        "type": "image",
+        "fileName": "btn-pc.png",
+        "extension": "png",
+        "size": 1825,
+        "hash": "ed6570d10cfbb7e1263213fa1f4705e5",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/layout/FloatHome.tsx",
+            "line": 91,
+            "type": "jsx-attr",
+            "assetPath": "/assets/float-home/btn-pc.png",
+            "usage": "oncatPathImage({ path: \"/assets/float-home/btn-pc.png\",",
+            "confidence": 0.9,
+            "section": "float-home"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "float-home",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": true,
+        "isReusable": false,
+        "appearsInSections": [
+          "float-home"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-007",
+        "canonicalPath": "public/assets/float-home/btn-store.png",
+        "publicPath": "/assets/float-home/btn-store.png",
+        "type": "image",
+        "fileName": "btn-store.png",
+        "extension": "png",
+        "size": 2653,
+        "hash": "3e3089eb960646688da71ca77fb36a16",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/layout/FloatHome.tsx",
+            "line": 41,
+            "type": "jsx-attr",
+            "assetPath": "/assets/float-home/btn-store.png",
+            "usage": "oncatPathImage({ path: \"/assets/float-home/btn-store.png\",",
+            "confidence": 0.9,
+            "section": "float-home"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "float-home",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": true,
+        "isReusable": false,
+        "appearsInSections": [
+          "float-home"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-008",
+        "canonicalPath": "public/assets/float-home/float-bg.png",
+        "publicPath": "/assets/float-home/float-bg.png",
+        "type": "image",
+        "fileName": "float-bg.png",
+        "extension": "png",
+        "size": 62796,
+        "hash": "845ab48e9a1e08af63d9388af10d23a5",
+        "responsive": "shared",
+        "references": [],
+        "referenceCount": 0,
+        "detectedBy": [
+          "filesystem"
+        ],
+        "confidence": 0.3,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "float-home",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": true,
+        "isReusable": false,
+        "appearsInSections": [],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-009",
+        "canonicalPath": "public/assets/float-home/float-right.png",
+        "publicPath": "/assets/float-home/float-right.png",
+        "type": "image",
+        "fileName": "float-right.png",
+        "extension": "png",
+        "size": 82063,
+        "hash": "706c7f98b67107e40cbfa4922cf47e99",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/layout/FloatHome.tsx",
+            "line": 18,
+            "type": "jsx-attr",
+            "assetPath": "/assets/float-home/float-right.png",
+            "usage": "dleConcatPathImage({ path: \"/assets/float-home/float-right.png\",",
+            "confidence": 0.9,
+            "section": "float-home"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "float-home",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": true,
+        "isReusable": false,
+        "appearsInSections": [
+          "float-home"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-010",
+        "canonicalPath": "public/assets/float-home/nap.png",
+        "publicPath": "/assets/float-home/nap.png",
+        "type": "image",
+        "fileName": "nap.png",
+        "extension": "png",
+        "size": 11654,
+        "hash": "d72e9434850fc6ab9a2b00e6281eedd0",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/layout/FloatHome.tsx",
+            "line": 137,
+            "type": "jsx-attr",
+            "assetPath": "/assets/float-home/nap.png",
+            "usage": "oncatPathImage({ path: \"/assets/float-home/nap.png\",",
+            "confidence": 0.9,
+            "section": "float-home"
+          },
+          {
+            "file": "src/layout/FloatHome.tsx",
+            "line": 147,
+            "type": "jsx-attr",
+            "assetPath": "/assets/float-home/nap.png",
+            "usage": "oncatPathImage({ path: \"/assets/float-home/nap.png\",",
+            "confidence": 0.9,
+            "section": "float-home"
+          }
+        ],
+        "referenceCount": 2,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "float-home",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": true,
+        "isReusable": false,
+        "appearsInSections": [
+          "float-home"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-011",
+        "canonicalPath": "public/assets/float-home/qr-code.png",
+        "publicPath": "/assets/float-home/qr-code.png",
+        "type": "image",
+        "fileName": "qr-code.png",
+        "extension": "png",
+        "size": 12356,
+        "hash": "7749189aa30a53f5b81679f3492455e5",
+        "responsive": "shared",
+        "references": [],
+        "referenceCount": 0,
+        "detectedBy": [
+          "filesystem"
+        ],
+        "confidence": 0.3,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "float-home",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": true,
+        "isReusable": false,
+        "appearsInSections": [],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-012",
+        "canonicalPath": "public/assets/header/btn-download.png",
+        "publicPath": "/assets/header/btn-download.png",
+        "type": "image",
+        "fileName": "btn-download.png",
+        "extension": "png",
+        "size": 24090,
+        "hash": "6cf00844b52b4b90b2279d60a5a255f9",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/layout/HeaderHome.tsx",
+            "line": 62,
+            "type": "jsx-attr",
+            "assetPath": "/assets/header/btn-download.png",
+            "usage": "me=\"aspect-220/70\" src=\"/assets/header/btn-download.png\"",
+            "confidence": 0.9,
+            "section": "header"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "header",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "header"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-013",
+        "canonicalPath": "public/assets/header/logo-game.png",
+        "publicPath": "/assets/header/logo-game.png",
+        "type": "image",
+        "fileName": "logo-game.png",
+        "extension": "png",
+        "size": 664257,
+        "hash": "9530c3c31b72f223a8daae9d65f29e97",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/layout/HeaderHome.tsx",
+            "line": 40,
+            "type": "jsx-attr",
+            "assetPath": "/assets/header/logo-game.png",
+            "usage": ":w-17.5 sm:h-17.5\" src=\"/assets/header/logo-game.png\"",
+            "confidence": 0.9,
+            "section": "header"
+          },
+          {
+            "file": "src/layout/HeaderHome.tsx",
+            "line": 45,
+            "type": "jsx-attr",
+            "assetPath": "/assets/header/logo-game.png",
+            "usage": ":w-17.5 sm:h-17.5\" src=\"/assets/header/logo-game.png\"",
+            "confidence": 0.9,
+            "section": "header"
+          },
+          {
+            "file": "src/layout/HeaderHome.tsx",
+            "line": 113,
+            "type": "jsx-attr",
+            "assetPath": "/assets/header/logo-game.png",
+            "usage": "t-120/120 w-30 h-30\" src=\"/assets/header/logo-game.png\"",
+            "confidence": 0.9,
+            "section": "header"
+          }
+        ],
+        "referenceCount": 3,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "header",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": true,
+        "isReusable": true,
+        "appearsInSections": [
+          "header"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-014",
+        "canonicalPath": "public/assets/home/banner/1920/banner.png",
+        "publicPath": "/assets/home/banner/1920/banner.png",
+        "type": "image",
+        "fileName": "banner.png",
+        "extension": "png",
+        "size": 3017906,
+        "hash": "1711893343848d716e237a94926c16f2",
+        "responsive": "per-breakpoint",
+        "references": [],
+        "referenceCount": 0,
+        "detectedBy": [
+          "filesystem"
+        ],
+        "confidence": 0.3,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "hero",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-015",
+        "canonicalPath": "public/assets/home/banner/1920/logo-18.png",
+        "publicPath": "/assets/home/banner/1920/logo-18.png",
+        "type": "image",
+        "fileName": "logo-18.png",
+        "extension": "png",
+        "size": 17320,
+        "hash": "2ead0f5df738847f4c8ee192528b0ca3",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/layout/Logo18.tsx",
+            "line": 10,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/banner/1920/logo-18.png",
+            "usage": "dleConcatPathImage({ path: \"/assets/home/banner/1920/logo-18.png\",",
+            "confidence": 0.9,
+            "section": "hero"
+          },
+          {
+            "file": "src/layout/Logo18.tsx",
+            "line": 16,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/banner/1920/logo-18.png",
+            "usage": "dleConcatPathImage({ path: \"/assets/home/banner/1920/logo-18.png\",",
+            "confidence": 0.9,
+            "section": "hero"
+          },
+          {
+            "file": "src/layout/Logo18.tsx",
+            "line": 21,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/banner/1920/logo-18.png",
+            "usage": "dleConcatPathImage({ path: \"/assets/home/banner/1920/logo-18.png\",",
+            "confidence": 0.9,
+            "section": "hero"
+          }
+        ],
+        "referenceCount": 3,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "hero",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": true,
+        "isReusable": false,
+        "appearsInSections": [
+          "hero"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-016",
+        "canonicalPath": "public/assets/home/banner/1920/text-game.png",
+        "publicPath": "/assets/home/banner/1920/text-game.png",
+        "type": "image",
+        "fileName": "text-game.png",
+        "extension": "png",
+        "size": 318439,
+        "hash": "f52545687529e01fe64021423a83bb3d",
+        "responsive": "per-breakpoint",
+        "references": [],
+        "referenceCount": 0,
+        "detectedBy": [
+          "filesystem"
+        ],
+        "confidence": 0.3,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "hero",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-017",
+        "canonicalPath": "public/assets/home/banner/768/banner.jpg",
+        "publicPath": "/assets/home/banner/768/banner.jpg",
+        "type": "image",
+        "fileName": "banner.jpg",
+        "extension": "jpg",
+        "size": 667608,
+        "hash": "26d378da3addd63f52a1e4fd295384b7",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/home/Banner.tsx",
+            "line": 25,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/banner/768/banner.jpg",
+            "usage": "andleConcatPathImage({ path: \"/assets/home/banner/768/banner.jpg\",",
+            "confidence": 0.9,
+            "section": "hero"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "hero",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "hero"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-018",
+        "canonicalPath": "public/assets/home/banner/768/text-game.png",
+        "publicPath": "/assets/home/banner/768/text-game.png",
+        "type": "image",
+        "fileName": "text-game.png",
+        "extension": "png",
+        "size": 198809,
+        "hash": "4a8ab0db6ee6e463d825fae50bb43684",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/home/Banner.tsx",
+            "line": 76,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/banner/768/text-game.png",
+            "usage": "andleConcatPathImage({ path: '/assets/home/banner/768/text-game.png',",
+            "confidence": 0.9,
+            "section": "hero"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "hero",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "hero"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-019",
+        "canonicalPath": "public/assets/home/banner/logo-game.png",
+        "publicPath": "/assets/home/banner/logo-game.png",
+        "type": "image",
+        "fileName": "logo-game.png",
+        "extension": "png",
+        "size": 41563,
+        "hash": "60cb7518d5ead1d3e63e2475f854b31c",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/components/home/Banner.tsx",
+            "line": 48,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/banner/logo-game.png",
+            "usage": "dleConcatPathImage({ path: \"/assets/home/banner/logo-game.png\",",
+            "confidence": 0.9,
+            "section": "hero"
+          },
+          {
+            "file": "src/components/home/Banner.tsx",
+            "line": 54,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/banner/logo-game.png",
+            "usage": "dleConcatPathImage({ path: \"/assets/home/banner/logo-game.png\",",
+            "confidence": 0.9,
+            "section": "hero"
+          },
+          {
+            "file": "src/components/home/Banner.tsx",
+            "line": 59,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/banner/logo-game.png",
+            "usage": "dleConcatPathImage({ path: \"/assets/home/banner/logo-game.png\",",
+            "confidence": 0.9,
+            "section": "hero"
+          }
+        ],
+        "referenceCount": 3,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "hero",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "hero"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-020",
+        "canonicalPath": "public/assets/home/footer/1920/logo.png",
+        "publicPath": "/assets/home/footer/1920/logo.png",
+        "type": "image",
+        "fileName": "logo.png",
+        "extension": "png",
+        "size": 51863,
+        "hash": "bd91ad890b9161253bed583d2673931d",
+        "responsive": "per-breakpoint",
+        "references": [],
+        "referenceCount": 0,
+        "detectedBy": [
+          "filesystem"
+        ],
+        "confidence": 0.5,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": true,
+        "footerOnly": true,
+        "section": "footer",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-021",
+        "canonicalPath": "public/assets/home/news/1920/android.png",
+        "publicPath": "/assets/home/news/1920/android.png",
+        "type": "image",
+        "fileName": "android.png",
+        "extension": "png",
+        "size": 3370,
+        "hash": "96dbb09191d90d9cd1705f7efc6d8275",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsDownloadPanel.tsx",
+            "line": 76,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/android.png",
+            "usage": "eConcatPathImage({ path: \"/assets/home/news/1920/android.png\",",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Contents.tsx",
+            "line": 149,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/android.png",
+            "usage": "<img src=\"/assets/home/news/1920/android.png\"",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Detail.tsx",
+            "line": 151,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/android.png",
+            "usage": "<img src=\"/assets/home/news/1920/android.png\"",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 3,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-022",
+        "canonicalPath": "public/assets/home/news/1920/apk.png",
+        "publicPath": "/assets/home/news/1920/apk.png",
+        "type": "image",
+        "fileName": "apk.png",
+        "extension": "png",
+        "size": 3138,
+        "hash": "4d1121ee953eb853eef4b9a4e8484b06",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsDownloadPanel.tsx",
+            "line": 92,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/apk.png",
+            "usage": "eConcatPathImage({ path: \"/assets/home/news/1920/apk.png\",",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Contents.tsx",
+            "line": 161,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/apk.png",
+            "usage": "<img src=\"/assets/home/news/1920/apk.png\"",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Detail.tsx",
+            "line": 163,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/apk.png",
+            "usage": "<img src=\"/assets/home/news/1920/apk.png\"",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 3,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-023",
+        "canonicalPath": "public/assets/home/news/1920/banner.png",
+        "publicPath": "/assets/home/news/1920/banner.png",
+        "type": "image",
+        "fileName": "banner.png",
+        "extension": "png",
+        "size": 12960,
+        "hash": "5948c46626504243430a49446b04907c",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/News.tsx",
+            "line": 34,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/banner.png",
+            "usage": "hImage({ path: \"/assets/home/news/1920/banner.png\",",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/news/News.tsx",
+            "line": 39,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/banner.png",
+            "usage": "hImage({ path: \"/assets/home/news/1920/banner.png\",",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 2,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-024",
+        "canonicalPath": "public/assets/home/news/1920/btn-cskh.png",
+        "publicPath": "/assets/home/news/1920/btn-cskh.png",
+        "type": "image",
+        "fileName": "btn-cskh.png",
+        "extension": "png",
+        "size": 71784,
+        "hash": "c0cbf493b05bb179c9597c9a43baa726",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsActionButtons.tsx",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "/assets/home/news/1920/btn-cskh.png",
+            "usage": "${basePath}/btn-cskh.png",
+            "confidence": 0.7,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.7,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-025",
+        "canonicalPath": "public/assets/home/news/1920/btn-fanpage.png",
+        "publicPath": "/assets/home/news/1920/btn-fanpage.png",
+        "type": "image",
+        "fileName": "btn-fanpage.png",
+        "extension": "png",
+        "size": 77883,
+        "hash": "a0a5b2b3e6fc03a988162967b204c915",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsActionButtons.tsx",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "/assets/home/news/1920/btn-fanpage.png",
+            "usage": "${basePath}/btn-fanpage.png",
+            "confidence": 0.7,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.7,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-026",
+        "canonicalPath": "public/assets/home/news/1920/btn-giftcode.png",
+        "publicPath": "/assets/home/news/1920/btn-giftcode.png",
+        "type": "image",
+        "fileName": "btn-giftcode.png",
+        "extension": "png",
+        "size": 68174,
+        "hash": "50f2beeabb1bdc74c76e715dcce43845",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsActionButtons.tsx",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "/assets/home/news/1920/btn-giftcode.png",
+            "usage": "${basePath}/btn-giftcode.png",
+            "confidence": 0.7,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.7,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-027",
+        "canonicalPath": "public/assets/home/news/1920/btn-nap.png",
+        "publicPath": "/assets/home/news/1920/btn-nap.png",
+        "type": "image",
+        "fileName": "btn-nap.png",
+        "extension": "png",
+        "size": 71981,
+        "hash": "8970780423aeea75e9fa3256b7a07118",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsActionButtons.tsx",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "/assets/home/news/1920/btn-nap.png",
+            "usage": "${basePath}/btn-nap.png",
+            "confidence": 0.7,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.7,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-028",
+        "canonicalPath": "public/assets/home/news/1920/btn-next.png",
+        "publicPath": "/assets/home/news/1920/btn-next.png",
+        "type": "image",
+        "fileName": "btn-next.png",
+        "extension": "png",
+        "size": 8326,
+        "hash": "733ee09a38309b07fd7ffea07998316e",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/SliderPC.tsx",
+            "line": 101,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/btn-next.png",
+            "usage": "eConcatPathImage({ path: \"/assets/home/news/1920/btn-next.png\",",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-029",
+        "canonicalPath": "public/assets/home/news/1920/btn-prev.png",
+        "publicPath": "/assets/home/news/1920/btn-prev.png",
+        "type": "image",
+        "fileName": "btn-prev.png",
+        "extension": "png",
+        "size": 8307,
+        "hash": "b042b56cf38374a2ca8a521601410a19",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/SliderPC.tsx",
+            "line": 84,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/btn-prev.png",
+            "usage": "eConcatPathImage({ path: \"/assets/home/news/1920/btn-prev.png\",",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-030",
+        "canonicalPath": "public/assets/home/news/1920/frame-middle.png",
+        "publicPath": "/assets/home/news/1920/frame-middle.png",
+        "type": "image",
+        "fileName": "frame-middle.png",
+        "extension": "png",
+        "size": 2159,
+        "hash": "1ea5422431df510e8c9dc3b0b3364d4e",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsDownloadPanel.tsx",
+            "line": 23,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/frame-middle.png",
+            "usage": "andleConcatPathImage({ path: \"/assets/home/news/1920/frame-middle.png",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Contents.tsx",
+            "line": 107,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/frame-middle.png",
+            "usage": "oncatPathImage({ path: \"/assets/home/news/1920/frame-middle.png",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Detail.tsx",
+            "line": 109,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/frame-middle.png",
+            "usage": "tPathImage({ path: \"/assets/home/news/1920/frame-middle.png",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 3,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-031",
+        "canonicalPath": "public/assets/home/news/1920/frame-right.png",
+        "publicPath": "/assets/home/news/1920/frame-right.png",
+        "type": "image",
+        "fileName": "frame-right.png",
+        "extension": "png",
+        "size": 3268,
+        "hash": "f30ae7fd833a73af418a80b592c8067d",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsDesktop.tsx",
+            "line": 66,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/frame-right.png",
+            "usage": "oncatPathImage({ path: \"/assets/home/news/1920/frame-right.png\"",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-032",
+        "canonicalPath": "public/assets/home/news/1920/frame.png",
+        "publicPath": "/assets/home/news/1920/frame.png",
+        "type": "image",
+        "fileName": "frame.png",
+        "extension": "png",
+        "size": 5248,
+        "hash": "e4683886842049de26d9a560806f5334",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsDesktop.tsx",
+            "line": 38,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/frame.png",
+            "usage": "eConcatPathImage({ path: \"/assets/home/news/1920/frame.png\",",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/news/NewsDesktop.tsx",
+            "line": 43,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/frame.png",
+            "usage": "eConcatPathImage({ path: \"/assets/home/news/1920/frame.png\",",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 2,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-033",
+        "canonicalPath": "public/assets/home/news/1920/icon-app.png",
+        "publicPath": "/assets/home/news/1920/icon-app.png",
+        "type": "image",
+        "fileName": "icon-app.png",
+        "extension": "png",
+        "size": 664257,
+        "hash": "9530c3c31b72f223a8daae9d65f29e97",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsDownloadPanel.tsx",
+            "line": 33,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/icon-app.png",
+            "usage": "src={siteConfig?.site_logo_url || \"/assets/home/news/1920/icon-app.png\"}",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/news/NewsDownloadPanel.tsx",
+            "line": 41,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/icon-app.png",
+            "usage": "src={siteConfig?.site_logo_url || \"/assets/home/news/1920/icon-app.png\"}",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Contents.tsx",
+            "line": 115,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/icon-app.png",
+            "usage": "src={siteConfig?.site_logo_url || \"/assets/home/news/1920/icon-app.png\"}",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Contents.tsx",
+            "line": 122,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/icon-app.png",
+            "usage": "src={siteConfig?.site_logo_url || \"/assets/home/news/1920/icon-app.png\"}",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Detail.tsx",
+            "line": 117,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/icon-app.png",
+            "usage": "src={siteConfig?.site_logo_url || \"/assets/home/news/1920/icon-app.png\"}",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Detail.tsx",
+            "line": 124,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/icon-app.png",
+            "usage": "src={siteConfig?.site_logo_url || \"/assets/home/news/1920/icon-app.png\"}",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/layout/FloatHome.tsx",
+            "line": 27,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/icon-app.png",
+            "usage": "g_link || handleConcatPathImage({ path: \"/assets/home/news/1920/icon-app.png\" })",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 7,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": true,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-034",
+        "canonicalPath": "public/assets/home/news/1920/ios.png",
+        "publicPath": "/assets/home/news/1920/ios.png",
+        "type": "image",
+        "fileName": "ios.png",
+        "extension": "png",
+        "size": 2862,
+        "hash": "a9c6026f748c3724f80d1e0e797faf51",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsDownloadPanel.tsx",
+            "line": 58,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/ios.png",
+            "usage": "eConcatPathImage({ path: \"/assets/home/news/1920/ios.png\",",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Contents.tsx",
+            "line": 137,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/ios.png",
+            "usage": "<img src=\"/assets/home/news/1920/ios.png\"",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Detail.tsx",
+            "line": 139,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/ios.png",
+            "usage": "<img src=\"/assets/home/news/1920/ios.png\"",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 3,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-035",
+        "canonicalPath": "public/assets/home/news/1920/note.png",
+        "publicPath": "/assets/home/news/1920/note.png",
+        "type": "image",
+        "fileName": "note.png",
+        "extension": "png",
+        "size": 1392,
+        "hash": "95a020834b872b23473efd69b62d6da3",
+        "responsive": "per-breakpoint",
+        "references": [],
+        "referenceCount": 0,
+        "detectedBy": [
+          "filesystem"
+        ],
+        "confidence": 0.3,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-036",
+        "canonicalPath": "public/assets/home/news/1920/pc.png",
+        "publicPath": "/assets/home/news/1920/pc.png",
+        "type": "image",
+        "fileName": "pc.png",
+        "extension": "png",
+        "size": 1688,
+        "hash": "45e84dd10315e08436a2dd0b6eed231b",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsDownloadPanel.tsx",
+            "line": 108,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/pc.png",
+            "usage": "eConcatPathImage({ path: \"/assets/home/news/1920/pc.png\",",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Contents.tsx",
+            "line": 173,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/pc.png",
+            "usage": "<img src=\"/assets/home/news/1920/pc.png\"",
+            "confidence": 0.9,
+            "section": "news"
+          },
+          {
+            "file": "src/components/tintuc/Detail.tsx",
+            "line": 175,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/1920/pc.png",
+            "usage": "<img src=\"/assets/home/news/1920/pc.png\"",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 3,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-037",
+        "canonicalPath": "public/assets/home/news/1920/slide.png",
+        "publicPath": "/assets/home/news/1920/slide.png",
+        "type": "image",
+        "fileName": "slide.png",
+        "extension": "png",
+        "size": 300458,
+        "hash": "8d5c2b5f133a7e5905aeabf3bc4d686b",
+        "responsive": "per-breakpoint",
+        "references": [],
+        "referenceCount": 0,
+        "detectedBy": [
+          "filesystem"
+        ],
+        "confidence": 0.3,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-038",
+        "canonicalPath": "public/assets/home/news/768/banner.png",
+        "publicPath": "/assets/home/news/768/banner.png",
+        "type": "image",
+        "fileName": "banner.png",
+        "extension": "png",
+        "size": 10060,
+        "hash": "3af5824d9ff7ff6c6537b5702b5c14db",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/News.tsx",
+            "line": 28,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/768/banner.png",
+            "usage": "hImage({ path: \"/assets/home/news/768/banner.png\",",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-039",
+        "canonicalPath": "public/assets/home/news/768/btn-cskh.png",
+        "publicPath": "/assets/home/news/768/btn-cskh.png",
+        "type": "image",
+        "fileName": "btn-cskh.png",
+        "extension": "png",
+        "size": 68580,
+        "hash": "606ffc1a77712c387b5f844989973641",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsActionButtons.tsx",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "/assets/home/news/768/btn-cskh.png",
+            "usage": "${basePath}/btn-cskh.png",
+            "confidence": 0.7,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.7,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-040",
+        "canonicalPath": "public/assets/home/news/768/btn-fanpage.png",
+        "publicPath": "/assets/home/news/768/btn-fanpage.png",
+        "type": "image",
+        "fileName": "btn-fanpage.png",
+        "extension": "png",
+        "size": 72691,
+        "hash": "5a378ab5834b9408ee144b198d6c6076",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsActionButtons.tsx",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "/assets/home/news/768/btn-fanpage.png",
+            "usage": "${basePath}/btn-fanpage.png",
+            "confidence": 0.7,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.7,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-041",
+        "canonicalPath": "public/assets/home/news/768/btn-giftcode.png",
+        "publicPath": "/assets/home/news/768/btn-giftcode.png",
+        "type": "image",
+        "fileName": "btn-giftcode.png",
+        "extension": "png",
+        "size": 65437,
+        "hash": "8e5cca667137606336fdd1a148bba125",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsActionButtons.tsx",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "/assets/home/news/768/btn-giftcode.png",
+            "usage": "${basePath}/btn-giftcode.png",
+            "confidence": 0.7,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.7,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-042",
+        "canonicalPath": "public/assets/home/news/768/btn-nap.png",
+        "publicPath": "/assets/home/news/768/btn-nap.png",
+        "type": "image",
+        "fileName": "btn-nap.png",
+        "extension": "png",
+        "size": 67182,
+        "hash": "8fe320b4571de48289ee59587a82769d",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsActionButtons.tsx",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "/assets/home/news/768/btn-nap.png",
+            "usage": "${basePath}/btn-nap.png",
+            "confidence": 0.7,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.7,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-043",
+        "canonicalPath": "public/assets/home/news/768/frame-right.png",
+        "publicPath": "/assets/home/news/768/frame-right.png",
+        "type": "image",
+        "fileName": "frame-right.png",
+        "extension": "png",
+        "size": 3607,
+        "hash": "364a665a17a74ff7f8b6b05350d02998",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsMobile.tsx",
+            "line": 38,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/768/frame-right.png",
+            "usage": "dleConcatPathImage({ path: \"/assets/home/news/768/frame-right.png\",",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-044",
+        "canonicalPath": "public/assets/home/news/768/frame.png",
+        "publicPath": "/assets/home/news/768/frame.png",
+        "type": "image",
+        "fileName": "frame.png",
+        "extension": "png",
+        "size": 228562,
+        "hash": "ef30059de1d49c1965641fc80877d975",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/news/NewsDesktop.tsx",
+            "line": 32,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/news/768/frame.png",
+            "usage": "eConcatPathImage({ path: \"/assets/home/news/768/frame.png\",",
+            "confidence": 0.9,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-045",
+        "canonicalPath": "public/assets/home/rank/1920/bg-rank.png",
+        "publicPath": "/assets/home/rank/1920/bg-rank.png",
+        "type": "image",
+        "fileName": "bg-rank.png",
+        "extension": "png",
+        "size": 621638,
+        "hash": "7792b86d548559dcc6434c5c7b8c00b2",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/home/Rank.tsx",
+            "line": 111,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/rank/1920/bg-rank.png",
+            "usage": "\"> <img src=\"/assets/home/rank/1920/bg-rank.png\"",
+            "confidence": 0.9,
+            "section": "leaderboard"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "leaderboard",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "leaderboard"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-046",
+        "canonicalPath": "public/assets/home/rank/768/bg-rank.png",
+        "publicPath": "/assets/home/rank/768/bg-rank.png",
+        "type": "image",
+        "fileName": "bg-rank.png",
+        "extension": "png",
+        "size": 73435,
+        "hash": "cad4cf0ae87a2b08dec4cdb32fc8f280",
+        "responsive": "per-breakpoint",
+        "references": [],
+        "referenceCount": 0,
+        "detectedBy": [
+          "filesystem"
+        ],
+        "confidence": 0.3,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "leaderboard",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-047",
+        "canonicalPath": "public/assets/home/rank/all.png",
+        "publicPath": "/assets/home/rank/all.png",
+        "type": "image",
+        "fileName": "all.png",
+        "extension": "png",
+        "size": 95765,
+        "hash": "1279805b4cadd5e4224bf4ba0191a3b9",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/components/home/Rank.tsx",
+            "line": 41,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/rank/all.png",
+            "usage": "name: \"BXH All Server\", image: \"/assets/home/rank/all.png\", },",
+            "confidence": 0.9,
+            "section": "leaderboard"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "leaderboard",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "leaderboard"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-048",
+        "canonicalPath": "public/assets/home/rank/custom.png",
+        "publicPath": "/assets/home/rank/custom.png",
+        "type": "image",
+        "fileName": "custom.png",
+        "extension": "png",
+        "size": 95345,
+        "hash": "fb69ddb967f93a5f18175c913a56fe70",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/components/home/Rank.tsx",
+            "line": 46,
+            "type": "jsx-attr",
+            "assetPath": "/assets/home/rank/custom.png",
+            "usage": "name: \"BXH Cụm Server\", image: \"/assets/home/rank/custom.png\", }",
+            "confidence": 0.9,
+            "section": "leaderboard"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "leaderboard",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "leaderboard"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-049",
+        "canonicalPath": "public/assets/home/rank/top1.png",
+        "publicPath": "/assets/home/rank/top1.png",
+        "type": "image",
+        "fileName": "top1.png",
+        "extension": "png",
+        "size": 4594,
+        "hash": "4ba647d119da9d41948ff245ef1fc0c4",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/components/home/Rank.tsx",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "/assets/home/rank/top1.png",
+            "usage": "/assets/home/rank/top${idx+1}.png",
+            "confidence": 0.7,
+            "section": "leaderboard"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.7,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "leaderboard",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "leaderboard"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": true
+      },
+      {
+        "id": "asset-050",
+        "canonicalPath": "public/assets/home/rank/top2.png",
+        "publicPath": "/assets/home/rank/top2.png",
+        "type": "image",
+        "fileName": "top2.png",
+        "extension": "png",
+        "size": 4490,
+        "hash": "db2595defc771b8102c1426ba48844dd",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/components/home/Rank.tsx",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "/assets/home/rank/top2.png",
+            "usage": "/assets/home/rank/top${idx+1}.png",
+            "confidence": 0.7,
+            "section": "leaderboard"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.7,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "leaderboard",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "leaderboard"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": true
+      },
+      {
+        "id": "asset-051",
+        "canonicalPath": "public/assets/home/rank/top3.png",
+        "publicPath": "/assets/home/rank/top3.png",
+        "type": "image",
+        "fileName": "top3.png",
+        "extension": "png",
+        "size": 4622,
+        "hash": "8838ebed304476a6c2789aea71258ed2",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/components/home/Rank.tsx",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "/assets/home/rank/top3.png",
+            "usage": "/assets/home/rank/top${idx+1}.png",
+            "confidence": 0.7,
+            "section": "leaderboard"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.7,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "leaderboard",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "leaderboard"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": true
+      },
+      {
+        "id": "asset-052",
+        "canonicalPath": "public/assets/rank/1920/bg-rank.png",
+        "publicPath": "/assets/rank/1920/bg-rank.png",
+        "type": "image",
+        "fileName": "bg-rank.png",
+        "extension": "png",
+        "size": 9049,
+        "hash": "8bb7bb0c8be20a03d80269ebfa55f629",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/home/Rank.tsx",
+            "line": 90,
+            "type": "jsx-attr",
+            "assetPath": "/assets/rank/1920/bg-rank.png",
+            "usage": "dleConcatPathImage({ path: \"/assets/rank/1920/bg-rank.png\",",
+            "confidence": 0.9,
+            "section": "leaderboard"
+          },
+          {
+            "file": "src/components/home/Rank.tsx",
+            "line": 95,
+            "type": "jsx-attr",
+            "assetPath": "/assets/rank/1920/bg-rank.png",
+            "usage": "dleConcatPathImage({ path: \"/assets/rank/1920/bg-rank.png\",",
+            "confidence": 0.9,
+            "section": "leaderboard"
+          }
+        ],
+        "referenceCount": 2,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "leaderboard",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "leaderboard"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-053",
+        "canonicalPath": "public/assets/rank/1920/title-rank.png",
+        "publicPath": "/assets/rank/1920/title-rank.png",
+        "type": "image",
+        "fileName": "title-rank.png",
+        "extension": "png",
+        "size": 45126,
+        "hash": "c5b57a86ac301d48df2ae9ef359694a0",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/home/Rank.tsx",
+            "line": 105,
+            "type": "jsx-attr",
+            "assetPath": "/assets/rank/1920/title-rank.png",
+            "usage": "> <img src={\"/assets/rank/1920/title-rank.png\"}",
+            "confidence": 0.9,
+            "section": "leaderboard"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "leaderboard",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "leaderboard"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-054",
+        "canonicalPath": "public/assets/rank/768/bg-rank.png",
+        "publicPath": "/assets/rank/768/bg-rank.png",
+        "type": "image",
+        "fileName": "bg-rank.png",
+        "extension": "png",
+        "size": 5836,
+        "hash": "bcf881ab6cdff9f6d5965d517a42df10",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/home/Rank.tsx",
+            "line": 84,
+            "type": "jsx-attr",
+            "assetPath": "/assets/rank/768/bg-rank.png",
+            "usage": "dleConcatPathImage({ path: \"/assets/rank/768/bg-rank.png\",",
+            "confidence": 0.9,
+            "section": "leaderboard"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "leaderboard",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "leaderboard"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-055",
+        "canonicalPath": "public/assets/rank/768/title-rank.png",
+        "publicPath": "/assets/rank/768/title-rank.png",
+        "type": "image",
+        "fileName": "title-rank.png",
+        "extension": "png",
+        "size": 45026,
+        "hash": "5cf31f528edec35debcc23e75e9ce0ec",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/home/Rank.tsx",
+            "line": 191,
+            "type": "jsx-attr",
+            "assetPath": "/assets/rank/768/title-rank.png",
+            "usage": "> <img src={\"/assets/rank/768/title-rank.png\"}",
+            "confidence": 0.9,
+            "section": "leaderboard"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "leaderboard",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "leaderboard"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-056",
+        "canonicalPath": "public/assets/tintuc/1920/banner_trang2.png",
+        "publicPath": "/assets/tintuc/1920/banner_trang2.png",
+        "type": "image",
+        "fileName": "banner_trang2.png",
+        "extension": "png",
+        "size": 12960,
+        "hash": "5948c46626504243430a49446b04907c",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/tintuc/Contents.tsx",
+            "line": 91,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+            "usage": "eConcatPathImage({ path: \"/assets/tintuc/1920/banner_trang2.png\",",
+            "confidence": 0.9,
+            "section": "news-detail"
+          },
+          {
+            "file": "src/components/tintuc/Contents.tsx",
+            "line": 96,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+            "usage": "eConcatPathImage({ path: \"/assets/tintuc/1920/banner_trang2.png\",",
+            "confidence": 0.9,
+            "section": "news-detail"
+          },
+          {
+            "file": "src/components/tintuc/Detail.tsx",
+            "line": 92,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+            "usage": "oncatPathImage({ path: \"/assets/tintuc/1920/banner_trang2.png\",",
+            "confidence": 0.9,
+            "section": "news-detail"
+          },
+          {
+            "file": "src/components/tintuc/Detail.tsx",
+            "line": 97,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/1920/banner_trang2.png",
+            "usage": "oncatPathImage({ path: \"/assets/tintuc/1920/banner_trang2.png\",",
+            "confidence": 0.9,
+            "section": "news-detail"
+          }
+        ],
+        "referenceCount": 4,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news-detail",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news-detail"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-057",
+        "canonicalPath": "public/assets/tintuc/1920/chevrons-left.png",
+        "publicPath": "/assets/tintuc/1920/chevrons-left.png",
+        "type": "image",
+        "fileName": "chevrons-left.png",
+        "extension": "png",
+        "size": 274,
+        "hash": "10a60e3318db8feb3fd19b09b211c7c2",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/Pagination.tsx",
+            "line": 13,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/1920/chevrons-left.png",
+            "usage": "<img src={handleConcatPathImage({path: '/assets/tintuc/1920/chevrons-left.png',",
+            "confidence": 0.9,
+            "section": "news-detail"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news-detail",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news-detail"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-058",
+        "canonicalPath": "public/assets/tintuc/1920/chevrons-right.png",
+        "publicPath": "/assets/tintuc/1920/chevrons-right.png",
+        "type": "image",
+        "fileName": "chevrons-right.png",
+        "extension": "png",
+        "size": 260,
+        "hash": "57824d7026d444680259df2838563456",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/Pagination.tsx",
+            "line": 32,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/1920/chevrons-right.png",
+            "usage": "<img src={handleConcatPathImage({path: '/assets/tintuc/1920/chevrons-right.png'",
+            "confidence": 0.9,
+            "section": "news-detail"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news-detail",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news-detail"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-059",
+        "canonicalPath": "public/assets/tintuc/1920/frame-tab-content.png",
+        "publicPath": "/assets/tintuc/1920/frame-tab-content.png",
+        "type": "image",
+        "fileName": "frame-tab-content.png",
+        "extension": "png",
+        "size": 8998,
+        "hash": "be38a3e7e456626c4ae3ece628fad06b",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/tintuc/Contents.tsx",
+            "line": 189,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/1920/frame-tab-content.png",
+            "usage": "catPathImage({ path: \"/assets/tintuc/1920/frame-tab-content.p",
+            "confidence": 0.9,
+            "section": "news-detail"
+          },
+          {
+            "file": "src/components/tintuc/Contents.tsx",
+            "line": 194,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/1920/frame-tab-content.png",
+            "usage": "catPathImage({ path: \"/assets/tintuc/1920/frame-tab-content.p",
+            "confidence": 0.9,
+            "section": "news-detail"
+          }
+        ],
+        "referenceCount": 2,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news-detail",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news-detail"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-060",
+        "canonicalPath": "public/assets/tintuc/1920/frame-tab-detail.png",
+        "publicPath": "/assets/tintuc/1920/frame-tab-detail.png",
+        "type": "image",
+        "fileName": "frame-tab-detail.png",
+        "extension": "png",
+        "size": 10499,
+        "hash": "7590f172bd0986daa2602593fc616596",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/tintuc/Detail.tsx",
+            "line": 191,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/1920/frame-tab-detail.png",
+            "usage": "athImage({ path: \"/assets/tintuc/1920/frame-tab-detail.pn",
+            "confidence": 0.9,
+            "section": "news-detail"
+          },
+          {
+            "file": "src/components/tintuc/Detail.tsx",
+            "line": 196,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/1920/frame-tab-detail.png",
+            "usage": "athImage({ path: \"/assets/tintuc/1920/frame-tab-detail.pn",
+            "confidence": 0.9,
+            "section": "news-detail"
+          }
+        ],
+        "referenceCount": 2,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news-detail",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news-detail"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-061",
+        "canonicalPath": "public/assets/tintuc/768/banner_trang2.png",
+        "publicPath": "/assets/tintuc/768/banner_trang2.png",
+        "type": "image",
+        "fileName": "banner_trang2.png",
+        "extension": "png",
+        "size": 8061,
+        "hash": "657a5907f1a1a2b52cbe72dd682be89b",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/tintuc/Contents.tsx",
+            "line": 85,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/768/banner_trang2.png",
+            "usage": "eConcatPathImage({ path: \"/assets/tintuc/768/banner_trang2.png\",",
+            "confidence": 0.9,
+            "section": "news-detail"
+          },
+          {
+            "file": "src/components/tintuc/Detail.tsx",
+            "line": 86,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/768/banner_trang2.png",
+            "usage": "oncatPathImage({ path: \"/assets/tintuc/768/banner_trang2.png\",",
+            "confidence": 0.9,
+            "section": "news-detail"
+          }
+        ],
+        "referenceCount": 2,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news-detail",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news-detail"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-062",
+        "canonicalPath": "public/assets/tintuc/768/frame-tab-content.png",
+        "publicPath": "/assets/tintuc/768/frame-tab-content.png",
+        "type": "image",
+        "fileName": "frame-tab-content.png",
+        "extension": "png",
+        "size": 9115,
+        "hash": "c0f59c511b9b5eac50aece4bdf1eefd2",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/tintuc/Contents.tsx",
+            "line": 183,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/768/frame-tab-content.png",
+            "usage": "catPathImage({ path: \"/assets/tintuc/768/frame-tab-content.pn",
+            "confidence": 0.9,
+            "section": "news-detail"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news-detail",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news-detail"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-063",
+        "canonicalPath": "public/assets/tintuc/768/frame-tab-detail.png",
+        "publicPath": "/assets/tintuc/768/frame-tab-detail.png",
+        "type": "image",
+        "fileName": "frame-tab-detail.png",
+        "extension": "png",
+        "size": 9025,
+        "hash": "671ba191caafae28df01bb309e381b6d",
+        "responsive": "per-breakpoint",
+        "references": [
+          {
+            "file": "src/components/tintuc/Detail.tsx",
+            "line": 185,
+            "type": "jsx-attr",
+            "assetPath": "/assets/tintuc/768/frame-tab-detail.png",
+            "usage": "athImage({ path: \"/assets/tintuc/768/frame-tab-detail.png",
+            "confidence": 0.9,
+            "section": "news-detail"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "filesystem",
+          "static-ref"
+        ],
+        "confidence": 0.9,
+        "needsManualReview": false,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news-detail",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news-detail"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "asset-064",
+        "canonicalPath": "public/assets/tintuc/apple-touch-icon.png",
+        "publicPath": "/assets/tintuc/apple-touch-icon.png",
+        "type": "image",
+        "fileName": "apple-touch-icon.png",
+        "extension": "png",
+        "size": 89144,
+        "hash": "f3c013df08d0aafb273887fde3180e03",
+        "responsive": "shared",
+        "references": [],
+        "referenceCount": 0,
+        "detectedBy": [
+          "filesystem"
+        ],
+        "confidence": 0.3,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": false,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news-detail",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "external-slide-1",
+        "canonicalPath": null,
+        "publicPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-1.jpg",
+        "type": "image",
+        "fileName": "slide-1.jpg",
+        "extension": "jpg",
+        "size": 0,
+        "hash": "",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/utils/constant.ts",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-1.jpg",
+            "usage": "SlideHome[].imageArt",
+            "confidence": 0.95,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "static-ref"
+        ],
+        "confidence": 0.95,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": true,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": true,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "external-slide-2",
+        "canonicalPath": null,
+        "publicPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-2.jpg",
+        "type": "image",
+        "fileName": "slide-2.jpg",
+        "extension": "jpg",
+        "size": 0,
+        "hash": "",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/utils/constant.ts",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-2.jpg",
+            "usage": "SlideHome[].imageArt",
+            "confidence": 0.95,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "static-ref"
+        ],
+        "confidence": 0.95,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": true,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": true,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "external-slide-3",
+        "canonicalPath": null,
+        "publicPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-3.jpg",
+        "type": "image",
+        "fileName": "slide-3.jpg",
+        "extension": "jpg",
+        "size": 0,
+        "hash": "",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/utils/constant.ts",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-3.jpg",
+            "usage": "SlideHome[].imageArt",
+            "confidence": 0.95,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "static-ref"
+        ],
+        "confidence": 0.95,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": true,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": true,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "external-slide-4",
+        "canonicalPath": null,
+        "publicPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-4.jpg",
+        "type": "image",
+        "fileName": "slide-4.jpg",
+        "extension": "jpg",
+        "size": 0,
+        "hash": "",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/utils/constant.ts",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-4.jpg",
+            "usage": "SlideHome[].imageArt",
+            "confidence": 0.95,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "static-ref"
+        ],
+        "confidence": 0.95,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": true,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": true,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "external-slide-5",
+        "canonicalPath": null,
+        "publicPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-5.jpg",
+        "type": "image",
+        "fileName": "slide-5.jpg",
+        "extension": "jpg",
+        "size": 0,
+        "hash": "",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/utils/constant.ts",
+            "line": 0,
+            "type": "template-literal",
+            "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-5.jpg",
+            "usage": "SlideHome[].imageArt",
+            "confidence": 0.95,
+            "section": "news"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "static-ref"
+        ],
+        "confidence": 0.95,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": true,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "news",
+        "isVideo": false,
+        "isCarousel": true,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "news"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "external-banner-video",
+        "canonicalPath": null,
+        "publicPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/homepage/homepage.mp4",
+        "type": "video",
+        "fileName": "homepage.mp4",
+        "extension": "mp4",
+        "size": 0,
+        "hash": "",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "src/components/home/Banner.tsx",
+            "line": 41,
+            "type": "jsx-attr",
+            "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/homepage/homepage.mp4",
+            "attribute": "src",
+            "usage": "<source src=... type=video/mp4 />",
+            "confidence": 0.95,
+            "section": "hero"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "static-ref"
+        ],
+        "confidence": 0.95,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": true,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "hero",
+        "isVideo": true,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "hero"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      },
+      {
+        "id": "external-og-image",
+        "canonicalPath": null,
+        "publicPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/homepage/poster.png",
+        "type": "image",
+        "fileName": "poster.png",
+        "extension": "png",
+        "size": 0,
+        "hash": "",
+        "responsive": "shared",
+        "references": [
+          {
+            "file": "index.html",
+            "line": 0,
+            "type": "css-url",
+            "assetPath": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/homepage/poster.png",
+            "attribute": "content",
+            "usage": "<meta property=\"og:image\" content=... />",
+            "confidence": 0.95,
+            "section": "meta"
+          }
+        ],
+        "referenceCount": 1,
+        "detectedBy": [
+          "static-ref"
+        ],
+        "confidence": 0.95,
+        "needsManualReview": true,
+        "isVendor": false,
+        "isExternal": true,
+        "isFooter": false,
+        "footerOnly": false,
+        "section": "meta",
+        "isVideo": false,
+        "isCarousel": false,
+        "isLayered": false,
+        "isOverlay": false,
+        "isSticky": false,
+        "isReusable": false,
+        "appearsInSections": [
+          "meta"
+        ],
+        "isChartData": false,
+        "isAnimation": false,
+        "isDynamic": false
+      }
+    ],
+    "dynamicBlocks": [
+      {
+        "id": "dyn-block-button-config",
+        "type": "api-buttons",
+        "source": "src/services/index.ts",
+        "selector": "layout/FloatHome.tsx, layout/HeaderHome.tsx, layout/FooterWrapper.tsx, components/news/NewsActionButtons.tsx, components/news/NewsDownloadPanel.tsx",
+        "apiEndpoint": "{VITE_APP_HUB}/api/frontend/config?game_id={gameId}&language_name={lang}",
+        "params": [
+          {
+            "name": "gameId",
+            "envKey": "VITE_APP_GAME_ID",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "language_name",
+            "envKey": "lang",
+            "type": "string",
+            "required": false,
+            "default": "vi"
+          }
+        ],
+        "injectVia": "env-inject",
+        "confidence": 0.65,
+        "detectionMethod": "ast-fallback"
+      },
+      {
+        "id": "dyn-block-leaderboard",
+        "type": "api-leaderboard",
+        "source": "src/services/index.ts",
+        "selector": "components/home/Rank.tsx",
+        "apiEndpoint": "{VITE_APP_API_GAME_SERVICES}/Ranking/GetRanking?gameId={gameId}&mode={mode}&scope={scope}",
+        "params": [
+          {
+            "name": "gameId",
+            "envKey": "VITE_APP_GAME_ID",
+            "type": "string",
+            "required": true
+          },
+          {
+            "name": "mode",
+            "envKey": "mode",
+            "type": "enum",
+            "required": true,
+            "options": [
+              "user"
+            ],
+            "default": "user"
+          },
+          {
+            "name": "scope",
+            "envKey": "scope",
+            "type": "enum",
+            "required": true,
+            "options": [
+              "all",
+              "area"
+            ]
+          }
+        ],
+        "injectVia": "env-inject",
+        "confidence": 0.7,
+        "detectionMethod": "ast-fallback"
+      }
+    ],
+    "swipers": [
+      {
+        "id": "swiper-news-main",
+        "type": "swiper",
+        "source": "src/components/news/NewsMainSlider.tsx",
+        "selector": "#news .relative.w-full (NewsMainSlider)",
+        "library": "swiper",
+        "visualMode": "single",
+        "effectType": "slide",
+        "slidesPerView": 1,
+        "centeredSlides": false,
+        "spaceBetween": 10,
+        "slideCount": 0,
+        "slides": [],
+        "navigation": {
+          "prev": "",
+          "next": ""
+        },
+        "indicators": [
+          "custom bullet buttons (bg-white / opacity)"
+        ],
+        "config": {
+          "autoplay": true,
+          "loop": true
+        },
+        "isDataDriven": true,
+        "dataSource": "getSiteSlide() -> GET /api/frontend/slides (src/services/index.ts)",
+        "hasEffect3D": false,
+        "uploadMode": "advanced"
+      },
+      {
+        "id": "swiper-slider-mb",
+        "type": "swiper",
+        "source": "src/components/news/SliderMB.tsx",
+        "selector": "#news .max-w-160 (SliderMB, mobile only, size<=768)",
+        "library": "swiper",
+        "visualMode": "single",
+        "effectType": "slide",
+        "slidesPerView": 1,
+        "centeredSlides": false,
+        "spaceBetween": 10,
+        "slideCount": 5,
+        "slides": [
+          {
+            "id": "swiper-slider-mb-slide-0",
+            "index": 0,
+            "title": "",
+            "assets": [],
+            "textBlocks": [],
+            "isComposite": false,
+            "flatImage": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-1.jpg"
+          },
+          {
+            "id": "swiper-slider-mb-slide-1",
+            "index": 1,
+            "title": "",
+            "assets": [],
+            "textBlocks": [],
+            "isComposite": false,
+            "flatImage": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-2.jpg"
+          },
+          {
+            "id": "swiper-slider-mb-slide-2",
+            "index": 2,
+            "title": "",
+            "assets": [],
+            "textBlocks": [],
+            "isComposite": false,
+            "flatImage": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-3.jpg"
+          },
+          {
+            "id": "swiper-slider-mb-slide-3",
+            "index": 3,
+            "title": "",
+            "assets": [],
+            "textBlocks": [],
+            "isComposite": false,
+            "flatImage": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-4.jpg"
+          },
+          {
+            "id": "swiper-slider-mb-slide-4",
+            "index": 4,
+            "title": "",
+            "assets": [],
+            "textBlocks": [],
+            "isComposite": false,
+            "flatImage": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-5.jpg"
+          }
+        ],
+        "navigation": {
+          "prev": "",
+          "next": ""
+        },
+        "indicators": [
+          "custom dot buttons"
+        ],
+        "config": {
+          "autoplay": true,
+          "loop": true
+        },
+        "isDataDriven": false,
+        "hasEffect3D": false,
+        "uploadMode": "simple"
+      },
+      {
+        "id": "swiper-slider-pc",
+        "type": "swiper",
+        "source": "src/components/news/SliderPC.tsx",
+        "selector": "#slide-landing (SliderPC, desktop only, size>768)",
+        "library": "swiper",
+        "visualMode": "coverflow",
+        "effectType": "coverflow",
+        "slidesPerView": 1.3,
+        "centeredSlides": true,
+        "spaceBetween": 0,
+        "slideCount": 5,
+        "slides": [
+          {
+            "id": "swiper-slider-pc-slide-0",
+            "index": 0,
+            "title": "",
+            "assets": [],
+            "textBlocks": [],
+            "isComposite": false,
+            "flatImage": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-1.jpg"
+          },
+          {
+            "id": "swiper-slider-pc-slide-1",
+            "index": 1,
+            "title": "",
+            "assets": [],
+            "textBlocks": [],
+            "isComposite": false,
+            "flatImage": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-2.jpg"
+          },
+          {
+            "id": "swiper-slider-pc-slide-2",
+            "index": 2,
+            "title": "",
+            "assets": [],
+            "textBlocks": [],
+            "isComposite": false,
+            "flatImage": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-3.jpg"
+          },
+          {
+            "id": "swiper-slider-pc-slide-3",
+            "index": 3,
+            "title": "",
+            "assets": [],
+            "textBlocks": [],
+            "isComposite": false,
+            "flatImage": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-4.jpg"
+          },
+          {
+            "id": "swiper-slider-pc-slide-4",
+            "index": 4,
+            "title": "",
+            "assets": [],
+            "textBlocks": [],
+            "isComposite": false,
+            "flatImage": "https://website-assets-cdn.vtvlive.vn/website_assets/t029/slide-5.jpg"
+          }
+        ],
+        "navigation": {
+          "prev": "/assets/home/news/1920/btn-prev.png",
+          "next": "/assets/home/news/1920/btn-next.png"
+        },
+        "indicators": [],
+        "config": {
+          "autoplay": true,
+          "loop": true
+        },
+        "isDataDriven": false,
+        "hasEffect3D": true,
+        "uploadMode": "simple"
+      }
+    ],
+    "leaderboards": [
+      {
+        "id": "leaderboard-home-rank",
+        "type": "api-leaderboard",
+        "source": "src/components/home/Rank.tsx",
+        "selector": "#rank",
+        "apiEndpoint": "{VITE_APP_API_GAME_SERVICES}/Ranking/GetRanking",
+        "defaultTab": "all",
+        "tabs": [
+          {
+            "id": "all",
+            "label": "BXH All Server",
+            "mode": "user",
+            "scope": "all",
+            "apiParams": {
+              "mode": "user",
+              "scope": "all"
+            },
+            "isDefault": true
+          },
+          {
+            "id": "area",
+            "label": "BXH Cụm Server",
+            "mode": "user",
+            "scope": "area",
+            "apiParams": {
+              "mode": "user",
+              "scope": "area"
+            }
+          }
+        ],
+        "columns": [
+          {
+            "key": "rank",
+            "label": "Hạng",
+            "type": "icon",
+            "width": "10%",
+            "align": "center"
+          },
+          {
+            "key": "name",
+            "label": "Tên nhân vật",
+            "type": "text",
+            "width": "40%",
+            "align": "center"
+          },
+          {
+            "key": "server",
+            "label": "Server",
+            "type": "text",
+            "width": "25%",
+            "align": "center"
+          },
+          {
+            "key": "power",
+            "label": "Lực chiến",
+            "type": "number",
+            "align": "center"
+          }
+        ],
+        "rankIcons": [
+          {
+            "rank": 1,
+            "assetPath": "public/assets/home/rank/top1.png",
+            "publicPath": "/assets/home/rank/top1.png"
+          },
+          {
+            "rank": 2,
+            "assetPath": "public/assets/home/rank/top2.png",
+            "publicPath": "/assets/home/rank/top2.png"
+          },
+          {
+            "rank": 3,
+            "assetPath": "public/assets/home/rank/top3.png",
+            "publicPath": "/assets/home/rank/top3.png"
+          }
+        ],
+        "frameAsset": {
+          "type": "single",
+          "mainPath": "/assets/home/rank/1920/bg-rank.png"
+        },
+        "hasPagination": false
+      }
+    ]
+  },
+  "detectionReport": {
+    "confidence": 0.78,
+    "staticAssetsDetected": 70,
+    "dynamicBlocksDetected": 2,
+    "swipersDetected": 3,
+    "leaderboardsDetected": 1,
+    "footerAssetsSkipped": 1,
+    "manualReviewRequired": true,
+    "detectedAt": "2026-09-23T09:26:22.924Z",
+    "framework": "vite-spa (unsupported by current 2-framework model; treated as nextjs-like SPA for detection purposes)",
+    "warnings": [
+      "FRAMEWORK_MISMATCH: repo is Vite 6 + React 19 SPA with react-router v7 client routing, not Next.js (App/Pages router) or .NET MVC as assumed by the 2-framework detection model in 00-CONTEXT.md. techStack.framework recorded as 'vite-spa' (extends schema enum) — manual review required before this repo can flow through the Next.js/dotnet-mvc specific Layer 2/3 detectors.",
+      "DYNAMIC_PATH_ASSETS: 3 leaderboard rank icons (top1-3.png) and 4 news action-button icons (btn-nap/giftcode/fanpage/cskh, x2 breakpoints) are referenced via computed template literals (`top${idx+1}.png`, `${basePath}/btn-x.png`) rather than static string literals; resolved via ast-fallback, confidence capped at 0.7.",
+      "INCONSISTENT_ASSET_BASE_PATH: most images go through handleConcatPathImage() (CDN-prefixed), but src/components/home/Rank.tsx references /assets/rank/... and /assets/rank/*/title-rank.png directly (root-relative, no CDN prefix) — these will 404 in production if the app domain doesn't also serve /assets/rank/*.",
+      "EXTERNAL_CDN_ASSETS: hero banner video (homepage.mp4), all 5 SliderMB/SliderPC art slides (slide-1..5.jpg), and the og:image poster.png are hardcoded to https://website-assets-cdn.vtvlive.vn/website_assets/t029/... and have no local counterpart under public/assets — cannot be swapped via manifest without a CDN re-upload step.",
+      "ORPHAN_ASSETS: 8 files exist under public/assets but have zero references in src or index.html (float-home/float-bg.png, float-home/qr-code.png, home/news/1920/note.png, home/news/1920/slide.png, tintuc/apple-touch-icon.png, home/banner/1920/banner.png, home/banner/1920/text-game.png, home/rank/768/bg-rank.png) — likely leftover from the template clone or an unused breakpoint variant; excluded from slot count confidence but retained in manifest for operator review.",
+      "DUPLICATE_PATH_NAMESPACES: two independent 'rank background' namespaces exist — /assets/home/rank/{768,1920}/bg-rank.png (used by Rank.tsx tab icons context) and /assets/rank/{768,1920}/bg-rank.png + title-rank.png (used as the actual section background/title) — do not merge these into one slot.",
+      "FOOTER_SDK: layout/Footer.tsx renders a third-party widget via data-vplay-widget/data-license-* attributes and injects an external SDK script (sdk-web-vplay/loader.min.js); per project rule this and public/assets/home/footer/1920/logo.png are excluded from the swappable manifest (footerOnly=true).",
+      "data-slot attribute not found anywhere in src/ — 0 assets qualify for the 1.0 confidence tier; all confidences derived from static-ref/ast-fallback (max 0.95 for unambiguous single string-literal references)."
+    ]
+  }
+}

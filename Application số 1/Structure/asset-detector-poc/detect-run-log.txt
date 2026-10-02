@@ -1,0 +1,28 @@
+
+> asset-detector-poc@0.1.0 detect:phuong-hoang
+> tsx src/index.ts --repo ../game-template-repo/phuong-hoang-tru-tien/home-page --game-id phuong-hoang-tru-tien
+
+
+🎮 Detecting: phuong-hoang-tru-tien
+📁 Repo: D:\Application số 1\Structure\game-template-repo\phuong-hoang-tru-tien\home-page
+
+[1/4] Detecting framework...
+      ✓ vite-spa ^6.3.5 (spa)
+
+[2/4] Scanning filesystem...
+      ✓ 70 assets found
+      ⏭️  1 footer files skipped
+      ⏭️  0 vendor files skipped
+
+[3/4] Scanning references...
+      ✓ 108 references found
+      ⏭️  1 footer files skipped
+
+[4/4] Merging...
+      ✓ 70 assets merged
+      ✓ Avg confidence: 0.73
+      ⚠ 27 assets need manual review
+
+✅ Done in 383ms
+📄 Output: D:\Application số 1\Structure\asset-detector-poc\output\phuong-hoang-tru-tien/
+

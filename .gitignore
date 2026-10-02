@@ -1,0 +1,30 @@
+# Template repos (originals) and generated clones — large, not part of the tool's source
+Application số 1/Structure/game-template-repo/
+
+# Dependencies / build output / caches
+node_modules/
+.next/
+dist/
+.cache/
+*.tsbuildinfo
+next-env.d.ts
+
+# Logs and runtime leftovers
+*.log
+.preview*.log
+.dev.log
+
+# Secrets — never commit (the tool's .env.local holds GITHUB_TOKEN)
+.env
+.env.*
+!.env.example
+!.env.local.example
+
+# Backup of the tool's former nested repo (kept locally, not pushed)
+.git.bak/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
