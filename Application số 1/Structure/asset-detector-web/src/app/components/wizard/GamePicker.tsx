@@ -1,6 +1,8 @@
 "use client";
 
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Spinner from "../Spinner";
 
 export interface GameOption {
   gameId: string;
@@ -23,6 +25,8 @@ function monogram(displayName: string): string {
 // out at the end of a long form.
 export default function GamePicker({ games }: { games: GameOption[] }) {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const [pendingId, setPendingId] = useState<string | null>(null);
 
   return (
     <div className="wrap" style={{ paddingTop: 28 }}>
@@ -37,9 +41,12 @@ export default function GamePicker({ games }: { games: GameOption[] }) {
           <button
             key={g.gameId}
             type="button"
-            className={`gamepicker-card${g.cloneReady ? "" : " disabled"}`}
-            disabled={!g.cloneReady}
-            onClick={() => router.push(`/?game=${g.gameId}`)}
+            className={`gamepicker-card${g.cloneReady ? "" : " disabled"}${pendingId === g.gameId ? " pending" : isPending ? " dim" : ""}`}
+            disabled={!g.cloneReady || isPending}
+            onClick={() => {
+              setPendingId(g.gameId);
+              startTransition(() => router.push(`/?game=${g.gameId}`));
+            }}
             title={g.cloneReady ? undefined : "Game này mới hỗ trợ xem trước asset, chưa tạo được bản sao"}
           >
             {g.iconUrl ? (
@@ -52,7 +59,11 @@ export default function GamePicker({ games }: { games: GameOption[] }) {
             )}
             <div className="gamepicker-name">{g.displayName}</div>
             <span className={`gamepicker-badge${g.cloneReady ? " ready" : ""}`}>
-              {g.cloneReady ? "Sẵn sàng tạo bản sao" : "Đang xây dựng — chưa hỗ trợ"}
+              {pendingId === g.gameId ? (
+                <>
+                  <Spinner />Đang tải…
+                </>
+              ) : g.cloneReady ? "Sẵn sàng tạo bản sao" : "Đang xây dựng — chưa hỗ trợ"}
             </span>
           </button>
         ))}

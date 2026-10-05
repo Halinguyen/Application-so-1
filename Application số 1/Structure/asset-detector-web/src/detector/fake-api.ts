@@ -39,7 +39,8 @@ const SITE_CONFIG: Record<string, string> = {
   news_tintuc_id: '1',
   news_tanthu_id: '1',
   news_vip_id: '2',
-  slide_home: '',
+  // Home slider (SliderPC/SliderMB) reads JSON [{id, image_link}] from the config API.
+  slide_home: JSON.stringify(FAKE_SLIDES.map((s, i) => ({ id: i + 1, image_link: s.image }))),
   loantinramat: '',
 };
 for (const k of [

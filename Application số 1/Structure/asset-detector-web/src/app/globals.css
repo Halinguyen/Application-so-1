@@ -286,3 +286,33 @@ footer.foot {
   cursor: pointer;
   font-family: "Inter", sans-serif;
 }
+
+/* Loading indicators */
+.spinner {
+  display: inline-block; width: 1em; height: 1em; border-radius: 50%;
+  border: 2px solid currentColor; border-right-color: transparent;
+  animation: spin 0.7s linear infinite; vertical-align: -0.15em; margin-right: 6px; flex: none;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn-loading { display: inline-flex; align-items: center; }
+.progress-note {
+  display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2);
+  font-size: 12.5px; color: var(--muted);
+}
+.progress-bar { position: relative; height: 3px; margin-top: 8px; border-radius: 3px; background: var(--border); overflow: hidden; }
+.progress-bar::after {
+  content: ""; position: absolute; inset: 0 auto 0 0; width: 35%; background: var(--accent);
+  border-radius: 3px; animation: indeterminate 1.2s ease-in-out infinite;
+}
+@keyframes indeterminate { 0% { left: -35%; } 100% { left: 100%; } }
+.gamepicker-card.pending { border-color: var(--accent); cursor: wait; }
+.gamepicker-card.dim { opacity: 0.5; pointer-events: none; }
+.preview-frame-wrap { position: relative; }
+.preview-frame-loading {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 10px; background: var(--surface); border-radius: 10px; border: 1px solid var(--border);
+  color: var(--muted); font-size: 13px; pointer-events: none;
+}
+.preview-frame-loading .spinner { width: 28px; height: 28px; border-width: 3px; margin: 0; }
+@media (prefers-reduced-motion: reduce) { .spinner, .progress-bar::after { animation-duration: 2s; } }

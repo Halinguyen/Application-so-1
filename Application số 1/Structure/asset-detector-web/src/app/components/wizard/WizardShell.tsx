@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { CloneSlot, CloneParam, CloneExternalSlot, CloneTextSlot, CropAnchor } from "./types";
+import Spinner from "../Spinner";
 import AssetCompareTile from "./AssetCompareTile";
 import ConfigStep from "./ConfigStep";
 import HoverHint from "./HoverHint";
@@ -589,7 +590,7 @@ export default function WizardShell({
             </div>
             <div style={{ marginTop: 12 }}>
               <button
-                className="rescan-btn"
+                className="rescan-btn btn-loading"
                 style={{ marginLeft: 0 }}
                 disabled={publishing || !result || !projectNameValid}
                 title={
@@ -601,9 +602,17 @@ export default function WizardShell({
                 }
                 onClick={publishRepo}
               >
-                {publishing ? "Đang tạo repo và đẩy code…" : "Tạo repo trên GitHub"}
+                {publishing ? <><Spinner />Đang tạo repo và đẩy code…</> : "Tạo repo trên GitHub"}
               </button>
             </div>
+            {publishing && (
+              <>
+                <div className="progress-note">
+                  <Spinner /> Đang kiểm tra file, tạo repo và đẩy code lên GitHub — có thể mất một lúc với bản clone lớn.
+                </div>
+                <div className="progress-bar" />
+              </>
+            )}
             {publishError && (
               <div style={{ color: "var(--warn)", fontSize: 12.5, marginTop: 10 }}>
                 {publishError.message}

@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import Spinner from "../Spinner";
+
 interface ReplacedFile {
   targetPath: string;
   originalBytes: number;
@@ -57,6 +60,9 @@ export default function PreviewPane({
   onGenerate: () => void;
   onStartPreview: () => void;
 }) {
+  const [loadedUrl, setLoadedUrl] = useState<string | null>(null);
+  const frameLoaded = !!previewResult?.url && loadedUrl === previewResult.url;
+
   return (
     <div>
       <div className="hint">
@@ -64,15 +70,32 @@ export default function PreviewPane({
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginTop: 16 }}>
-        <button className="rescan-btn" style={{ marginLeft: 0 }} onClick={onGenerate} disabled={submitting}>
-          {submitting ? "Đang tạo…" : `Tạo bản sao (${replacedCount} mục đã thay)`}
+        <button className="rescan-btn btn-loading" style={{ marginLeft: 0 }} onClick={onGenerate} disabled={submitting}>
+          {submitting ? <><Spinner />Đang tạo…</> : `Tạo bản sao (${replacedCount} mục đã thay)`}
         </button>
         {result && (
-          <button className="chip" onClick={onStartPreview} disabled={previewing}>
-            {previewing ? "Đang khởi động…" : "Xem trước"}
+          <button className="chip btn-loading" onClick={onStartPreview} disabled={previewing}>
+            {previewing ? <><Spinner />Đang khởi động…</> : "Xem trước"}
           </button>
         )}
       </div>
+
+      {submitting && (
+        <>
+          <div className="progress-note">
+            <Spinner /> Đang xử lý ảnh/video, ghi cấu hình và tạo bản sao — vui lòng không đóng trang.
+          </div>
+          <div className="progress-bar" />
+        </>
+      )}
+      {previewing && (
+        <>
+          <div className="progress-note">
+            <Spinner /> Đang khởi động bản xem trước (lần đầu có thể cần vài chục giây)…
+          </div>
+          <div className="progress-bar" />
+        </>
+      )}
 
       {error && (
         <div className="ext-note" style={{ marginTop: 12, borderColor: "var(--warn)" }}>
@@ -125,8 +148,16 @@ export default function PreviewPane({
                   {previewResult.url}
                 </a>
               </div>
+              <div className="preview-frame-wrap">
+              {!frameLoaded && (
+                <div className="preview-frame-loading">
+                  <Spinner />
+                  Đang tải bản xem trước…
+                </div>
+              )}
               <iframe
                 key={previewResult.url}
+                onLoad={() => setLoadedUrl(previewResult.url ?? null)}
                 src={previewResult.url}
                 title="Xem trước"
                 style={{
@@ -137,6 +168,7 @@ export default function PreviewPane({
                   background: "var(--surface)",
                 }}
               />
+              </div>
             </>
           ) : (
             <div className="ext-note" style={{ borderColor: "var(--warn)" }}>
