@@ -2,13 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "node:fs/promises";
 import { existsSync, symlinkSync } from "node:fs";
 import path from "node:path";
-import { resolveGame, getGameDisplayName, FAKE_SLIDE_SIZE } from "@/detector/config";
-import { detectFramework } from "@/detector/framework-detector";
+import { resolveGame, REAL_HUB_URL, REAL_RANKING_HOST } from "@/detector/config";
 import { readBaseEnv } from "@/detector/base-env";
 import { stopPreview, stopProcessesUsingDir } from "@/detector/preview-process";
-import { buildMockNewsModuleSource, patchServicesForFakeNews } from "@/detector/fake-news";
-import { buildMockApiModuleSource, prependMockApiImport } from "@/detector/fake-api";
-import { generateFakeSlideImages } from "@/detector/fake-slide-images";
 import { resizeUploadToMatchTarget, resizeUploadToMatchRemote, type CropAnchor } from "@/detector/resize-upload";
 import { applyTextSlot } from "@/detector/site-text";
 
@@ -159,28 +155,13 @@ async function readUploadBuffer(value: FormDataEntryValue): Promise<Buffer> {
   return Buffer.from(await res.arrayBuffer());
 }
 
-async function applyFakeNewsData(cloneDir: string, gameName: string, gameId: string) {
-  const slideImagePaths = await generateFakeSlideImages(cloneDir, FAKE_SLIDE_SIZE[gameId]);
-
-  const servicesPath = path.join(cloneDir, "src", "services", "index.ts");
-  const mockPath = path.join(cloneDir, "src", "services", "mock-news-data.ts");
-  const original = await fs.readFile(servicesPath, "utf-8");
-  const patched = patchServicesForFakeNews(original);
-  await fs.writeFile(servicesPath, patched);
-  await fs.writeFile(mockPath, buildMockNewsModuleSource(slideImagePaths, gameName));
-
-  // Offline mode: answer every axios call locally (no real backend). The
-  // adapter module must load before any file that creates/uses axios.
-  await fs.writeFile(path.join(cloneDir, "src", "services", "mock-api.ts"), buildMockApiModuleSource(gameName));
-  const withMockApi: [string, string][] = [
-    ["index.ts", "."],
-    ["baseAxios.ts", "."],
-    [path.join("axios", "index.ts"), ".."],
-  ];
-  for (const [rel, importBase] of withMockApi) {
-    const file = path.join(cloneDir, "src", "services", rel);
-    if (!existsSync(file)) continue;
-    await fs.writeFile(file, prependMockApiImport(await fs.readFile(file, "utf-8"), importBase));
+/** Replaces the host of `url`, keeping its scheme and path; falls back to https://domain. */
+function withHost(url: string | undefined, domain: string): string {
+  try {
+    const u = new URL(url ?? "");
+    return `${u.protocol}//${domain}${u.pathname.replace(/\/$/, "")}`;
+  } catch {
+    return `https://${domain}`;
   }
 }
 
@@ -188,20 +169,11 @@ export async function POST(request: NextRequest) {
   try {
     const form = await request.formData();
     const gameIdField = form.get("gameId");
-    const { gameId, repoPath } = resolveGame(typeof gameIdField === "string" ? gameIdField : undefined);
+    const { repoPath } = resolveGame(typeof gameIdField === "string" ? gameIdField : undefined);
     const CLONE_DIR = getCloneDir(repoPath);
 
     await copyRepoSkeleton(repoPath, CLONE_DIR);
     await applyPersistedUploads(repoPath, CLONE_DIR);
-    // Mock-news patching rewrites src/services/index.ts, a Vite/Next-only
-    // path that doesn't exist in a .NET repo (Controllers/Views instead) —
-    // no .NET equivalent has been built yet (see MULTI-GAME-ROLLOUT-PLAN.md /
-    // clone-scope memory), so skip rather than crash the whole clone on a
-    // framework this step was never written for.
-    const { framework } = await detectFramework(repoPath);
-    if (framework !== "dotnet-mvc") {
-      await applyFakeNewsData(CLONE_DIR, getGameDisplayName(gameId).replace(/^\[[^\]]*\]\s*/, ""), gameId);
-    }
 
     const filesReplaced: { targetPath: string; originalBytes: number; finalBytes: number; resized: boolean }[] = [];
     const externalReplaced: {
@@ -318,6 +290,16 @@ export async function POST(request: NextRequest) {
         }
       }
     }
+
+    // Real backend, no fake data: hub keys → REAL_HUB_URL, ranking keys → the
+    // real game-services host (scheme/path of the original value kept).
+    const hubKeys = Object.keys(env).filter((k) => /(^|_)HUB$/i.test(k) && /^https?:\/\//i.test(env[k]));
+    const rankingKeys = Object.keys(env).filter((k) => /(GAME_SERVICES?|SERVICE_GAME|RANKING_API)/i.test(k) && /^https?:\/\//i.test(env[k]));
+    for (const k of hubKeys) env[k] = REAL_HUB_URL;
+    for (const k of rankingKeys) env[k] = withHost(env[k], REAL_RANKING_HOST);
+    overriddenKeys.push(...hubKeys, ...rankingKeys);
+    if (hubKeys.length === 0) warnings.push("Không tìm thấy env key base URL của Hub — API hub vẫn dùng URL gốc.");
+    if (rankingKeys.length === 0) warnings.push("Không tìm thấy env key base URL của Ranking — Ranking vẫn dùng URL gốc.");
 
     const envPath = path.join(CLONE_DIR, ".env.local");
     const envLines = Object.entries(env).map(([k, v]) => `${k}=${v}`);

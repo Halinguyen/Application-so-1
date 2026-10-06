@@ -21,6 +21,11 @@ function isCloneReady(framework: string): boolean {
   return framework === "vite-spa" || framework === "nextjs";
 }
 
+// Sections whose content is now filled by the real APIs (slides / banner, news
+// posts + categories, ranking) — not static assets to replace, so the wizard
+// does not list them.
+const API_FILLED_SECTIONS = new Set(["home-banner", "banner", "home-news", "news", "tintuc", "home-rank", "rank"]);
+
 export default async function Home({
   searchParams,
 }: {
@@ -68,7 +73,7 @@ export default async function Home({
   const textSlots = await readTextSlots(repoPath);
 
   const slots: CloneSlot[] = data.assets
-    .filter((a) => (a.metadata?.operatorEditable || a.isAutoManaged) && !a.isExternal)
+    .filter((a) => (a.metadata?.operatorEditable || a.isAutoManaged) && !a.isExternal && !API_FILLED_SECTIONS.has(a.section))
     .map((a) => ({
       id: a.id,
       label: a.metadata?.label || a.fileName,

@@ -108,3 +108,11 @@ export function resolveGame(gameIdInput?: string | null): ResolvedGame {
   const defaultPath = path.join(GAME_TEMPLATE_ROOT, DEFAULT_GAME_ID, GAME_REPO_MAP[DEFAULT_GAME_ID]);
   return { gameId: DEFAULT_GAME_ID, repoPath: defaultPath };
 }
+
+// Clones always call the REAL backend (no fake data): hub config / categories /
+// slides / posts go to REAL_HUB_URL (the game's code adds
+// `?game_id=<GAME_ID>&language_name=vi`), ranking goes to REAL_RANKING_HOST
+// (`/api/Ranking/GetRanking?gameId=&mode=&scope=`). Both are written into the
+// clone's .env.local — nothing is asked in the wizard.
+export const REAL_HUB_URL = "https://vplay.vn/website-api";
+export const REAL_RANKING_HOST = "game-services-api.vplay.vn";
