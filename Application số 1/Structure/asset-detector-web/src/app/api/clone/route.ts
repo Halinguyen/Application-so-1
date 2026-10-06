@@ -301,9 +301,15 @@ export async function POST(request: NextRequest) {
     if (hubKeys.length === 0) warnings.push("Không tìm thấy env key base URL của Hub — API hub vẫn dùng URL gốc.");
     if (rankingKeys.length === 0) warnings.push("Không tìm thấy env key base URL của Ranking — Ranking vẫn dùng URL gốc.");
 
-    const envPath = path.join(CLONE_DIR, ".env.local");
+    // Some repos ship their own .env.development (dev hub, dev game id). Vite
+    // loads .env.[mode] AFTER .env.local, so it would override our values and
+    // the preview would call the dev hub (blocked by CORS from localhost).
+    // .env.[mode].local has the highest priority in both Vite and Next, so the
+    // same content goes there too.
     const envLines = Object.entries(env).map(([k, v]) => `${k}=${v}`);
-    await fs.writeFile(envPath, envLines.join("\n") + "\n");
+    for (const name of [".env.local", ".env.development.local"]) {
+      await fs.writeFile(path.join(CLONE_DIR, name), envLines.join("\n") + "\n");
+    }
 
     return NextResponse.json({
       cloneDir: CLONE_DIR,

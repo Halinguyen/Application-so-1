@@ -84,6 +84,11 @@ async function readCached(fileCache: Map<string, string>, repoPath: string, file
 // Returns the first candidate file whose content actually matches the
 // pattern — not just the first one that exists, since a divergent repo can
 // have a same-named file that isn't the right one for this slot.
+// A match whose captured block holds media/link markup (e.g. <h1><a><picture><img…>
+// — tamquoc-quan-anh's header) is NOT plain text: replacing it would wipe the
+// logo images (found: mobile header lost its game icon). Treat it as no match.
+const NON_TEXT_MARKUP = /<(img|picture|source|svg|video|a|Image|Link)[\s/>]/i;
+
 function resolveSlotFile(
   slot: TextSlotDef,
   fileCache: Map<string, string>
@@ -91,7 +96,7 @@ function resolveSlotFile(
   for (const file of slot.files) {
     const content = fileCache.get(file) ?? "";
     const match = content.match(slot.pattern);
-    if (match) return { file, match };
+    if (match && !NON_TEXT_MARKUP.test(match[1])) return { file, match };
   }
   return { file: slot.files[0], match: null };
 }
@@ -105,7 +110,8 @@ export async function readTextSlots(repoPath: string): Promise<TextSlotValue[]> 
       await readCached(fileCache, repoPath, file);
     }
     const { match } = resolveSlotFile(slot, fileCache);
-    const raw = match ? match[1] : "";
+    if (!match) continue; // slot not present, or not plain text — don't offer it
+    const raw = match[1];
     values.push({ id: slot.id, label: slot.label, defaultValue: slot.toDisplay ? slot.toDisplay(raw) : raw });
   }
 
