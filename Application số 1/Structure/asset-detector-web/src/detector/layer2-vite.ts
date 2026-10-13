@@ -37,6 +37,7 @@ export async function layer2ScanVite(repoPath: string): Promise<Layer2Result> {
   const codeFiles = await fg([
     '**/*.{ts,tsx,js,jsx}',
     '**/*.{css,scss}',
+    '**/*.html',
   ], {
     cwd: repoPath,
     ignore: IGNORE_PATTERNS,
@@ -61,6 +62,8 @@ export async function layer2ScanVite(repoPath: string): Promise<Layer2Result> {
       references.push(...scanJsCode(relativePath, content));
     } else if (['.css', '.scss'].includes(ext)) {
       references.push(...scanCssCode(relativePath, content));
+    } else if (ext === '.html') {
+      references.push(...scanHtmlCode(relativePath, content));
     }
   }
 
@@ -168,6 +171,24 @@ function scanJsCode(file: string, content: string): AssetReference[] {
       }
     },
 
+    // Any other plain string that is an asset path — e.g. the arrays of image
+    // paths at the top of a component (`const items = ["/assets/a.webp", ...]`)
+    // or both branches of a ternary. Without this, an asset used only that way
+    // looks unreferenced. Duplicates of the visitors above are dropped below.
+    StringLiteral(p: any) {
+      if (p.parent?.type === 'ImportDeclaration' || p.parent?.type === 'ExportNamedDeclaration' || p.parent?.type === 'ExportAllDeclaration') return;
+      const value = p.node.value;
+      if (typeof value !== 'string' || !isAssetPath(value)) return;
+      refs.push({
+        file,
+        line: p.node.loc?.start.line || 0,
+        type: 'string-literal',
+        assetPath: value,
+        usage: 'string literal',
+        confidence: 0.8,
+      });
+    },
+
     TemplateLiteral(p: any) {
       const raw = p.node.quasis.map((q: any) => q.value.raw).join('${}');
       if (isAssetPath(raw)) {
@@ -183,6 +204,32 @@ function scanJsCode(file: string, content: string): AssetReference[] {
     },
   });
 
+  // The generic visitors overlap the specific ones on the same literal; keep one
+  // reference per (line, path) — the specific visitor runs first (parent before child).
+  const seen = new Set<string>();
+  return refs.filter((r) => {
+    const key = `${r.line}|${r.assetPath}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+// index.html and other static pages: <link rel="icon" href>, <meta content>, <img src>…
+function scanHtmlCode(file: string, content: string): AssetReference[] {
+  const refs: AssetReference[] = [];
+  for (const match of content.matchAll(/\b(?:href|src|content|poster|srcset)\s*=\s*["']([^"']+)["']/gi)) {
+    const url = match[1].trim();
+    if (!isAssetPath(url)) continue;
+    refs.push({
+      file,
+      line: content.substring(0, match.index).split('\n').length,
+      type: 'html-attr',
+      assetPath: url,
+      usage: 'html',
+      confidence: 1.0,
+    });
+  }
   return refs;
 }
 
@@ -191,7 +238,10 @@ function scanCssCode(file: string, content: string): AssetReference[] {
 
   const urlMatches = content.matchAll(/url\(['"]?([^'")]+)['"]?\)/g);
   for (const match of urlMatches) {
-    const url = match[1];
+    // `url(../img/a.png)` is relative to the CSS file: resolve it to a repo path so it
+    // can be matched to the asset (the bare `../img/a.png` never matches anything).
+    const raw = match[1].trim();
+    const url = raw.startsWith('.') ? path.posix.normalize(path.posix.join(path.posix.dirname(file), raw)) : raw;
     if (isAssetPath(url)) {
       refs.push({
         file,

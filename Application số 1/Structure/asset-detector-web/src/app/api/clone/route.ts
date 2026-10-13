@@ -5,6 +5,8 @@ import path from "node:path";
 import { resolveGame, REAL_HUB_URL, REAL_RANKING_HOST } from "@/detector/config";
 import { readBaseEnv } from "@/detector/base-env";
 import { stopPreview, stopProcessesUsingDir } from "@/detector/preview-process";
+import { toDirectUrl } from "@/detector/fetch-psd-url";
+import sharp from "sharp";
 import { resizeUploadToMatchTarget, resizeUploadToMatchRemote, type CropAnchor } from "@/detector/resize-upload";
 import { applyTextSlot } from "@/detector/site-text";
 
@@ -150,9 +152,19 @@ async function readUploadBuffer(value: FormDataEntryValue): Promise<Buffer> {
   const url = typeof value === "string" ? value.trim() : "";
   if (!url) throw new Error("no file or URL provided");
   if (!/^https?:\/\//i.test(url)) throw new Error(`unsupported URL: ${url}`);
-  const res = await fetch(url);
+  // Drive/Dropbox share links are web pages - turn them into direct downloads.
+  const res = await fetch(toDirectUrl(url));
   if (!res.ok) throw new Error(`could not fetch ${url} (${res.status})`);
+  // A page instead of media (login wall, unshared file) would otherwise be saved as the image.
+  if ((res.headers.get("content-type") ?? "").includes("text/html")) {
+    throw new Error(`link trả về trang web chứ không phải file ảnh (cần chia sẻ công khai hoặc dùng link tải trực tiếp): ${url}`);
+  }
   return Buffer.from(await res.arrayBuffer());
+}
+
+async function isRasterOrSvg(buf: Buffer): Promise<boolean> {
+  if (await sharp(buf).metadata().then(() => true, () => false)) return true;
+  return /^\s*(<\?xml|<svg)/i.test(buf.subarray(0, 256).toString("utf8"));
 }
 
 /** Replaces the host of `url`, keeping its scheme and path; falls back to https://domain. */
@@ -208,6 +220,14 @@ export async function POST(request: NextRequest) {
           warnings.push(`${targetPaths[0]}: ${e instanceof Error ? e.message : String(e)}`);
           continue;
         }
+        // These are image files the site loads through <img>/CSS: a video or other non-image
+        // written over them leaves a broken file, so refuse it loudly and keep the original.
+        if (!(await isRasterOrSvg(uploadBuf))) {
+          warnings.push(
+            `${targetPaths[0]}: ô này là ảnh tĩnh trên trang nên không nhận video/file không phải ảnh — chưa thay, giữ ảnh gốc. Hãy dùng ảnh (PNG/JPG/WebP).`
+          );
+          continue;
+        }
         for (const targetPath of targetPaths) {
           // targetPath is repo-relative, e.g. "public/assets/rank/1920/bg-rank.png"
           // Resize/compress to match THIS target's own real dimensions —
@@ -244,6 +264,10 @@ export async function POST(request: NextRequest) {
           uploadBuf = await readUploadBuffer(value);
         } catch (e) {
           warnings.push(`${localPath}: ${e instanceof Error ? e.message : String(e)}`);
+          continue;
+        }
+        if (!(await isRasterOrSvg(uploadBuf))) {
+          warnings.push(`${localPath}: file không phải ảnh (PNG/JPG/WebP/SVG) — chưa thay, giữ nguyên asset gốc.`);
           continue;
         }
         // Fetch the CDN URL being replaced to read ITS dimensions, then resize

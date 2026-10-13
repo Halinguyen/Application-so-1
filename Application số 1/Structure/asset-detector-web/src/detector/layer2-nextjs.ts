@@ -164,6 +164,24 @@ function scanJsCode(file: string, content: string): AssetReference[] {
     // ones already captured by JSXAttribute or ObjectProperty above (both
     // visit the very same TemplateLiteral node when it's their direct
     // child) to avoid recording the same usage twice.
+    // Any other plain string that is an asset path - arrays of image paths at the top of a
+    // component, both branches of a ternary, data files. Without this an asset used only
+    // that way looks unreferenced. Overlaps with the visitors above are dropped below.
+    StringLiteral(p: any) {
+      const parentType = p.parent?.type;
+      if (parentType === 'ImportDeclaration' || parentType === 'ExportNamedDeclaration' || parentType === 'ExportAllDeclaration') return;
+      const value = p.node.value;
+      if (typeof value !== 'string' || !isAssetPath(value)) return;
+      refs.push({
+        file,
+        line: p.node.loc?.start.line || 0,
+        type: 'string-literal',
+        assetPath: value,
+        usage: 'string literal',
+        confidence: 0.8,
+      });
+    },
+
     TemplateLiteral(p: any) {
       if (p.findParent((pp: any) => pp.isJSXAttribute())) return;
       if (p.parentPath?.isObjectProperty() && p.parentPath.node.value === p.node) return;
@@ -181,7 +199,14 @@ function scanJsCode(file: string, content: string): AssetReference[] {
     },
   });
 
-  return refs;
+  // Keep one reference per (line, path): the specific visitors run first (parent before child).
+  const seen = new Set<string>();
+  return refs.filter((r) => {
+    const key = `${r.line}|${r.assetPath}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }
 
 function scanCssCode(file: string, content: string): AssetReference[] {
@@ -189,7 +214,10 @@ function scanCssCode(file: string, content: string): AssetReference[] {
 
   const urlMatches = content.matchAll(/url\(['"]?([^'")]+)['"]?\)/g);
   for (const match of urlMatches) {
-    const url = match[1];
+    // `url(../img/a.png)` is relative to the CSS file: resolve it to a repo path so it
+    // can be matched to the asset (the bare `../img/a.png` never matches anything).
+    const raw = match[1].trim();
+    const url = raw.startsWith('.') ? path.posix.normalize(path.posix.join(path.posix.dirname(file), raw)) : raw;
     if (isAssetPath(url)) {
       refs.push({
         file,

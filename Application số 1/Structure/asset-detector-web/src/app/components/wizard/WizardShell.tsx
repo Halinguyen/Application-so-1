@@ -7,12 +7,14 @@ import Spinner from "../Spinner";
 import AssetCompareTile from "./AssetCompareTile";
 import ConfigStep from "./ConfigStep";
 import HoverHint from "./HoverHint";
+import PsdMappingStep, { type PsdApplyEntry } from "./PsdMappingStep";
 import PreviewPane, { type CloneResult, type PreviewResult } from "./PreviewPane";
 
 const STEPS = [
-  { n: 2, label: "Nội dung & hình ảnh" },
-  { n: 3, label: "Cấu hình" },
-  { n: 4, label: "Xem trước & Hoàn tất" },
+  { n: 2, label: "Ghép từ PSD" },
+  { n: 3, label: "Nội dung & hình ảnh" },
+  { n: 4, label: "Cấu hình" },
+  { n: 5, label: "Xem trước & Hoàn tất" },
 ] as const;
 
 // Only plain strings/records are persisted — File objects can't be
@@ -46,7 +48,7 @@ interface RepoResult {
 }
 
 function storageKey(gameId: string) {
-  return `wizard-state:${gameId}`;
+  return `wizard-state:v2:${gameId}`;
 }
 
 function loadPersisted(gameId: string): Partial<PersistedState> {
@@ -66,6 +68,7 @@ export default function WizardShell({
   params,
   externalSlots,
   textSlots,
+  unusedAssets = [],
 }: {
   gameId: string;
   displayName?: string;
@@ -74,6 +77,8 @@ export default function WizardShell({
   params: CloneParam[];
   externalSlots: CloneExternalSlot[];
   textSlots: CloneTextSlot[];
+  /** Repo files no source code refers to — skipped, listed for transparency. */
+  unusedAssets?: string[];
 }) {
   const persisted = useMemo(() => loadPersisted(gameId), [gameId]);
 
@@ -81,6 +86,9 @@ export default function WizardShell({
   const [files, setFiles] = useState<Record<string, File>>({});
   const [previews, setPreviews] = useState<Record<string, string>>({});
   const [urlValues, setUrlValues] = useState<Record<string, string>>(persisted.urlValues ?? {});
+  // Images mapped from the PSD design, per slot and device (a per-breakpoint slot
+  // gets a mobile and a desktop image that replace different target files).
+  const [deviceFiles, setDeviceFiles] = useState<Record<string, Record<string, PsdApplyEntry>>>({});
   const [anchors] = useState<Record<string, CropAnchor>>({});
   const [externalFiles, setExternalFiles] = useState<Record<string, File>>({});
   const [externalPreviews, setExternalPreviews] = useState<Record<string, string>>({});
@@ -166,7 +174,35 @@ export default function WizardShell({
     );
   }, [slots]);
 
+  function dropDeviceFiles(slotId: string) {
+    setDeviceFiles((prev) => {
+      if (!prev[slotId]) return prev;
+      const next = { ...prev };
+      delete next[slotId];
+      return next;
+    });
+  }
+
+  function applyPsd(entries: PsdApplyEntry[]) {
+    const grouped: Record<string, Record<string, PsdApplyEntry>> = {};
+    for (const e of entries) (grouped[e.slotId] ??= {})[e.device] = e;
+    setDeviceFiles(grouped);
+    // The PSD image supersedes any earlier manual pick for the same slot.
+    const ids = Object.keys(grouped);
+    setFiles((prev) => { const next = { ...prev }; for (const id of ids) delete next[id]; return next; });
+    setUrlValues((prev) => { const next = { ...prev }; for (const id of ids) delete next[id]; return next; });
+    setPreviews((prev) => {
+      const next = { ...prev };
+      for (const id of ids) {
+        const pick = grouped[id].desktop ?? grouped[id].shared ?? grouped[id].mobile;
+        next[id] = URL.createObjectURL(pick.file);
+      }
+      return next;
+    });
+  }
+
   function onFilePicked(slot: CloneSlot, file: File | null) {
+    dropDeviceFiles(slot.id);
     setFiles((prev) => {
       const next = { ...prev };
       if (file) next[slot.id] = file;
@@ -184,6 +220,7 @@ export default function WizardShell({
 
   function onUrlPasted(slot: CloneSlot, raw: string) {
     const url = raw.trim();
+    if (url) dropDeviceFiles(slot.id);
     setUrlValues((prev) => {
       const next = { ...prev };
       if (url) next[slot.id] = url;
@@ -252,6 +289,10 @@ export default function WizardShell({
         const key = `file:${JSON.stringify({ targetPaths: slot.targetPaths, anchor: anchors[slot.id] || "attention" })}`;
         if (file) form.append(key, file);
         else if (url) form.append(key, url);
+        // PSD-mapped images: one entry per device so each replaces only its own targets.
+        for (const entry of Object.values(deviceFiles[slot.id] ?? {})) {
+          form.append(`file:${JSON.stringify({ targetPaths: entry.targetPaths, anchor: anchors[slot.id] || "attention" })}`, entry.file);
+        }
       }
       for (const slot of externalSlots) {
         if (excludedIds[slot.id]) continue;
@@ -305,6 +346,7 @@ export default function WizardShell({
   }
 
   const replacedCount =
+    Object.keys(deviceFiles).length +
     Object.keys(files).length +
     Object.keys(urlValues).length +
     Object.keys(externalFiles).length +
@@ -341,7 +383,17 @@ export default function WizardShell({
         ))}
       </nav>
 
-      {currentStep === 2 && (
+      <div style={{ display: currentStep === 2 ? "block" : "none" }}>
+        <PsdMappingStep
+          gameId={gameId}
+          slots={slots}
+          excludedIds={excludedIds}
+          onApply={applyPsd}
+          onContinue={() => setCurrentStep(3)}
+        />
+      </div>
+
+      {currentStep === 3 && (
         <section className="block" style={{ marginTop: 24 }}>
           {textSlots.length > 0 && (
             <div style={{ marginBottom: 28 }}>
@@ -373,6 +425,18 @@ export default function WizardShell({
             <li><strong>Hiển thị / Mỗi thiết bị dùng ảnh riêng</strong>: cho biết ảnh bạn tải lên sẽ thay ở máy tính, máy tính bảng hay điện thoại.</li>
             <li><strong>Tải ảnh mới lên</strong>: thay ảnh. <strong>Không dùng asset này</strong>: ẩn ảnh, không đưa vào bản sao (bấm ↺ ở mục "Đã ẩn" để hiện lại).</li>
           </ul>
+          {unusedAssets.length > 0 && (
+            <details className="hint" style={{ margin: "0 0 14px" }}>
+              <summary>
+                Đã bỏ qua {unusedAssets.length} file ảnh có trong repo nhưng code không dùng
+              </summary>
+              <ul style={{ margin: "6px 0 0 18px", lineHeight: 1.6 }}>
+                {unusedAssets.map((p) => (
+                  <li key={p} className="mono">{p}</li>
+                ))}
+              </ul>
+            </details>
+          )}
           {bySection.map(([section, sectionSlots], sectionIndex) => {
             const visibleSlots = sectionSlots.filter((s) => !excludedIds[s.id]);
             const hiddenSlots = sectionSlots.filter((s) => excludedIds[s.id]);
@@ -393,7 +457,7 @@ export default function WizardShell({
                       slot={slot}
                       originalUrl={`/api/asset-image?path=${encodeURIComponent(slot.previewPath)}&game=${gameId}`}
                       replacedPreviewUrl={previews[slot.id] || urlValues[slot.id] || null}
-                      hasReplacement={!!files[slot.id] || !!urlValues[slot.id]}
+                      hasReplacement={!!files[slot.id] || !!urlValues[slot.id] || !!deviceFiles[slot.id]}
                       onFilePicked={(f) => onFilePicked(slot, f)}
                       onUrlPasted={(u) => onUrlPasted(slot, u)}
                       onClear={() => clearSlot(slot)}
@@ -516,14 +580,14 @@ export default function WizardShell({
           )}
 
           <div style={{ marginTop: 24 }}>
-            <button className="rescan-btn" style={{ marginLeft: 0 }} onClick={() => setCurrentStep(3)}>
+            <button className="rescan-btn" style={{ marginLeft: 0 }} onClick={() => setCurrentStep(4)}>
               Tiếp tục →
             </button>
           </div>
         </section>
       )}
 
-      {currentStep === 3 && (
+      {currentStep === 4 && (
         <section className="block" style={{ marginTop: 24 }}>
           <h2>Thông tin bản sao</h2>
           <div className="hint">
@@ -552,7 +616,7 @@ export default function WizardShell({
             )}
           </div>
           <div style={{ marginTop: 24, display: "flex", gap: 10 }}>
-            <button className="chip" onClick={() => setCurrentStep(2)}>
+            <button className="chip" onClick={() => setCurrentStep(3)}>
               ← Quay lại
             </button>
             <button
@@ -560,7 +624,7 @@ export default function WizardShell({
               style={{ marginLeft: 0 }}
               disabled={!projectNameValid}
               title={projectNameValid ? undefined : "Nhập tên dự án đúng định dạng [mã game]-[tên game] để tiếp tục"}
-              onClick={() => setCurrentStep(4)}
+              onClick={() => setCurrentStep(5)}
             >
               Tiếp tục →
             </button>
@@ -568,7 +632,7 @@ export default function WizardShell({
         </section>
       )}
 
-      {currentStep === 4 && (
+      {currentStep === 5 && (
         <section className="block" style={{ marginTop: 24 }}>
           <h2>Xem trước & Hoàn tất</h2>
           <PreviewPane
@@ -641,7 +705,7 @@ export default function WizardShell({
             )}
           </div>
           <div style={{ marginTop: 24 }}>
-            <button className="chip" onClick={() => setCurrentStep(3)}>
+            <button className="chip" onClick={() => setCurrentStep(4)}>
               ← Quay lại
             </button>
           </div>

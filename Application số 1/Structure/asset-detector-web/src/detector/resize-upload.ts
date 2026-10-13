@@ -117,6 +117,10 @@ async function resizeUploadToDimensions(
   anchor: CropAnchor,
   maxFileSize: number
 ): Promise<Buffer> {
+  // Not a raster image sharp can decode (a video uploaded into an image slot,
+  // a corrupt file…): keep the upload untouched instead of failing the whole clone.
+  if (!(await sharp(uploadBuf).metadata().then(() => true, () => false))) return uploadBuf;
+
   const normalizedExt = ext.toLowerCase();
   const pipeline = sharp(uploadBuf).resize(width, height, { fit: "cover", position: resolvePosition(anchor) });
 

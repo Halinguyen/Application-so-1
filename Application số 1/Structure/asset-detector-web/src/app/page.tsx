@@ -7,7 +7,62 @@ import { describeSection, describeSectionPosition, sectionOrder, needsVisualProo
 import Link from "next/link";
 import GamePicker, { type GameOption } from "./components/wizard/GamePicker";
 import WizardShell from "./components/wizard/WizardShell";
-import type { CloneSlot, CloneParam, CloneExternalSlot } from "./components/wizard/types";
+import type { CloneSlot, CloneSlotTarget, CloneParam, CloneExternalSlot } from "./components/wizard/types";
+import type { DetectedAsset } from "@/detector/types";
+
+// Many assets share a file name in different folders ("title.webp" x10), which made the
+// list look like repeats. Append the folder they live in to every label that is not unique.
+function withUniqueLabels(slots: CloneSlot[]): CloneSlot[] {
+  const count = new Map<string, number>();
+  for (const s of slots) count.set(s.label, (count.get(s.label) ?? 0) + 1);
+  return slots.map((s) => {
+    if ((count.get(s.label) ?? 0) < 2) return s;
+    const folder = s.previewPath
+      .replace(/\\/g, "/")
+      .replace(/^(public|wwwroot)\//, "")
+      .replace(/^assets\//, "")
+      .split("/")
+      .slice(0, -1)
+      .filter((p) => !/^\d+$/.test(p))
+      .join("/");
+    return folder ? { ...s, label: `${s.label} · ${folder}` } : s;
+  });
+}
+
+// Splits an asset into per-device PSD-mappable targets. Tablet shares the
+// desktop design (the operator supplies only a mobile and a desktop PSD).
+function buildTargets(a: DetectedAsset): CloneSlotTarget[] {
+  const v = a.variants;
+  if (a.responsive === "per-breakpoint" && v) {
+    const out: CloneSlotTarget[] = [];
+    const mobile = v.mobile;
+    const desk = [v.desktop, v.tablet].filter((x): x is NonNullable<typeof x> => !!x);
+    if (mobile) {
+      out.push({ device: "mobile", label: "Điện thoại", previewPath: mobile.path, targetPaths: [mobile.path], width: mobile.width, height: mobile.height });
+    }
+    if (desk.length) {
+      out.push({
+        device: "desktop",
+        label: v.tablet && v.desktop ? "Máy tính + tablet" : v.desktop ? "Máy tính" : "Máy tính bảng",
+        previewPath: desk[0].path,
+        targetPaths: desk.map((x) => x.path),
+        width: desk[0].width,
+        height: desk[0].height,
+      });
+    }
+    if (out.length) return out;
+  }
+  return [
+    {
+      device: "shared",
+      label: "Mọi thiết bị",
+      previewPath: a.canonicalPath,
+      targetPaths: a.injection?.targetPaths || [a.canonicalPath],
+      width: a.dimensions?.width,
+      height: a.dimensions?.height,
+    },
+  ];
+}
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -25,6 +80,12 @@ function isCloneReady(framework: string): boolean {
 // posts + categories, ranking) — not static assets to replace, so the wizard
 // does not list them.
 const API_FILLED_SECTIONS = new Set(["home-banner", "banner", "home-news", "news", "tintuc", "home-rank", "rank"]);
+
+// Buttons / icons / logos inside those sections are static artwork (nav, download, prev/next)
+// that the clone must be able to replace; only the content images are API-driven.
+function isApiFilled(a: DetectedAsset): boolean {
+  return API_FILLED_SECTIONS.has(a.section) && !/^(btn|icon|logo)/i.test(a.fileName);
+}
 
 export default async function Home({
   searchParams,
@@ -72,8 +133,15 @@ export default async function Home({
   const baseEnv = await readBaseEnv(repoPath);
   const textSlots = await readTextSlots(repoPath);
 
-  const slots: CloneSlot[] = data.assets
-    .filter((a) => (a.metadata?.operatorEditable || a.isAutoManaged) && !a.isExternal && !API_FILLED_SECTIONS.has(a.section))
+  // Only assets the source code actually uses (favicons are always kept: they are wired
+  // through index.html/manifest). Files that merely sit in the assets folder are listed
+  // separately so the operator is not asked to replace images nothing displays.
+  const candidates = data.assets.filter(
+    (a) => (a.metadata?.operatorEditable || a.isAutoManaged) && !a.isExternal && !isApiFilled(a)
+  );
+  const unusedAssets = candidates.filter((a) => !a.isAutoManaged && a.referenceCount === 0).map((a) => a.canonicalPath);
+  const slots: CloneSlot[] = withUniqueLabels(candidates
+    .filter((a) => a.isAutoManaged || a.referenceCount > 0)
     .map((a) => ({
       id: a.id,
       label: a.metadata?.label || a.fileName,
@@ -93,7 +161,8 @@ export default async function Home({
         usage: r.usage,
         attribute: r.attribute,
       })),
-    }));
+      targets: buildTargets(a),
+    })));
 
   const externalSlots: CloneExternalSlot[] = data.assets
     .filter((a) => a.isExternal)
@@ -141,6 +210,6 @@ export default async function Home({
         ];
 
   return (
-    <WizardShell key={gameId} gameId={gameId} displayName={getGameDisplayName(gameId)} iconUrl={getGameIconUrl(gameId)} slots={slots} params={params} externalSlots={externalSlots} textSlots={textSlots} />
+    <WizardShell key={gameId} gameId={gameId} displayName={getGameDisplayName(gameId)} iconUrl={getGameIconUrl(gameId)} slots={slots} params={params} externalSlots={externalSlots} textSlots={textSlots} unusedAssets={unusedAssets} />
   );
 }

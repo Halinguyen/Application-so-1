@@ -43,6 +43,13 @@ function waitForPort(port: number, timeoutMs: number, hasExited: () => boolean =
   });
 }
 
+// The link must use the host the operator opened the tool with — "localhost"
+// would point at the PARTNER's own machine when the tool is used over the LAN.
+function previewUrl(request: NextRequest, port: number): string {
+  const host = (request.headers.get("host") ?? "localhost").replace(/:\d+$/, "");
+  return `http://${host}:${port}`;
+}
+
 export async function POST(request: NextRequest) {
   const { gameId, repoPath } = resolveGame(request.nextUrl.searchParams.get("game"));
   const CLONE_DIR = getCloneDir(repoPath);
@@ -57,7 +64,7 @@ export async function POST(request: NextRequest) {
   if (existingPort && existingGameId === gameId) {
     const alive = await waitForPort(existingPort, 500);
     if (alive) {
-      return NextResponse.json({ gameId, port: existingPort, url: `http://localhost:${existingPort}`, alreadyRunning: true });
+      return NextResponse.json({ gameId, port: existingPort, url: previewUrl(request, existingPort), alreadyRunning: true });
     }
   } else if (existingPort) {
     // A preview for a DIFFERENT game is running — the single in-memory slot
@@ -83,8 +90,8 @@ export async function POST(request: NextRequest) {
     const { framework } = await detectFramework(repoPath);
     const devArgs =
       framework === "nextjs"
-        ? ["run", "dev", "--", "--port", String(port)]
-        : ["run", "dev", "--", "--port", String(port), "--strictPort"];
+        ? ["run", "dev", "--", "--port", String(port), "--hostname", "0.0.0.0"]
+        : ["run", "dev", "--", "--port", String(port), "--strictPort", "--host"];
     // Log to a file instead of discarding output — a silent crash (wrong
     // CLI flag, missing dependency, a runtime error on first compile) was
     // previously undiagnosable since stdio:"ignore" threw the only evidence
@@ -139,7 +146,7 @@ export async function POST(request: NextRequest) {
             ? "Preview server exited right after starting — see the log for the reason."
             : "Preview server didn't come up in time — it may still be starting. Try opening the URL in a moment, or run it manually.",
           port,
-          url: `http://localhost:${port}`,
+          url: previewUrl(request, port),
           manualCommand: `cd "${CLONE_DIR}" && npm run dev -- ${devArgs.slice(3).join(" ")}`,
           logPath,
         },
@@ -147,7 +154,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ gameId, port, url: `http://localhost:${port}`, ready: true });
+    return NextResponse.json({ gameId, port, url: previewUrl(request, port), ready: true });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     return NextResponse.json(

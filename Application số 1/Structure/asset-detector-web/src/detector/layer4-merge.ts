@@ -125,6 +125,15 @@ export function matchesAsset(refPath: string, raw: RawAsset): boolean {
     if (!prefix && suffix) {
       if (('/' + fileName).endsWith(suffix)) return true;
     }
+
+    // General form: every `${}` is a wildcard, the rest must match the tail of the path.
+    // Covers `/${base}/img/btn-menu.png` (variable folder + fixed folder + file name),
+    // which neither check above can match.
+    const relNoRoot = rel.replace(/^(public|static|wwwroot)\//, '');
+    const body = normalized.split('${}').map((s) => s.replace(/[.*+?^$()|[\]\\{}]/g, '\\$&')).join('[^/]*(?:/[^/]+)*?');
+    // Needs real literal text beyond the extension, or `${}.png` would match every png.
+    const literal = normalized.replace(/\$\{\}/g, '').replace(/\.[a-z0-9]+$/, '');
+    if (literal.replace(/\//g, '').length >= 4 && new RegExp('(?:^|/)' + body + '$').test(relNoRoot)) return true;
   }
 
   // NOTE: a "Case 3: match by bare filename" fallback (`normalized.endsWith('/' + fileName)`)
