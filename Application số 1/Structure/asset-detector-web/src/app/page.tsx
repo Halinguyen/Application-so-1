@@ -3,6 +3,7 @@ import { readBaseEnv } from "@/detector/base-env";
 import { readTextSlots } from "@/detector/site-text";
 import { resolveGame, GAME_REPO_MAP, getGameDisplayName, getGameIconUrl } from "@/detector/config";
 import { detectFramework } from "@/detector/framework-detector";
+import { readImageSize } from "@/detector/image-size";
 import { describeSection, describeSectionPosition, sectionOrder, needsVisualProof, describeResponsive } from "@/detector/section-labels";
 import Link from "next/link";
 import GamePicker, { type GameOption } from "./components/wizard/GamePicker";
@@ -31,14 +32,18 @@ function withUniqueLabels(slots: CloneSlot[]): CloneSlot[] {
 
 // Splits an asset into per-device PSD-mappable targets. Tablet shares the
 // desktop design (the operator supplies only a mobile and a desktop PSD).
-function buildTargets(a: DetectedAsset): CloneSlotTarget[] {
+// Per-breakpoint variants carry no width/height, so each target's own file is
+// measured: without a size the PSD matcher has nothing to compare and skips it.
+type SizeOf = (relPath: string) => Promise<{ width: number; height: number } | null>;
+
+async function buildTargets(a: DetectedAsset, sizeOf: SizeOf): Promise<CloneSlotTarget[]> {
   const v = a.variants;
   if (a.responsive === "per-breakpoint" && v) {
     const out: CloneSlotTarget[] = [];
     const mobile = v.mobile;
     const desk = [v.desktop, v.tablet].filter((x): x is NonNullable<typeof x> => !!x);
     if (mobile) {
-      out.push({ device: "mobile", label: "Điện thoại", previewPath: mobile.path, targetPaths: [mobile.path], width: mobile.width, height: mobile.height });
+      out.push({ device: "mobile", label: "Điện thoại", previewPath: mobile.path, targetPaths: [mobile.path], ...(await sizeOf(mobile.path)) });
     }
     if (desk.length) {
       out.push({
@@ -46,8 +51,7 @@ function buildTargets(a: DetectedAsset): CloneSlotTarget[] {
         label: v.tablet && v.desktop ? "Máy tính + tablet" : v.desktop ? "Máy tính" : "Máy tính bảng",
         previewPath: desk[0].path,
         targetPaths: desk.map((x) => x.path),
-        width: desk[0].width,
-        height: desk[0].height,
+        ...(await sizeOf(desk[0].path)),
       });
     }
     if (out.length) return out;
@@ -58,8 +62,7 @@ function buildTargets(a: DetectedAsset): CloneSlotTarget[] {
       label: "Mọi thiết bị",
       previewPath: a.canonicalPath,
       targetPaths: a.injection?.targetPaths || [a.canonicalPath],
-      width: a.dimensions?.width,
-      height: a.dimensions?.height,
+      ...(a.dimensions ?? (await sizeOf(a.canonicalPath))),
     },
   ];
 }
@@ -140,9 +143,10 @@ export default async function Home({
     (a) => (a.metadata?.operatorEditable || a.isAutoManaged) && !a.isExternal && !isApiFilled(a)
   );
   const unusedAssets = candidates.filter((a) => !a.isAutoManaged && a.referenceCount === 0).map((a) => a.canonicalPath);
-  const slots: CloneSlot[] = withUniqueLabels(candidates
+  const sizeOf: SizeOf = (relPath) => readImageSize(repoPath, relPath);
+  const slots: CloneSlot[] = withUniqueLabels(await Promise.all(candidates
     .filter((a) => a.isAutoManaged || a.referenceCount > 0)
-    .map((a) => ({
+    .map(async (a): Promise<CloneSlot> => ({
       id: a.id,
       label: a.metadata?.label || a.fileName,
       section: a.section,
@@ -161,8 +165,8 @@ export default async function Home({
         usage: r.usage,
         attribute: r.attribute,
       })),
-      targets: buildTargets(a),
-    })));
+      targets: await buildTargets(a, sizeOf),
+    }))));
 
   const externalSlots: CloneExternalSlot[] = data.assets
     .filter((a) => a.isExternal)
@@ -195,7 +199,20 @@ export default async function Home({
       )
     ),
   ];
-  const params: CloneParam[] =
+  // Optional hero play-video button (see layer2-hero-video.ts): one YouTube link
+  // per detected block, written to .env.local; blank = button hidden.
+  const heroVideoParams: CloneParam[] = data.dynamicBlocks
+    .filter((b) => b.type === "hero-video")
+    .flatMap((b) =>
+      b.params.map((p) => ({
+        blockLabel: b.label,
+        name: p.name,
+        envKey: p.envKey,
+        required: false,
+        defaultValue: baseEnv[p.envKey] ?? "",
+      }))
+    );
+  const gameIdParams: CloneParam[] =
     gameIdKeys.length === 0
       ? []
       : [
@@ -208,6 +225,8 @@ export default async function Home({
             defaultValue: baseEnv[gameIdKeys[0]] ?? "",
           },
         ];
+
+  const params: CloneParam[] = [...gameIdParams, ...heroVideoParams];
 
   return (
     <WizardShell key={gameId} gameId={gameId} displayName={getGameDisplayName(gameId)} iconUrl={getGameIconUrl(gameId)} slots={slots} params={params} externalSlots={externalSlots} textSlots={textSlots} unusedAssets={unusedAssets} />

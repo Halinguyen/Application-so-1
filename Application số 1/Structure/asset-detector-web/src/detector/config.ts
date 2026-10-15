@@ -1,5 +1,7 @@
 import path from "node:path";
 import { existsSync } from "node:fs";
+import { readCloneSchema } from "./clone-schema";
+import { materializeTemplate } from "./template-store";
 
 // Nhóm A games confirmed to share phuong-hoang-tru-tien's exact structural
 // fingerprint (src/services/index.ts, src/layout/HeaderHome.tsx,
@@ -90,23 +92,49 @@ const GAME_TEMPLATE_ROOT = path.resolve(process.cwd(), "..", "game-template-repo
 export interface ResolvedGame {
   gameId: string;
   repoPath: string;
+  // "live" = the working template folder in game-template-repo/;
+  // "snapshot" = extracted from the frozen archive in template-store/.
+  source: "live" | "snapshot";
+}
+
+// The template comes from the live folder when it exists, otherwise from the
+// frozen snapshot named by the game's schema (the live folder may have been
+// deleted once the schema was verified). TEMPLATE_SOURCE=snapshot forces the
+// snapshot even while the live folder is still there — used to prove a clone
+// really works without it.
+function resolveTemplate(gameId: string): ResolvedGame | null {
+  const mapped = GAME_REPO_MAP[gameId];
+  const livePath = mapped ? path.join(GAME_TEMPLATE_ROOT, gameId, mapped) : null;
+  const liveExists = !!livePath && existsSync(livePath);
+  if (liveExists && process.env.TEMPLATE_SOURCE !== "snapshot") {
+    return { gameId, repoPath: livePath, source: "live" };
+  }
+  const schema = readCloneSchema(gameId);
+  if (schema?.status === "frozen") {
+    return { gameId, repoPath: materializeTemplate(gameId, schema.templateRef), source: "snapshot" };
+  }
+  // Forced to snapshot but this game has none yet: keep working on the live one.
+  return liveExists ? { gameId, repoPath: livePath, source: "live" } : null;
 }
 
 // Falls back to DEFAULT_GAME_ID for an unknown id (typo'd ?game= value, or
-// one not yet in GAME_REPO_MAP) or one whose folder doesn't actually exist
-// on disk (e.g. minh-chu-vo-lam is listed in the rollout plan but isn't
-// checked out in this workspace) — never throws, since this runs on every
-// page load and a bad query param shouldn't 500 the whole tool.
+// one with no GAME_REPO_MAP entry and no schema) or one with neither a live
+// folder nor a frozen snapshot (e.g. minh-chu-vo-lam is listed in the rollout
+// plan but isn't checked out in this workspace) — never throws for those,
+// since this runs on every page load and a bad query param shouldn't 500 the
+// whole tool. A snapshot that exists but is corrupt DOES throw: silently
+// serving another game's template would be worse than an error.
 export function resolveGame(gameIdInput?: string | null): ResolvedGame {
-  const candidate = gameIdInput && GAME_REPO_MAP[gameIdInput] ? gameIdInput : DEFAULT_GAME_ID;
-  const candidatePath = path.join(GAME_TEMPLATE_ROOT, candidate, GAME_REPO_MAP[candidate]);
-  if (existsSync(candidatePath)) {
-    return { gameId: candidate, repoPath: candidatePath };
-  }
-  // Candidate folder missing on disk — fall back to the default game
-  // instead of resolving to a path that will 404/ENOENT everywhere.
-  const defaultPath = path.join(GAME_TEMPLATE_ROOT, DEFAULT_GAME_ID, GAME_REPO_MAP[DEFAULT_GAME_ID]);
-  return { gameId: DEFAULT_GAME_ID, repoPath: defaultPath };
+  const known = !!gameIdInput && (!!GAME_REPO_MAP[gameIdInput] || !!readCloneSchema(gameIdInput));
+  const candidate = known ? gameIdInput : DEFAULT_GAME_ID;
+  return (
+    resolveTemplate(candidate) ??
+    resolveTemplate(DEFAULT_GAME_ID) ?? {
+      gameId: DEFAULT_GAME_ID,
+      repoPath: path.join(GAME_TEMPLATE_ROOT, DEFAULT_GAME_ID, GAME_REPO_MAP[DEFAULT_GAME_ID]),
+      source: "live",
+    }
+  );
 }
 
 // Clones always call the REAL backend (no fake data): hub config / categories /

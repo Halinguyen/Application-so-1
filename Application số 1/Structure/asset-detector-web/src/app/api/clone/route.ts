@@ -9,6 +9,7 @@ import { toDirectUrl } from "@/detector/fetch-psd-url";
 import sharp from "sharp";
 import { resizeUploadToMatchTarget, resizeUploadToMatchRemote, type CropAnchor } from "@/detector/resize-upload";
 import { applyTextSlot } from "@/detector/site-text";
+import { ensureDependencies } from "@/detector/ensure-deps";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -184,6 +185,7 @@ export async function POST(request: NextRequest) {
     const { repoPath } = resolveGame(typeof gameIdField === "string" ? gameIdField : undefined);
     const CLONE_DIR = getCloneDir(repoPath);
 
+    await ensureDependencies(repoPath);
     await copyRepoSkeleton(repoPath, CLONE_DIR);
     await applyPersistedUploads(repoPath, CLONE_DIR);
 

@@ -5,12 +5,13 @@ import { layer2ScanNextjs } from "./layer2-nextjs";
 import { layer2ScanDotNet } from "./layer2-dotnet";
 import { layer2ScanApiBlocks } from "./layer2-api-blocks";
 import { layer2ScanSwiper } from "./layer2-swiper";
+import { layer2ScanHeroVideo } from "./layer2-hero-video";
 import { mergeDetected } from "./layer4-merge";
 import { layer4GroupResponsive } from "./layer4-responsive";
 import { layer4EnrichAssets } from "./layer4-constraints";
 import type { DetectionResult } from "./types";
 import { resolveGame } from "./config";
-import { readCachedDetection, writeCachedDetection } from "./detect-cache";
+import { readCloneSchema } from "./clone-schema";
 
 /**
  * Runs the full detection pipeline against the given game (falls back to
@@ -23,21 +24,23 @@ export async function runDetection(
   gameIdInput?: string,
   opts: { force?: boolean } = {}
 ): Promise<DetectionResult> {
-  const { gameId, repoPath } = resolveGame(gameIdInput);
-  // Full scan is slow (23s on than-ma-ao-hoa: AST parse + sharp per image), so
-  // reuse the last result until a file under repoPath changes or Re-scan forces it.
-  if (!opts.force) {
-    const cached = await readCachedDetection(gameId, repoPath);
-    if (cached) return cached;
+  const { gameId, repoPath, source } = resolveGame(gameIdInput);
+  // Running from a frozen template: the verified schema IS the detection
+  // result — no scan, and no drift from re-parsing at a different tool version.
+  if (!opts.force && source === "snapshot") {
+    const schema = readCloneSchema(gameId);
+    if (schema) {
+      return { ...schema.detection, repoPath, detectedAt: schema.verification.verifiedAt, durationMs: 0 };
+    }
   }
-  const result = await runDetectionUncached(gameIdInput);
-  await writeCachedDetection(gameId, repoPath, result);
-  return result;
+  // No result cache: every call scans (slow on big repos, e.g. ~23s on
+  // than-ma-ao-hoa) but can never serve a stale result.
+  return detectRepo(gameId, repoPath);
 }
 
-async function runDetectionUncached(gameIdInput?: string): Promise<DetectionResult> {
+/** The scan itself, on an explicit repoPath (also used to verify a re-extracted snapshot). */
+export async function detectRepo(gameId: string, repoPath: string): Promise<DetectionResult> {
   const startTime = Date.now();
-  const { gameId, repoPath } = resolveGame(gameIdInput);
 
   const framework = await detectFramework(repoPath);
 
@@ -57,6 +60,8 @@ async function runDetectionUncached(gameIdInput?: string): Promise<DetectionResu
 
   const apiBlocksResult = await layer2ScanApiBlocks(repoPath);
   const swiperResult = await layer2ScanSwiper(repoPath);
+  const heroVideoResult = await layer2ScanHeroVideo(repoPath);
+  const dynamicBlocks = [...apiBlocksResult.dynamicBlocks, ...heroVideoResult.dynamicBlocks];
 
   const merged = await mergeDetected(layer1.assets, references);
   const avgConfidence =
@@ -77,12 +82,12 @@ async function runDetectionUncached(gameIdInput?: string): Promise<DetectionResu
     framework,
     assets: enrichedAssets,
     references,
-    dynamicBlocks: apiBlocksResult.dynamicBlocks,
+    dynamicBlocks,
     swipers: swiperResult.swipers,
     summary: {
       totalAssets: enrichedAssets.length,
       totalReferences: references.length,
-      totalDynamicBlocks: apiBlocksResult.dynamicBlocks.length,
+      totalDynamicBlocks: dynamicBlocks.length,
       totalSwipers: swiperResult.swipers.length,
       avgConfidence,
       needsReview,

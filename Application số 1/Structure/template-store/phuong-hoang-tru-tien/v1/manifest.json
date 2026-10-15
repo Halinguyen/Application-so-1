@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "gameId": "phuong-hoang-tru-tien",
+  "version": 1,
+  "contentHash": "eb0975a7a8614856ad909f54b180ecfc9f1502095e1becd08fd2eb179fb3c7dd",
+  "archiveSha256": "f33f306f84ae29ea624342aa2bec0488856d8692a07b4b46b1d247ea18443c18",
+  "repoDir": "home-page",
+  "sourceCommit": "9f8702794aaebd3deb33d0dc297221ac2f2a3981",
+  "fileCount": 143,
+  "totalBytes": 9264020,
+  "frozenAt": "2026-10-15T03:42:30.537Z"
+}

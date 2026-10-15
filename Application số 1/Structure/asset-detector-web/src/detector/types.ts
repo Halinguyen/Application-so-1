@@ -109,7 +109,7 @@ export interface DetectedAsset {
   dimensions?: { width: number; height: number };  // ← NEW
 }
 
-export type DynamicBlockType = 'api-buttons' | 'api-leaderboard';
+export type DynamicBlockType = 'api-buttons' | 'api-leaderboard' | 'hero-video';
 
 export interface DynamicBlockParam {
   name: string;

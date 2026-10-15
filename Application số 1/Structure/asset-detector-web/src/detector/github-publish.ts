@@ -120,10 +120,35 @@ function git(args: string[], cwd: string, env: NodeJS.ProcessEnv): Promise<strin
   });
 }
 
+// Node's fetch only says "fetch failed" for any network problem; the real reason
+// (connect timeout, DNS, reset...) is in error.cause. Transient failures are retried —
+// safe here because an already-created repo comes back as 422 "already exists",
+// which createOrgRepo treats as success.
+async function githubFetch(url: string, init: RequestInit, token: string): Promise<Response> {
+  const attempts = 3;
+  let last: unknown;
+  for (let i = 1; i <= attempts; i++) {
+    try {
+      return await fetch(url, { ...init, signal: AbortSignal.timeout(20_000) });
+    } catch (e) {
+      last = e;
+      if (i < attempts) await new Promise((r) => setTimeout(r, 1000 * i));
+    }
+  }
+  const cause = (last as { cause?: { code?: string; message?: string } })?.cause;
+  const reason = cause?.code ?? cause?.message ?? (last instanceof Error ? last.message : String(last));
+  throw new Error(
+    scrub(
+      `Không kết nối được tới GitHub sau ${attempts} lần thử (${reason}). Kiểm tra mạng/VPN/proxy của máy chạy tool, hoặc thử lại sau ít phút.`,
+      token
+    )
+  );
+}
+
 export type CreateRepoResult = { created: boolean; htmlUrl: string; cloneUrl: string };
 
 export async function createOrgRepo(org: string, name: string, token: string): Promise<CreateRepoResult> {
-  const res = await fetch(`https://api.github.com/orgs/${encodeURIComponent(org)}/repos`, {
+  const res = await githubFetch(`https://api.github.com/orgs/${encodeURIComponent(org)}/repos`, {
     method: "POST",
     headers: {
       Accept: "application/vnd.github+json",
@@ -133,7 +158,7 @@ export async function createOrgRepo(org: string, name: string, token: string): P
       "User-Agent": "asset-detector-web",
     },
     body: JSON.stringify({ name, private: true, auto_init: false, description: `Website clone ${name}` }),
-  });
+  }, token);
   const body = (await res.json().catch(() => ({}))) as {
     html_url?: string;
     clone_url?: string;

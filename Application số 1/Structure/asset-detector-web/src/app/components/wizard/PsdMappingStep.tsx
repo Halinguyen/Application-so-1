@@ -16,7 +16,7 @@ export interface PsdApplyEntry {
 type LoadedPsd = PsdInfo & { fileName: string };
 
 type Assignment =
-  | { kind: "layer"; source: PsdDevice; layerId: number; auto: boolean; confidence?: Confidence; ambiguous?: boolean }
+  | { kind: "layer"; source: PsdDevice; layerId: number; auto: boolean; confidence?: Confidence; ambiguous?: boolean; pending?: boolean }
   | { kind: "file"; file: File; url: string };
 
 interface Row {
@@ -34,6 +34,12 @@ function layerUrl(psdId: string, layerId: number, thumb = false) {
 
 function toMatchLayers(source: PsdDevice, psd: LoadedPsd | undefined): MatchLayer[] {
   return (psd?.layers ?? []).map((l) => ({ source, id: l.id, name: l.name, path: l.path, width: l.width, height: l.height }));
+}
+
+// Favicons / app icons / the Vite logo are generated from the brand mark, not drawn in the page design.
+const NOT_IN_DESIGN_RE = /(^|\/)(favicon[^/]*|apple-touch-icon[^/]*|android-chrome-[^/]*|vite\.svg)$|\.ico$/i;
+function isNotInDesign(slot: CloneSlot) {
+  return slot.targetPaths.every((p) => NOT_IN_DESIGN_RE.test(p));
 }
 
 function fileNamesOf(target: CloneSlotTarget) {
@@ -65,7 +71,7 @@ export default function PsdMappingStep({
   const rows: Row[] = useMemo(
     () =>
       slots
-        .filter((s) => !excludedIds[s.id])
+        .filter((s) => !excludedIds[s.id] && !isNotInDesign(s))
         .sort((a, b) => a.sectionOrder - b.sectionOrder)
         .flatMap((slot) => slot.targets.map((target) => ({ key: `${slot.id}::${target.device}`, slot, target }))),
     [slots, excludedIds]
@@ -105,7 +111,7 @@ export default function PsdMappingStep({
         continue;
       }
       const m = matches[row.key];
-      if (m) next[row.key] = { kind: "layer", source: m.source as PsdDevice, layerId: m.layerId, auto: true, confidence: m.confidence, ambiguous: m.ambiguous };
+      if (m) next[row.key] = { kind: "layer", source: m.source as PsdDevice, layerId: m.layerId, auto: true, confidence: m.confidence, ambiguous: m.ambiguous, pending: !(m.confidence === "high" || m.nameHit) };
     }
     return next;
   }
@@ -156,7 +162,11 @@ export default function PsdMappingStep({
     setAssignment(row.key, { kind: "file", file, url: URL.createObjectURL(file) });
   }
 
-  const assignedRows = rows.filter((r) => assign[r.key]);
+  // A suggestion that matched on shape/size alone is only a hint: checked against
+  // a real PSD, such matches were mostly the wrong picture, so they wait for a click.
+  const isPending = (a: Assignment | null | undefined) => a?.kind === "layer" && !!a.pending;
+  const assignedRows = rows.filter((r) => assign[r.key] && !isPending(assign[r.key]));
+  const pendingCount = rows.filter((r) => isPending(assign[r.key])).length;
 
   async function apply() {
     setApplying(true);
@@ -262,7 +272,7 @@ export default function PsdMappingStep({
       <h2>Ghép asset từ file thiết kế PSD</h2>
       <div className="hint">
         Bước này không bắt buộc. Tải PSD bản máy tính và/hoặc bản điện thoại — tool tự đề xuất layer cho từng asset dựa trên tỉ lệ và kích thước
-        (tên layer chỉ để tham khảo). Bạn có thể đổi layer hoặc tải ảnh khác cho từng dòng trước khi áp dụng.
+        (tên layer chỉ để tham khảo). Chỉ tự gán khi có bằng chứng (tên layer khớp hoặc khớp rất sát); các dòng còn lại là gợi ý chờ bạn bấm duyệt, dòng trống thì chọn tay bằng &quot;Đổi layer&quot;. Bạn có thể đổi layer hoặc tải ảnh khác cho từng dòng trước khi áp dụng.
       </div>
 
       <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 12 }}>
@@ -274,7 +284,7 @@ export default function PsdMappingStep({
       {hasPsd && (
         <>
           <h3 style={{ marginTop: 24 }}>
-            Danh sách asset sau khi ghép ({assignedRows.length}/{rows.length} đã có ảnh)
+            Danh sách asset sau khi ghép ({assignedRows.length}/{rows.length} đã có ảnh{pendingCount > 0 ? `, ${pendingCount} gợi ý chờ duyệt` : ""})
           </h3>
           {sections.map((section) => {
             const sectionRows = rows.filter((r) => r.slot.section === section);
@@ -330,7 +340,15 @@ export default function PsdMappingStep({
                               <div style={{ marginTop: 2 }}>
                                 Layer: <span className="mono">{layer.path}</span> ({layer.width}×{layer.height}px
                                 {layer.kind === "group" ? ", nhóm" : ""}){" "}
-                                {a.auto && a.confidence && (
+                                {a.pending && (
+                                  <>
+                                    <span style={{ color: CONFIDENCE_COLOR.low, fontWeight: 600 }}>Gợi ý — chưa áp dụng, cần xem lại</span>{" "}
+                                    <button type="button" className="chip" onClick={() => setAssignment(row.key, { ...a, pending: false, auto: false })}>
+                                      Dùng layer này
+                                    </button>
+                                  </>
+                                )}
+                                {!a.pending && a.auto && a.confidence && (
                                   <span style={{ color: CONFIDENCE_COLOR[a.confidence], fontWeight: 600 }}>
                                     {CONFIDENCE_LABEL[a.confidence]}
                                     {a.ambiguous ? " · có layer tương tự, kiểm tra lại" : ""}

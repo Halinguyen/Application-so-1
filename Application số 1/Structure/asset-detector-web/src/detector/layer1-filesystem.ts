@@ -33,6 +33,9 @@ const FOOTER_PATTERNS = [
   /[/\\]sdk[/\\]/i,
   /Footer\.(tsx|jsx|ts|js)$/i,
   /footer\.(tsx|jsx|ts|js)$/i,
+  // Footer is 100% the Vplay SDK: its background art (e.g. legacy/img/bg-footer-pc.webp,
+  // used by `.footer { background: url(...) }`) is not an operator slot either.
+  /[^/\\]*footer[^/\\]*\.(png|jpe?g|webp|gif|svg|avif|mp4|webm)$/i,
 ];
 
 const VENDOR_PATTERNS = [

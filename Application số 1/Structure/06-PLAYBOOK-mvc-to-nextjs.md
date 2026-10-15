@@ -179,3 +179,13 @@ Bảng kết quả detect từng game và checklist nhận diện cho game .NET 
 - Dữ liệu giả được trả qua các hàm generic (`fakePostsByCategory<T>()`, `fakeCategories<T>()`, `fakeSlides<T>()`, `getFakePostBySlug<T>()`), kiểu `T` suy ra từ kiểu trả về của hàm nên không lệch với `NewsPost`/`Slide` riêng của từng game.
 
 Kiểm chứng: tạo lại clone cho 11 game, `tsc` sạch cả 11; `next build` thật chạy thành công với `ta-la-hac-ngokhong`. Khi thêm game mới, nên chạy `tsc` (và nếu có thể `next build`) trên **bản clone**, không chỉ trên template.
+
+## Quy ước "video hero" (nút phát video ở hero)
+
+Dùng chung cho mọi game, detector nhận theo **tên biến env**, không theo gameId (`layer2-hero-video.ts`):
+
+- Template đọc link YouTube từ **một biến env kết thúc bằng `HERO_VIDEO_URL`** (`NEXT_PUBLIC_HERO_VIDEO_URL`, `VITE_APP_HERO_VIDEO_URL`…) và chỉ render nút khi link hợp lệ.
+- Detector tìm biến đó trong `src/` → wizard hiện 1 ô "Link YouTube" (không bắt buộc) → clone ghi vào `.env.local`. Để trống = ẩn nút.
+- Khai báo `…HERO_VIDEO_URL=` (rỗng) trong `deploy/develop/.env.example`.
+- Mẫu cài đặt: `ta-la-hac-ngokhong` → `src/components/landing/HeroVideo.tsx` (popup YouTube; nút xuất từ PSD `trang 1`).
+- Template chưa có biến này thì không hiện gì.
