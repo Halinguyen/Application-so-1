@@ -9,6 +9,7 @@ import {
   readManifest,
   readRoutes,
   readSlots,
+  readExternalSlots,
   removeElement,
   restoreHistory,
   writeLayout,
@@ -26,10 +27,10 @@ function game(input: string | null) {
 }
 
 async function snapshot(gameId: string, repoPath: string, cloneDir: string, extra: Record<string, unknown> = {}) {
-  const [layout, manifest, history, slots, routes] = await Promise.all([readLayout(repoPath), readManifest(repoPath), listHistory(repoPath), readSlots(repoPath), readRoutes(repoPath)]);
+  const [layout, manifest, history, slots, routes, externalSlots] = await Promise.all([readLayout(repoPath), readManifest(repoPath), listHistory(repoPath), readSlots(repoPath), readRoutes(repoPath), readExternalSlots(repoPath)]);
   const { css, conflicts } = buildCss(layout, manifest, gameId, templateHash(gameId));
   const cssWritten = await rewriteCloneCss(cloneDir, css);
-  return { layout: layout ?? emptyLayout(gameId), manifest, conflicts, history, slots, routes, cssWritten, ...extra };
+  return { layout: layout ?? emptyLayout(gameId), manifest, conflicts, history, slots, externalSlots, routes, cssWritten, ...extra };
 }
 
 /** GET ?gameId= -> layout, manifest (editable elements), conflicts, history. */

@@ -5,15 +5,16 @@ import path from "node:path";
 import { resolveGame, REAL_HUB_URL, REAL_RANKING_HOST } from "@/detector/config";
 import { readBaseEnv } from "@/detector/base-env";
 import { stopPreview, stopProcessesUsingDir } from "@/detector/preview-process";
-import { getUploadsDir, isRasterOrSvg, persistUpload, readUploadBuffer, sniffVideoExt } from "@/detector/upload-store";
-import sharp from "sharp";
+import { getUploadsDir, isRasterOrSvg, persistUpload, readUploadBuffer } from "@/detector/upload-store";
 import { writeBlankImage } from "@/detector/blank-image";
-import { resizeUploadToMatchTarget, resizeUploadToMatchRemote, type CropAnchor } from "@/detector/resize-upload";
+import { resizeUploadToMatchTarget, type CropAnchor } from "@/detector/resize-upload";
 import { applyTextSlot } from "@/detector/site-text";
 import { ensureDependencies } from "@/detector/ensure-deps";
 import { applyVisualEditing } from "@/detector/visual-editing";
 import { pruneExcludedRoutes } from "@/detector/prune-routes";
 import { isHexColor, replaceHex } from "@/detector/color-scan";
+import { applyPersistedColors } from "@/detector/color-store";
+import { readExternalManifest, replaceExternalAsset } from "@/detector/external-replace";
 import { requireTemplate } from "@/detector/template-source";
 
 export const dynamic = "force-dynamic";
@@ -40,25 +41,6 @@ export function getCloneDir(repoPath: string): string {
 // redone on every fresh copyRepoSkeleton (it only lives in the wiped
 // CLONE_DIR, never in repoPath) — this manifest is what makes that
 // possible without the operator resubmitting the external: field again.
-type ExternalManifestEntry = { url: string; localPath: string; refFiles: string[] };
-function getExternalManifestPath(repoPath: string): string {
-  return path.join(path.dirname(repoPath), "home-page-uploads-manifest.json");
-}
-
-async function readExternalManifest(repoPath: string): Promise<Record<string, ExternalManifestEntry>> {
-  try {
-    return JSON.parse(await fs.readFile(getExternalManifestPath(repoPath), "utf-8"));
-  } catch {
-    return {};
-  }
-}
-
-async function writeExternalManifestEntry(repoPath: string, entry: ExternalManifestEntry) {
-  const manifest = await readExternalManifest(repoPath);
-  manifest[entry.localPath] = entry;
-  await fs.writeFile(getExternalManifestPath(repoPath), JSON.stringify(manifest, null, 2));
-}
-
 async function applyPersistedUploads(repoPath: string, cloneDir: string) {
   const uploadsDir = getUploadsDir(repoPath);
   if (existsSync(uploadsDir)) {
@@ -159,6 +141,8 @@ export async function POST(request: NextRequest) {
     await ensureDependencies(repoPath);
     await copyRepoSkeleton(repoPath, CLONE_DIR);
     await applyPersistedUploads(repoPath, CLONE_DIR);
+    // colours the operator changed in the preview editor earlier
+    await applyPersistedColors(repoPath, CLONE_DIR);
     // pages the clone does not carry (/choigameN): gone from the clone, the template is untouched
     const pruned = await pruneExcludedRoutes(CLONE_DIR);
 
@@ -236,73 +220,16 @@ export async function POST(request: NextRequest) {
           filesReplaced.push({ targetPath, originalBytes: 0, finalBytes: written.buf.byteLength, resized: false });
         }
       } else if (key.startsWith("external:") && (value instanceof File || typeof value === "string")) {
-        // External (CDN-hosted) assets have no local file to overwrite — save
-        // the upload into the clone's public/ dir instead, then literal-string
-        // replace the hardcoded external URL with the new root-relative path
-        // in every source file that referenced it (same technique as the
-        // fake-news fallback patching: rewrite the clone's own copy only).
-        const {
-          url,
-          localPath: declaredLocalPath,
-          refFiles,
-          anchor,
-        }: { url: string; localPath: string; refFiles: string[]; anchor: CropAnchor } = JSON.parse(
-          key.slice("external:".length)
-        );
-        let localPath = declaredLocalPath; // the extension may change when the upload is a video of another type
-        let uploadBuf: Buffer;
-        try {
-          uploadBuf = await readUploadBuffer(value);
-        } catch (e) {
-          warnings.push(`${localPath}: ${e instanceof Error ? e.message : String(e)}`);
+        // External (CDN-hosted) assets have no local file to overwrite: see replaceExternalAsset (shared with the preview editor)
+        const spec: { url: string; localPath: string; refFiles: string[]; anchor: CropAnchor } = JSON.parse(key.slice("external:".length));
+        const r = await replaceExternalAsset(repoPath, CLONE_DIR, spec, value, spec.anchor);
+        if (!r.ok) {
+          warnings.push(r.warning);
           continue;
         }
-        // A video (the home banner of phuong-hoang-tru-tien is a CDN .mp4) is written as it is: no crop, and its file
-        // extension follows the bytes so the <source type> stays right.
-        const videoExt = sniffVideoExt(uploadBuf);
-        if (!videoExt && !(await isRasterOrSvg(uploadBuf))) {
-          warnings.push(`${localPath}: file không phải ảnh hoặc video (PNG/JPG/WebP/SVG/MP4/WebM) — chưa thay, giữ nguyên asset gốc.`);
-          continue;
-        }
-        if (videoExt) localPath = localPath.replace(/\.[a-z0-9]+$/i, "") + videoExt;
-        // Fetch the CDN URL being replaced to read ITS dimensions, then resize
-        // the upload to match — the same "never write an off-size asset"
-        // guarantee local file replacement already has (resize-upload.ts),
-        // just sourced from a network fetch instead of a repo file since
-        // there's no local original to read here.
-        const finalBuf = videoExt ? uploadBuf : await resizeUploadToMatchRemote(uploadBuf, url, path.extname(localPath), anchor);
-        const destPath = path.join(CLONE_DIR, "public", localPath);
-        await fs.mkdir(path.dirname(destPath), { recursive: true });
-        await fs.writeFile(destPath, finalBuf);
-        await persistUpload(repoPath, path.join("public", localPath), finalBuf);
-        await writeExternalManifestEntry(repoPath, { url, localPath, refFiles });
-
-        const publicUrl = "/" + localPath.replace(/\\/g, "/");
-        const refFilesPatched: string[] = [];
-        for (const refFile of refFiles) {
-          const srcPath = path.join(CLONE_DIR, refFile);
-          if (!existsSync(srcPath)) continue;
-          const content = await fs.readFile(srcPath, "utf-8");
-          if (!content.includes(url)) continue;
-          let patched = content.split(url).join(publicUrl);
-          // <source src="/x.webm" type="video/mp4"> would not play: keep the type in step with the new file
-          if (videoExt) {
-            const mime = videoExt === ".webm" ? "video/webm" : "video/mp4";
-            const escaped = publicUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-            patched = patched.replace(new RegExp("(src=[{\"'`]+" + escaped + "[^>]*?type=[\"'])video/[a-z0-9]+", "g"), "$1" + mime);
-          }
-          await fs.writeFile(srcPath, patched);
-          refFilesPatched.push(refFile);
-        }
-        externalReplaced.push({
-          id: `${localPath}`,
-          url,
-          localPath: publicUrl,
-          refFilesPatched,
-          originalBytes: uploadBuf.byteLength,
-          finalBytes: finalBuf.byteLength,
-          resized: finalBuf !== uploadBuf,
-        });
+        const { ok: _ok, ...done } = r;
+        void _ok;
+        externalReplaced.push(done);
       } else if (key.startsWith("color:") && typeof value === "string") {
         // "color:<{literals, files}>" = the new #rrggbb: every spelling of the old colour in those files of the CLONE becomes it
         let spec: { literals?: unknown; files?: unknown };

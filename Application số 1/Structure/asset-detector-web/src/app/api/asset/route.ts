@@ -4,7 +4,8 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import { resolveGame } from "@/detector/config";
 import { getCloneDir } from "@/app/api/clone/route";
-import { readSlots } from "@/detector/layout-store";
+import { readExternalSlots, readSlots } from "@/detector/layout-store";
+import { replaceExternalAsset } from "@/detector/external-replace";
 import { allowedTargetPaths, publicPathOf } from "@/detector/asset-match";
 import { resizeUploadToMatchTarget, type CropAnchor } from "@/detector/resize-upload";
 import { getUploadsDir, isRasterOrSvg, persistUpload, readUploadBuffer, removePersistedUpload } from "@/detector/upload-store";
@@ -63,6 +64,20 @@ export async function POST(request: NextRequest) {
     const form = await request.formData();
     const gameField = form.get("gameId");
     const { repoPath, cloneDir } = setup(typeof gameField === "string" ? gameField : null);
+
+    // A picture/video hosted on a CDN: only an address of a detected external slot may be replaced
+    const externalUrl = form.get("external");
+    if (typeof externalUrl === "string" && externalUrl !== "") {
+      const slot = (await readExternalSlots(repoPath)).find((x) => x.url === externalUrl);
+      if (!slot) return NextResponse.json({ error: "Địa chỉ này không phải asset ngoài đã nhận diện — không thay." }, { status: 400 });
+      const value = form.get("file") ?? form.get("url");
+      if (value === null || (typeof value === "string" && value.trim() === "")) return NextResponse.json({ error: "Chưa chọn file hoặc dán link." }, { status: 400 });
+      if (!existsSync(cloneDir)) return NextResponse.json({ error: "Chưa có bản sao — bấm Tạo bản sao trước." }, { status: 409 });
+      const a = String(form.get("anchor") ?? "attention") as CropAnchor;
+      const r = await replaceExternalAsset(repoPath, cloneDir, { url: slot.url, localPath: slot.localPath, refFiles: slot.refFiles }, value, ANCHORS.includes(a) ? a : "attention");
+      if (!r.ok) return NextResponse.json({ error: r.warning }, { status: 400 });
+      return NextResponse.json({ external: { localPath: r.localPath, refFilesPatched: r.refFilesPatched } });
+    }
 
     const targets = await checkedTargets(repoPath, JSON.parse(String(form.get("targetPaths") ?? "null")));
     if (!Array.isArray(targets)) return NextResponse.json(targets, { status: 400 });

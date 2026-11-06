@@ -26,6 +26,7 @@ const layoutFile = (repoPath: string) => path.join(getLayoutDir(repoPath), "layo
 const manifestFile = (repoPath: string) => path.join(getLayoutDir(repoPath), "manifest.json");
 const historyDir = (repoPath: string) => path.join(getLayoutDir(repoPath), "history");
 const slotsFile = (repoPath: string) => path.join(getLayoutDir(repoPath), "slots.json");
+const externalSlotsFile = (repoPath: string) => path.join(getLayoutDir(repoPath), "external-slots.json");
 const routesFile = (repoPath: string) => path.join(getLayoutDir(repoPath), "routes.json");
 
 async function readJson<T>(file: string): Promise<T | null> {
@@ -52,6 +53,24 @@ export async function readSlots(repoPath: string): Promise<EditSlot[]> {
 export async function writeSlots(repoPath: string, slots: EditSlot[]): Promise<void> {
   await fs.mkdir(getLayoutDir(repoPath), { recursive: true });
   await fs.writeFile(slotsFile(repoPath), JSON.stringify(slots, null, 2));
+}
+
+/** A picture/video hosted on a CDN that the preview editor may replace (through the clone's rewrite of the address). */
+export interface EditExternalSlot {
+  url: string;
+  localPath: string;
+  refFiles: string[];
+  type: "image" | "video";
+  label: string;
+}
+
+export async function readExternalSlots(repoPath: string): Promise<EditExternalSlot[]> {
+  return (await readJson<EditExternalSlot[]>(externalSlotsFile(repoPath))) ?? [];
+}
+
+export async function writeExternalSlots(repoPath: string, slots: EditExternalSlot[]): Promise<void> {
+  await fs.mkdir(getLayoutDir(repoPath), { recursive: true });
+  await fs.writeFile(externalSlotsFile(repoPath), JSON.stringify(slots, null, 2));
 }
 
 /** The pages of the site and the files each draws (so the editor can open any page). */

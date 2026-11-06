@@ -111,6 +111,17 @@
           }));
       return !!p && isEditId(p.editId) && isBreakpoint(p.breakpoint) && isOverride(p.override) && warningsOk;
     },
+    // The colours at the point the operator pressed (any element, tagged or not): [{ prop, hex }]
+    COLOR_PICKED: function (p) {
+      return (
+        !!p &&
+        Array.isArray(p.colors) &&
+        p.colors.length <= 3 &&
+        p.colors.every(function (c) {
+          return !!c && (c.prop === "background" || c.prop === "text" || c.prop === "border") && /^#[0-9a-f]{6}$/.test(c.hex);
+        })
+      );
+    },
     ERROR: function (p) {
       return !!p && typeof p.message === "string";
     },

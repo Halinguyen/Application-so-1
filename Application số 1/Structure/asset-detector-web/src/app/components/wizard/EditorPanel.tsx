@@ -12,6 +12,8 @@ interface Snapshot {
   history: string[];
   /** asset slots found when the clone was built: the files this editor may replace */
   slots?: EditSlot[];
+  /** pictures/videos hosted on a CDN that can be replaced through the clone's rewrite of their address */
+  externalSlots?: { url: string; type: "image" | "video"; label: string }[];
   /** every page of the site and the files each draws */
   routes?: { path: string; label: string; dynamic: boolean }[];
 }
@@ -56,6 +58,12 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
   const [selected, setSelected] = useState<Selected>({ editId: null });
   // the pages shown side by side. Starts with every page that needs no parameter; the operator can add a page with parameters
   const [message, setMessage] = useState<string | null>(null);
+  // colours under the last press in a page (any area, with or without a picture) and what the operator typed for each
+  const [picked, setPicked] = useState<{ prop: "background" | "text" | "border"; hex: string }[]>([]);
+  const [typedColor, setTypedColor] = useState<Record<string, string>>({});
+  const [colorBusy, setColorBusy] = useState(false);
+  // bumped after a CDN picture/video was replaced: the pages are loaded again
+  const [reloadKey, setReloadKey] = useState(0);
   // Full-screen editor: a fixed layer over the wizard with its own toolbar, stage and side panel,
   // so nothing is clipped by the wizard's scrolling. "Fit" scales the preview down to show more of the page.
   const [open, setOpen] = useState(true);
@@ -176,6 +184,8 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
       if (!r.ok) return;
       if (r.type === "READY") {
         post("INIT", { editMode: editModeRef.current }, fromId);
+      } else if (r.type === "COLOR_PICKED") {
+        setPicked(r.payload.colors);
       } else if (r.type === "SELECTED") {
         if (r.payload.editId === null) {
           // a page that merely cleared its own selection must not wipe the one picked on another page
@@ -270,9 +280,12 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
             data-testid="ve-reset-all"
             onClick={async () => {
               await call("DELETE");
+              await fetch(`/api/colors?gameId=${encodeURIComponent(gameId)}`, { method: "DELETE" }).catch(() => null);
               post("RESET", {});
               post("RELOAD_CSS", {});
               setSelected({ editId: null });
+              setPicked([]);
+              setTypedColor({});
             }}
           >
             Reset toàn trang
@@ -307,6 +320,7 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
                           if (el) frames.current.set(pg.id, el);
                           else frames.current.delete(pg.id);
                         }}
+                        key={reloadKey}
                         data-testid="ve-frame"
                         data-path={pg.path}
                         title={"Trang " + pg.label}
@@ -335,6 +349,64 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
             style={{ flex: "0 0 320px", fontSize: 13, overflowY: "auto", margin: 0, borderRadius: 0, border: 0, borderLeft: "1px solid var(--border)" }}
             data-testid="ve-panel"
           >
+        {picked.length > 0 && (
+          <div style={{ marginBottom: 12 }} data-testid="ve-colors">
+            {picked.map((c) => {
+              const typed = typedColor[c.hex] ?? "";
+              const valid = /^#[0-9a-fA-F]{6}$/.test(typed);
+              return (
+                <div key={c.prop + c.hex} data-testid="ve-color-row" data-hex={c.hex} style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+                  <span style={{ width: 44, fontSize: 12 }}>{c.prop === "background" ? "Nền" : c.prop === "text" ? "Chữ" : "Viền"}</span>
+                  <span style={{ width: 22, height: 22, borderRadius: 4, background: c.hex, border: "1px solid var(--border)" }} />
+                  <span className="mono" style={{ fontSize: 12 }}>{c.hex}</span>
+                  <span>→</span>
+                  <input
+                    type="color"
+                    aria-label={"Màu mới cho " + c.hex}
+                    value={valid ? typed : c.hex}
+                    onChange={(e) => setTypedColor((v) => ({ ...v, [c.hex]: e.target.value }))}
+                    style={{ width: 28, height: 24, padding: 0, border: 0, background: "none" }}
+                  />
+                  <input
+                    type="text"
+                    data-testid="ve-color-input"
+                    placeholder="#rrggbb"
+                    maxLength={7}
+                    value={typed}
+                    onChange={(e) => setTypedColor((v) => ({ ...v, [c.hex]: e.target.value === "" || e.target.value.startsWith("#") ? e.target.value : "#" + e.target.value }))}
+                    style={{ width: 74, borderColor: typed && !valid ? "var(--warn)" : undefined }}
+                  />
+                  <button
+                    className="chip"
+                    data-testid="ve-color-apply"
+                    disabled={!valid || colorBusy}
+                    onClick={async () => {
+                      setColorBusy(true);
+                      try {
+                        const res = await fetch("/api/colors", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ gameId, from: c.hex, to: typed }) });
+                        const json = await res.json();
+                        if (!res.ok) throw new Error(json.error || "Không đổi được màu");
+                        setMessage(null);
+                        setPicked((list) => list.map((x) => (x.hex === c.hex && x.prop === c.prop ? { ...x, hex: typed.toLowerCase() } : x)));
+                        setTypedColor((v) => {
+                          const n = { ...v };
+                          delete n[c.hex];
+                          return n;
+                        });
+                      } catch (e) {
+                        setMessage(e instanceof Error ? e.message : String(e));
+                      } finally {
+                        setColorBusy(false);
+                      }
+                    }}
+                  >
+                    Đổi
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
         {message && (
           <div className="ext-note" style={{ borderColor: "var(--warn)", marginBottom: 8 }} data-testid="ve-message">
             {message}
@@ -377,9 +449,15 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
                     index={i}
                     media={m}
                     slots={snap?.slots ?? []}
+                    externalSlots={snap?.externalSlots ?? []}
                     origin={origin}
                     gameId={gameId}
                     dataDriven={!!selected.dataDriven}
+                    onExternalDone={() => {
+                      // the clone's source now names another file: every page reloads to show it
+                      setReloadKey((k) => k + 1);
+                      setSelected({ editId: null });
+                    }}
                     onDone={(paths) => {
                       post("RELOAD_MEDIA", { paths });
                       // read the element again so the thumbnail and sizes shown here are the new ones
@@ -492,18 +570,22 @@ function MediaReplacer({
   index,
   media,
   slots,
+  externalSlots,
   origin,
   gameId,
   dataDriven,
   onDone,
+  onExternalDone,
 }: {
   index: number;
   media: NonNullable<Selected["media"]>[number];
   slots: EditSlot[];
+  externalSlots: { url: string; type: "image" | "video"; label: string }[];
   origin: string;
   gameId: string;
   dataDriven: boolean;
   onDone: (publicPaths: string[]) => void;
+  onExternalDone: () => void;
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [url, setUrl] = useState("");
@@ -514,6 +596,32 @@ function MediaReplacer({
   const { match, remote } = matchMediaToSlot(media.src, slots, origin);
 
   const targets = match ? (onlyShown ? [match.shownPath] : match.slot.targetPaths) : [];
+  // a picture/video that is not a file of the repo but a CDN address the source spells out
+  const ext = !match ? externalSlots.find((x) => x.url.split("?")[0] === media.src.split("?")[0]) : undefined;
+
+  async function replaceExternal() {
+    if (!ext) return;
+    setBusy(true);
+    setNote(null);
+    try {
+      const form = new FormData();
+      form.append("gameId", gameId);
+      form.append("external", ext.url);
+      form.append("anchor", anchor);
+      if (file) form.append("file", file);
+      else form.append("url", url.trim());
+      const res = await fetch("/api/asset", { method: "POST", body: form });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Không thay được");
+      setFile(null);
+      setUrl("");
+      onExternalDone();
+    } catch (e) {
+      setNote({ ok: false, text: e instanceof Error ? e.message : String(e) });
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function replace() {
     if (!match) return;
@@ -575,6 +683,15 @@ function MediaReplacer({
         </div>
       </div>
 
+      {!dataDriven && !!ext && (
+        <div style={{ marginTop: 6, display: "grid", gap: 6 }} data-testid="ve-external">
+          <input data-testid="ve-asset-file" type="file" accept={ext.type === "video" ? "video/*,image/*" : "image/*"} onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
+          <input data-testid="ve-asset-url" type="text" placeholder={ext.type === "video" ? "…hoặc dán link video" : "…hoặc dán link ảnh"} value={url} disabled={!!file} onChange={(e) => setUrl(e.target.value)} />
+          <button className="chip" data-testid="ve-asset-replace" disabled={busy || (!file && url.trim() === "")} onClick={replaceExternal}>
+            {busy ? "Đang thay…" : ext.type === "video" ? "Thay video" : "Thay ảnh"}
+          </button>
+        </div>
+      )}
       {canReplace && (
         <div style={{ marginTop: 6, display: "grid", gap: 6 }}>
           <input data-testid="ve-asset-file" type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />

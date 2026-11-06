@@ -309,8 +309,52 @@
   }
 
   // ---------- pointer interaction ----------
+  // ---------- colours under the pointer ----------
+  function toHex(rgb) {
+    var m = /^rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)(?:[,\s/]+([\d.]+%?))?\s*\)$/.exec(String(rgb));
+    if (!m) return null;
+    var a = m[4] === undefined ? 1 : m[4].slice(-1) === "%" ? parseFloat(m[4]) / 100 : parseFloat(m[4]);
+    if (a < 0.05) return null; // transparent
+    function h(n) {
+      var x = Math.max(0, Math.min(255, parseInt(n, 10))).toString(16);
+      return x.length < 2 ? "0" + x : x;
+    }
+    return "#" + h(m[1]) + h(m[2]) + h(m[3]);
+  }
+  function pickColors(target) {
+    var out = [];
+    var seen = {};
+    function add(prop, hex) {
+      if (hex && !seen[hex]) {
+        seen[hex] = 1;
+        out.push({ prop: prop, hex: hex });
+      }
+    }
+    try {
+      var el = target && target.nodeType === 1 ? target : target && target.parentElement;
+      if (!el) return out;
+      var cs = getComputedStyle(el);
+      // the nearest non-transparent background, from the element up
+      var bgEl = el;
+      var bg = null;
+      while (bgEl && bgEl.nodeType === 1 && !bg) {
+        bg = toHex(getComputedStyle(bgEl).backgroundColor);
+        bgEl = bgEl.parentElement;
+      }
+      add("background", bg);
+      if (el.textContent && el.textContent.trim()) add("text", toHex(cs.color));
+      if (parseFloat(cs.borderTopWidth) > 0 && cs.borderTopStyle !== "none") add("border", toHex(cs.borderTopColor));
+    } catch (_) {
+      /* an unusual element: no colours */
+    }
+    return out;
+  }
+
   function onPointerDown(e) {
     if (!editMode || e.button !== 0) return;
+    if (!(e.target && e.target.getAttribute && (e.target.getAttribute("data-ve-handle") || e.target === moveHandle))) {
+      send("COLOR_PICKED", { colors: pickColors(e.target) });
+    }
     var dir = e.target && e.target.getAttribute ? e.target.getAttribute("data-ve-handle") : null;
     if (dir && handles[dir] === e.target) return startResize(e, dir);
     if (e.target === moveHandle) {

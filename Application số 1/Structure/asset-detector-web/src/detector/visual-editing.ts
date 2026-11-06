@@ -5,7 +5,7 @@ import { readCloneSchema } from "./clone-schema";
 import { injectEditIdsInDir } from "./edit-id";
 import { installNextAdapter } from "./ve-adapter-next";
 import { installViteAdapter } from "./ve-adapter-vite";
-import { buildCss, readLayout, writeManifest, writeRoutes, writeSlots } from "./layout-store";
+import { buildCss, readLayout, writeExternalSlots, writeManifest, writeRoutes, writeSlots } from "./layout-store";
 import { discoverRoutes } from "./routes";
 import { buildCloneSlots } from "./clone-slots";
 import type { LayoutConflicts } from "./layout-schema";
@@ -63,6 +63,20 @@ export async function applyVisualEditing(
   await writeSlots(
     repoPath,
     buildCloneSlots(detection).slots.map((s) => ({ id: s.id, label: s.label, targetPaths: s.targetPaths, previewPath: s.previewPath, sizeLabel: s.sizeLabel }))
+  );
+
+  // CDN-hosted pictures/videos: same address and local name the wizard's step 2 uses, so both write the same files
+  await writeExternalSlots(
+    repoPath,
+    detection.assets
+      .filter((a) => a.isExternal)
+      .map((a) => ({
+        url: a.externalUrl || a.canonicalPath,
+        localPath: `assets/_uploads/${a.id.replace(/[^a-z0-9.]/gi, "-")}-${a.fileName}`,
+        refFiles: [...new Set(a.references.map((r) => r.file))],
+        type: a.type === "video" ? ("video" as const) : ("image" as const),
+        label: a.metadata?.label || a.fileName,
+      }))
   );
 
   const { css, conflicts } = buildCss(saved, manifest, gameId, templateHash(gameId));
