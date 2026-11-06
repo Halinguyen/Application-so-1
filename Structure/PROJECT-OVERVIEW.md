@@ -564,7 +564,8 @@ Từ README/memory/plan (chưa xác minh lại từng cái trừ khi ghi chú):
 | 2026-11-06 | `e7835f7` | Bỏ thư mục bao ngoài `Application số 1`: `Structure/` nay ở gốc repo; sửa `.gitignore`, `CLAUDE.md`, hook và đường dẫn trong tài liệu này |
 | 2026-11-06 | `d9eea32` | `page.tsx`: template không mở được (snapshot thiếu `template.tgz`, thư mục không đọc được) hiện thông báo thay vì trang lỗi `digest`; ghi chú vì sao Vercel không phù hợp (mục 8.3) |
 | 2026-11-06 | `e7cdc7a` | Hỗ trợ Vercel: `template-seed.ts` + `pack-templates.mjs --per-game`, dữ liệu ở `/tmp`, 501 rõ ràng cho clone/preview, `vercel.json`, `.vercelignore`, `maxDuration`; `PREVIEW_PORT_RANGE`; `docker-compose.yml`; hướng dẫn `deploy/vercel` và `deploy/demo` |
-| 2026-11-06 | (commit kế tiếp) | Bản demo chỉ 5 game (T029, T203, T030, R015, T031): `enabledGameIds`, `npm run pack:vercel`, `.gitignore` cho `demo-seed`/`demo-data` |
+| 2026-11-06 | `b1cea62` | Bản demo chỉ 5 game (T029, T203, T030, R015, T031): `enabledGameIds`, `npm run pack:vercel`, `.gitignore` cho `demo-seed`/`demo-data` |
+| 2026-11-06 | (commit kế tiếp) | `next.config.ts`: `allowedDevOrigins` tự gồm mọi IPv4 và tên máy của máy chủ (mở tool từ máy khác qua IP không còn bị `next dev` chặn HMR/JS, bấm game có phản ứng); `ALLOWED_DEV_ORIGINS` vẫn cộng thêm. Preview của game Next.js (`next dev` của clone) vẫn có thể chặn khi xem từ máy khác, chưa xử lý |
 
 ## 10. Cách cập nhật tài liệu này
 
