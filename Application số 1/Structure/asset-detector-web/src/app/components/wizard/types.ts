@@ -34,6 +34,8 @@ export interface CloneSlot {
   needsVisualProof: boolean;
   responsiveLabel: string;
   references: AssetReferenceHint[];
+  /** set when several byte-identical pictures / the icon family were folded into this one slot */
+  merged?: { count: number; kind: "icon-family" | "identical" };
 }
 
 export interface FigmaSuggestionView {

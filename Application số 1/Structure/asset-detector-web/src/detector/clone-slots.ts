@@ -1,6 +1,7 @@
 import { describeResponsive, describeSection, describeSectionPosition, needsVisualProof, sectionOrder } from "./section-labels";
 import type { DetectedAsset, DetectionResult } from "./types";
 import type { CloneSlot } from "@/app/components/wizard/types";
+import { mergeSlots } from "./slot-merge";
 
 // The rows the wizard lists: one slot per replaceable asset.
 
@@ -77,5 +78,5 @@ export function buildCloneSlots(data: DetectionResult): { slots: CloneSlot[]; un
           })
         )
   );
-  return { slots, unusedAssets };
+  return { slots: mergeSlots(slots, data.assets), unusedAssets };
 }

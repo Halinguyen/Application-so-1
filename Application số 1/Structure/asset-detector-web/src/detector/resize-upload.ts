@@ -32,6 +32,39 @@ function resolvePosition(anchor: CropAnchor): string {
   return anchor === "attention" ? "attention" : SHARP_POSITION[anchor];
 }
 
+/** Sizes packed into a favicon.ico built from an upload. */
+const ICO_SIZES = [16, 32, 48];
+
+/**
+ * Builds a real .ico (PNG images packed in an ICO container: 16, 32 and 48 px) from an uploaded picture, so the one
+ * picture that fills the whole icon family also gives a valid favicon.ico instead of raw PNG bytes under a .ico name.
+ */
+export async function buildIco(uploadBuf: Buffer, anchor: CropAnchor = "attention"): Promise<Buffer> {
+  const pngs: Buffer[] = [];
+  for (const size of ICO_SIZES) {
+    pngs.push(await sharp(uploadBuf).resize(size, size, { fit: "cover", position: resolvePosition(anchor) }).png({ compressionLevel: 9 }).toBuffer());
+  }
+  const header = Buffer.alloc(6);
+  header.writeUInt16LE(0, 0); // reserved
+  header.writeUInt16LE(1, 2); // type: icon
+  header.writeUInt16LE(pngs.length, 4);
+  const entries = Buffer.alloc(16 * pngs.length);
+  let offset = 6 + entries.length;
+  pngs.forEach((png, i) => {
+    const o = i * 16;
+    entries.writeUInt8(ICO_SIZES[i], o); // width (0 would mean 256)
+    entries.writeUInt8(ICO_SIZES[i], o + 1); // height
+    entries.writeUInt8(0, o + 2); // palette
+    entries.writeUInt8(0, o + 3); // reserved
+    entries.writeUInt16LE(1, o + 4); // colour planes
+    entries.writeUInt16LE(32, o + 6); // bits per pixel
+    entries.writeUInt32LE(png.length, o + 8);
+    entries.writeUInt32LE(offset, o + 12);
+    offset += png.length;
+  });
+  return Buffer.concat([header, entries, ...pngs]);
+}
+
 /**
  * Resizes/compresses an operator-uploaded replacement image to match the
  * EXACT pixel dimensions of the file it's replacing at `targetPath`.
@@ -57,6 +90,8 @@ export async function resizeUploadToMatchTarget(
   anchor: CropAnchor = "attention",
   maxFileSize = 2 * 1024 * 1024
 ): Promise<Buffer> {
+  // sharp cannot read or write .ico: pack the upload into a proper icon file
+  if (path.extname(targetPath).toLowerCase() === ".ico") return buildIco(uploadBuf, anchor).catch(() => uploadBuf);
   const originalAbsPath = path.join(repoPath, targetPath);
   if (!existsSync(originalAbsPath)) return uploadBuf;
 

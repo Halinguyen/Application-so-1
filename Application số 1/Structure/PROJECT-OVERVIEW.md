@@ -266,6 +266,8 @@ Trang: `/` (`src/app/page.tsx`: GamePicker hoặc WizardShell), `/admin` (QA das
 | File | Việc |
 |---|---|
 | `generate-registry.mjs` | Sinh `template-registry/<game>.json` từ repo template trên máy (đọc `GAME_REPO_MAP` bằng regex trên `config.ts`); `--check` exit 1 nếu manifest cũ; báo working copy khác commit |
+| `detector/slot-merge.ts` (+test) | Gọi từ `buildCloneSlots` (`clone-slots.ts`): gộp thành MỘT slot (`targetPaths` = hợp, `merged: {count, kind}`) (1) họ icon: favicon-16/32, apple-touch-icon, android-chrome-*, favicon.ico tự quản + mọi ảnh trùng hash với chúng (icon game dùng trong trang); (2) các ảnh trùng hash khác. Ảnh chỉ trùng tên nhưng khác hash KHÔNG gộp. Một lần upload -> `/api/clone` cắt đúng cỡ từng file. Trên than-ma-ao-hoa gộp 15 nhóm, phuong-hoang có slot "Icon game" |
+| `detector/resize-upload.ts` | thêm `buildIco()`: upload -> favicon.ico thật (PNG 16/32/48 trong container ICO); trước đây ghi nguyên byte PNG vào file .ico |
 | `detector/prune-routes.ts` (+test) | Gọi trong `/api/clone` ngay sau khi copy template: bỏ các trang có segment đầu khớp `EXCLUDED_ROUTE_SEGMENTS` (hiện `/^choigame + số tùy ý$/i`, quyết định 2026-11-06) khỏi CLONE: dòng `<Route>` + import + file page (react-router) hoặc thư mục `app/**/choigame*` (Next), cùng asset local chỉ các trang đó dùng. Template không bị sửa. Hiện chỉ phuong-hoang-tru-tien và tuyetdinh-chiengioi có trang này (asset của chúng toàn CDN nên 0 asset local bị xóa) |
 | `ve-pages-smoke.mjs` | Smoke test giao diện đa trang hiện tại (Playwright): số trang, tải lười, chọn phần tử trên nhiều trang, panel chỉ còn Reset toàn trang. `node scripts/ve-pages-smoke.mjs <gameId>` (đã đạt cho phuong-hoang-tru-tien và than-ma-ao-hoa) |
 | `ve-e2e.mjs` | **LEGACY** — viết cho editor cũ (một iframe, danh sách phần tử, ghi chú), KHÔNG còn chạy với giao diện mới; cần port từng kiểm tra (mục 5.5); `TOOL` mặc định `http://localhost:3100`, Chrome mặc định `C:/Program Files/Google/Chrome/Application/chrome.exe` |
@@ -538,7 +540,8 @@ Từ README/memory/plan (chưa xác minh lại từng cái trừ khi ghi chú):
 | 2026-11-06 | `c1411cc` | VE: adapter Next hỗ trợ nhiều root layout (route group); `edit-id.ts` phân giải ảnh import qua barrel (`barrelAliasRefs`); smoke test clone+VE 9 game còn lại đều `installed`, chưa e2e kéo thả; thêm `ve-barrel-layouts.test.ts` (165 test) |
 | 2026-11-06 | `1080709` | Editor: dàn nhiều trang cạnh nhau (tải lười), panel bỏ hết chữ chỉ còn Reset toàn trang; detector tag thêm video và ảnh nền full-width trong luồng trang (chế độ `scale`; số phần tử sửa được: than-ma 106→118, phuong 40→57, tuyetdinh 39→56, daiminhtinh 70→75, giang-ho 95→99); `ve-pages-smoke.mjs` mới, `ve-e2e.mjs` đánh dấu legacy |
 | 2026-11-06 | `a907a31` | Bỏ "Thêm trang"/`×`, nút Reset toàn trang lên header; `prune-routes.ts` xóa trang /choigameN (và asset local riêng của chúng) khỏi clone; xóa cache clone/.next/template-materialized của các game |
-| 2026-11-06 | (commit kế tiếp) | Wizard: lưu tiến độ trong trình duyệt là tùy chọn, cần bấm "Lưu tiến độ" + xác nhận; không xác nhận thì không lưu và xóa bản lưu cũ; Figma review không còn localStorage |
+| 2026-11-06 | `6a29eb4` | Wizard: lưu tiến độ trong trình duyệt là tùy chọn, cần bấm "Lưu tiến độ" + xác nhận; không xác nhận thì không lưu và xóa bản lưu cũ; Figma review không còn localStorage |
+| 2026-11-06 | (commit kế tiếp) | Gộp slot: họ icon + ảnh trùng hash thành một slot, một upload ra mọi kích thước; `.ico` được tạo đúng định dạng |
 
 ## 10. Cách cập nhật tài liệu này
 
