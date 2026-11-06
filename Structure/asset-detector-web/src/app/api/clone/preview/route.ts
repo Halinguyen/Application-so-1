@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { spawn } from "node:child_process";
 import net from "node:net";
 import { findFreePort } from "@/detector/preview-port";
-import { existsSync, openSync, closeSync } from "node:fs";
+import { existsSync, openSync, closeSync, appendFileSync } from "node:fs";
 import path from "node:path";
 import { getCloneDir } from "../route";
 import { resolveGame } from "@/detector/config";
@@ -106,6 +106,7 @@ export async function POST(request: NextRequest) {
       if (/^(__NEXT|NEXT_|TURBOPACK|NODE_OPTIONS$|NODE_ENV$|PORT$)/i.test(key)) delete childEnv[key];
     }
     let childExited = false;
+    const startedAt = Date.now();
     const child = spawn("npm", devArgs, {
       env: childEnv,
       cwd: CLONE_DIR,
@@ -122,8 +123,22 @@ export async function POST(request: NextRequest) {
     // EPERM-blocking fs.rm() when regenerating THOSE games' clones, with no
     // process obviously still running to explain it — only a server restart
     // (which force-closes all its fds) cleared it.
-    child.on("exit", () => {
+    child.on("error", (e) => {
       childExited = true;
+      try {
+        appendFileSync(logPath, `\n[tool] could not start the preview: ${e.message}\n`);
+      } catch {
+        // the log is only a diagnosis aid
+      }
+    });
+    child.on("exit", (code, signal) => {
+      childExited = true;
+      // A child that dies before printing anything leaves an empty log: say how it ended.
+      try {
+        appendFileSync(logPath, `\n[tool] preview process ended (exit code ${code ?? "none"}, signal ${signal ?? "none"}) after ${Math.round((Date.now() - startedAt) / 100) / 10}s\n`);
+      } catch {
+        // the log is only a diagnosis aid
+      }
       try {
         closeSync(logFd);
       } catch {

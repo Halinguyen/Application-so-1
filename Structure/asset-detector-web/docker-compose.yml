@@ -9,10 +9,10 @@ services:
         DEPLOY: develop # copies deploy/develop/.env.example to .env (paths under /data, tokens empty)
     ports:
       - "3000:3000"
-      - "6000-6050:6000-6050"
+      - "7000-7050:7000-7050"
     environment:
       PORT: "3000"
-      PREVIEW_PORT_RANGE: "6000-6050"
+      PREVIEW_PORT_RANGE: "7000-7050"
       # optional: tokens for fetching templates from git / publishing (leave empty for a seeded demo)
       TEMPLATE_GIT_TOKEN: "${TEMPLATE_GIT_TOKEN:-}"
       GITHUB_TOKEN: "${GITHUB_TOKEN:-}"

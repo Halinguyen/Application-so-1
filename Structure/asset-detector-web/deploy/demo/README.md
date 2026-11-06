@@ -4,7 +4,7 @@
 
 ## Cần
 - Máy chủ Linux có Docker và Docker Compose, ≥ 4 GB RAM, ≥ 10 GB ổ đĩa (mỗi game cần `npm install` khi tạo bản sao).
-- Cho phép truy cập **HTTP** tới cổng **3000** và dải **6000–6050** từ trình duyệt của người xem.
+- Cho phép truy cập **HTTP** tới cổng **3000** và dải **7000–7050** từ trình duyệt của người xem.
 - Truy cập internet (npm registry) để `npm install` trong bản sao.
 
 ## Các bước

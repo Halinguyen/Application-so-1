@@ -127,7 +127,7 @@ Trên một máy chủ chạy liên tục (VM, server, hoặc K8s):
 cd Structure/asset-detector-web
 node scripts/pack-templates.mjs                       # một file lớn cho thư mục /data
 mkdir -p demo-data && tar xzf ../demo-seed/templates-seed.tgz -C demo-data
-docker compose up -d --build                           # mở :3000 và các cổng xem trước 6000-6050
+docker compose up -d --build                           # mở :3000 và các cổng xem trước 7000-7050
 ```
 
-Máy chủ phải cho truy cập HTTP trực tiếp tới cổng 3000 và dải 6000–6050 (iframe xem trước dùng HTTP, đặt sau HTTPS sẽ bị trình duyệt chặn). Xem thêm `deploy/demo/README.md`. **`Dockerfile` và `docker-compose.yml` chưa được chạy thử trong container** (chỉ kiểm bước build của Next.js và logic từng phần).
+Máy chủ phải cho truy cập HTTP trực tiếp tới cổng 3000 và dải 7000–7050 (iframe xem trước dùng HTTP, đặt sau HTTPS sẽ bị trình duyệt chặn). Xem thêm `deploy/demo/README.md`. **`Dockerfile` và `docker-compose.yml` chưa được chạy thử trong container** (chỉ kiểm bước build của Next.js và logic từng phần).
