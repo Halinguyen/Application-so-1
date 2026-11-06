@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
+    "pack:vercel": "node scripts/pack-templates.mjs --per-game --games phuong-hoang-tru-tien,tamquoc-quan-anh,giang-ho-ky-ngo,quy-mon-quan,ta-la-hac-ngokhong",
     "registry:generate": "node scripts/generate-registry.mjs",
     "registry:check": "node scripts/generate-registry.mjs --check",
     "e2e:visual-editing": "node scripts/ve-e2e.mjs"

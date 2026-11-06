@@ -2,7 +2,7 @@ import { runDetection } from "@/detector/run";
 import { readBaseEnv } from "@/detector/base-env";
 import { readTextSlots } from "@/detector/site-text";
 import { keepRatioSlotIds } from "@/detector/flow-image";
-import { resolveGame, GAME_REPO_MAP, getGameDisplayName, getGameIconUrl, isFigmaHidden } from "@/detector/config";
+import { resolveGame, enabledGameIds, getGameDisplayName, getGameIconUrl, isFigmaHidden } from "@/detector/config";
 import { detectFramework } from "@/detector/framework-detector";
 import { readRegistryEntry, requireTemplate } from "@/detector/template-source";
 import { buildCloneSlots } from "@/detector/clone-slots";
@@ -36,7 +36,7 @@ export default async function Home({
 
   if (!game) {
     const games: GameOption[] = await Promise.all(
-      Object.keys(GAME_REPO_MAP).map(async (gameId) => {
+      enabledGameIds().map(async (gameId) => {
         // the manifest knows the framework: the list must not need every template on disk (it would fetch them all)
         const known = readRegistryEntry(gameId)?.framework;
         const framework = known ?? (await detectFramework(resolveGame(gameId).repoPath)).framework;

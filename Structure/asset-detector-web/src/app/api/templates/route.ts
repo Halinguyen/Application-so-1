@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import { GAME_REPO_MAP } from "@/detector/config";
+import { GAME_REPO_MAP, isGameEnabled } from "@/detector/config";
 import { TEMPLATE_ROOT } from "@/detector/paths";
 import { readRegistryEntry } from "@/detector/template-source";
 
@@ -10,7 +10,7 @@ export const runtime = "nodejs";
 
 /** GET: for every game, whether its template is on disk now and where it comes from (the manifest). */
 export async function GET() {
-  const games = Object.entries(GAME_REPO_MAP).map(([gameId, repoDir]) => {
+  const games = Object.entries(GAME_REPO_MAP).filter(([gameId]) => isGameEnabled(gameId)).map(([gameId, repoDir]) => {
     const entry = readRegistryEntry(gameId);
     return {
       gameId,

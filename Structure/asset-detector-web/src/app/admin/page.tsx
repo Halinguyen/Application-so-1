@@ -1,5 +1,5 @@
 import { runDetection } from "@/detector/run";
-import { GAME_REPO_MAP, GAME_DISPLAY_NAMES, getGameDisplayName } from "@/detector/config";
+import { enabledGameIds, GAME_DISPLAY_NAMES, getGameDisplayName } from "@/detector/config";
 import Gallery, { type GalleryAsset } from "../components/Gallery";
 import RescanButton from "../components/RescanButton";
 import GameSwitcher from "../components/GameSwitcher";
@@ -72,7 +72,7 @@ export default async function AdminPage({
           <div className="meta">
             framework <span className="mono">{framework.framework}</span>
             <br />
-            <GameSwitcher gameId={gameId} games={Object.keys(GAME_REPO_MAP)} labels={GAME_DISPLAY_NAMES} />
+            <GameSwitcher gameId={gameId} games={enabledGameIds()} labels={GAME_DISPLAY_NAMES} />
             <br />
             <a href={`/?game=${gameId}`} style={{ color: "var(--accent)" }}>
               Operator wizard →

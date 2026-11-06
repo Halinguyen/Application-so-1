@@ -80,6 +80,24 @@ export function getGameIconUrl(gameId: string): string | null {
 
 export const DEFAULT_GAME_ID = "phuong-hoang-tru-tien";
 
+/**
+ * The games a deployment offers. Unset: every game (a laptop, Docker). On Vercel the default is the five the operator chose
+ * (2026-11-06): T029 Phượng Hoàng Tru Tiên, T203 Tam Quốc Quần Anh (git group t023), T030 Giang Hồ Kỳ Ngộ, R015 Quỷ Môn Quan,
+ * T031 Ta Là Hắc Ngộ Không. ENABLED_GAMES overrides it: a comma list of game ids, or "*" for all.
+ */
+export const VERCEL_GAMES = ["phuong-hoang-tru-tien", "tamquoc-quan-anh", "giang-ho-ky-ngo", "quy-mon-quan", "ta-la-hac-ngokhong"];
+
+export function enabledGameIds(): string[] {
+  const all = Object.keys(GAME_REPO_MAP);
+  const env = process.env.ENABLED_GAMES?.trim();
+  const wanted = env ? (env === "*" ? null : env.split(",").map((g) => g.trim()).filter(Boolean)) : process.env.VERCEL ? VERCEL_GAMES : null;
+  return wanted ? all.filter((g) => wanted.includes(g)) : all;
+}
+
+export function isGameEnabled(gameId: string): boolean {
+  return enabledGameIds().includes(gameId);
+}
+
 // TEMPORARY (2026-11-05): games whose wizard does not show anything coming from the Figma design (the "Gợi ý ảnh từ
 // Figma" / import block of step 2). The server also skips computing the proposals for them. To bring it back for a
 // game, remove its id here: nothing else needs to change (snapshots and the /api/figma routes are untouched).

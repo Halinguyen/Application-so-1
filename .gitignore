@@ -33,3 +33,8 @@ Thumbs.db
 # the extracted working copy is regenerated from the archive on demand
 Structure/template-store/**/template.tgz
 Structure/template-materialized/
+
+# Template archives and runtime data for demo servers (company sources: never in git)
+Structure/demo-seed/
+Structure/demo-data/
+Structure/asset-detector-web/demo-data/

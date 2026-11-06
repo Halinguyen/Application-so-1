@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GAME_REPO_MAP } from "@/detector/config";
+import { GAME_REPO_MAP, enabledGameIds } from "@/detector/config";
 import { ensureTemplate } from "@/detector/template-source";
 
 export const dynamic = "force-dynamic";
@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   } catch {
     /* no body: every game */
   }
-  const ids = gameId ? [gameId] : Object.keys(GAME_REPO_MAP);
+  const ids = gameId ? [gameId] : enabledGameIds();
   if (gameId && !GAME_REPO_MAP[gameId]) return NextResponse.json({ error: `không biết game "${gameId}"` }, { status: 400 });
 
   const results = [];

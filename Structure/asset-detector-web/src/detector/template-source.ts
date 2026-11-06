@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
-import { DEFAULT_GAME_ID, GAME_REPO_MAP } from "./config";
+import { DEFAULT_GAME_ID, GAME_REPO_MAP, isGameEnabled } from "./config";
 import { readCloneSchema } from "./clone-schema";
 import { REGISTRY_DIR, TEMPLATE_ROOT } from "./paths";
 import { fetchSeedTemplate } from "./template-seed";
@@ -115,6 +115,7 @@ export async function fetchGitTemplate(source: { url: string; commit: string }, 
  */
 export async function requireTemplate(gameId?: string | null): Promise<string | null> {
   const id = gameId && GAME_REPO_MAP[gameId] ? gameId : DEFAULT_GAME_ID;
+  if (!isGameEnabled(id)) return `game "${id}" không nằm trong danh sách game của bản triển khai này (ENABLED_GAMES).`;
   const r = await ensureTemplate(id);
   if (r.state === "failed" || r.state === "no-source") return r.message ?? "template chưa sẵn sàng";
   return null;

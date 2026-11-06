@@ -2,7 +2,9 @@
 
 Tài liệu này dựa trên hướng dẫn của Vercel (https://vercel.com/get-started.md: cài CLI, thêm hướng dẫn cho agent, nối MCP) và trên cách công cụ này thực sự chạy.
 
-## 0. Đọc trước: Vercel làm được gì, không làm được gì
+## 0. Đọc trước: phạm vi bản demo và Vercel làm được gì
+
+**Bản demo chỉ có 5 game** (quyết định của người vận hành, 2026-11-06): **T029** Phượng Hoàng Tru Tiên (`phuong-hoang-tru-tien`), **T203** Tam Quốc Quần Anh (`tamquoc-quan-anh`; nhóm git của nó là `t023`), **T030** Giang Hồ Kỳ Ngộ (`giang-ho-ky-ngo`), **R015** Quỷ Môn Quan (`quy-mon-quan`), **T031** Ta Là Hắc Ngộ Không (`ta-la-hac-ngokhong`). Trên Vercel (`VERCEL` được đặt) tool tự chỉ hiện 5 game này; 6 game còn lại ẩn đi và không cần đóng gói. Sau này muốn mở tất cả: đặt `ENABLED_GAMES=*` (hoặc một danh sách id cách nhau bằng dấu phẩy) rồi đóng gói thêm các game đó.
 
 | Chức năng | Trên Vercel | Ghi chú |
 |---|---|---|
@@ -54,17 +56,19 @@ Nhánh deploy: `main`. Nếu bạn đổi tên hay chuyển thư mục, phải s
 
 `game-template-repo` và `template-store/**/template.tgz` bị `.gitignore`, nên **không có trên GitHub và không có trên Vercel**. Mở game sẽ báo "Chưa lấy được mã nguồn template…". Cách xử lý: đóng gói **mỗi game một file** rồi để tool tải khi cần.
 
-**4.1. Đóng gói (trên máy có `game-template-repo`):**
+**4.1. Đóng gói 5 game của bản demo (trên máy có `game-template-repo`):**
 
 ```bash
 cd Structure/asset-detector-web
-node scripts/pack-templates.mjs --per-game --out-dir ../demo-seed
-# tạo ../demo-seed/<gameId>.tgz  (9 – 187 MB mỗi game, 11 game)
+npm run pack:vercel
+# tạo Structure/demo-seed/<gameId>.tgz: phuong-hoang-tru-tien 9 MB, ta-la-hac-ngokhong 14 MB, quy-mon-quan 54 MB,
+#   tamquoc-quan-anh 84 MB, giang-ho-ky-ngo 135 MB  (tổng ≈ 295 MB; thư mục demo-seed đã nằm trong .gitignore)
+# đóng thêm game khác sau này:  node scripts/pack-templates.mjs --per-game --games <id1>,<id2>
 ```
 
-Mỗi file chứa `templates/<gameId>/<repoDir>/…`, không có `node_modules`, `.git`, build, log. Gói gọn nhẹ vì Vercel chỉ cho ghi khoảng 512 MB vào `/tmp`; gói tất cả 11 game (≈700 MB) thì không vừa.
+Mỗi file chứa `templates/<gameId>/<repoDir>/…`, không có `node_modules`, `.git`, build, log. Mỗi game một file vì Vercel chỉ cho ghi khoảng 512 MB vào `/tmp`; gói tất cả 11 game (≈700 MB) thì không vừa.
 
-**4.2. Đưa lên nơi lưu trữ có địa chỉ HTTPS** (Vercel Blob, S3, hay máy chủ file nội bộ). Các file này là **mã nguồn của công ty**: đừng để công khai. Chọn nơi cần token, hoặc dùng địa chỉ không đoán được, và đặt `TEMPLATE_SEED_TOKEN` (tool gửi nó dưới dạng `Authorization: Bearer …`).
+**4.2. Đưa lên nơi lưu trữ có địa chỉ HTTPS** (Vercel Blob, S3, hay máy chủ file nội bộ). Các file này là **mã nguồn của công ty** và còn chứa cả file môi trường của template (có khóa kiểu `VITE_APP_CLIENT_SECRET`): đừng để công khai. Chọn nơi cần token, hoặc dùng địa chỉ không đoán được, và đặt `TEMPLATE_SEED_TOKEN` (tool gửi nó dưới dạng `Authorization: Bearer …`).
 
 Địa chỉ phải có dạng `<TEMPLATE_SEED_BASE_URL>/<gameId>.tgz`, ví dụ `https://kho.example.com/seed/than-ma-ao-hoa.tgz`.
 
@@ -76,6 +80,7 @@ Mỗi file chứa `templates/<gameId>/<repoDir>/…`, không có `node_modules`,
 |---|---|---|
 | `TEMPLATE_SEED_BASE_URL` | **Có** | Thư mục HTTPS chứa `<gameId>.tgz` (mục 4) |
 | `TEMPLATE_SEED_TOKEN` | Nên có | Token gửi kèm khi tải file |
+| `ENABLED_GAMES` | Không | Mặc định trên Vercel là 5 game của bản demo. `*` = tất cả; hoặc danh sách id cách nhau bằng dấu phẩy |
 | `APP_DATA_DIR` | Không | Mặc định trên Vercel là `/tmp/asset-detector` |
 | `TEMPLATE_GIT_TOKEN`, `TEMPLATE_GIT_USER` | Không | Chỉ để kéo từ git; Vercel không có `git` nên thường không dùng |
 | `FIGMA_TOKEN` | Không | Nếu dùng phần Figma |
@@ -99,7 +104,7 @@ vercel --prod
 ## 7. Kiểm tra sau deploy
 
 1. `https://<tên>.vercel.app/api/health` trả `{"ok":true,…}`.
-2. Trang chủ liệt kê 11 game.
+2. Trang chủ liệt kê đúng 5 game của bản demo.
 3. Bấm một game: hiện "Đang quét asset…" rồi wizard bước 2 (Nội dung chữ, Hình ảnh & video). Lần đầu có thể mất vài chục giây vì phải tải file game.
 4. Bấm "Tạo bản sao": phải thấy thông báo "…không chạy được trên Vercel…" (HTTP 501), không phải lỗi trống.
 
