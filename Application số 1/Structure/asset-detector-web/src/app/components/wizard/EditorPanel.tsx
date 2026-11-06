@@ -4,8 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import protocol from "../../../../public/ve/protocol.js";
 import type { EditManifest, LayoutBreakpoint, LayoutConflicts, LayoutFile } from "@/detector/layout-schema";
 import { matchMediaToSlot, type EditSlot } from "@/detector/asset-match";
-import type { RouteInfo } from "@/detector/routes";
-import { fillRoute, paramsOf } from "@/detector/route-path";
 
 interface Snapshot {
   layout: LayoutFile;
@@ -15,7 +13,7 @@ interface Snapshot {
   /** asset slots found when the clone was built: the files this editor may replace */
   slots?: EditSlot[];
   /** every page of the site and the files each draws */
-  routes?: RouteInfo[];
+  routes?: { path: string; label: string; dynamic: boolean }[];
 }
 
 interface Selected {
@@ -57,9 +55,6 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
   const [snap, setSnap] = useState<Snapshot | null>(null);
   const [selected, setSelected] = useState<Selected>({ editId: null });
   // the pages shown side by side. Starts with every page that needs no parameter; the operator can add a page with parameters
-  const [custom, setPages] = useState<{ id: string; path: string; label: string }[] | null>(null);
-  const [routePick, setRoutePick] = useState<string>("/");
-  const [params, setParams] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<string | null>(null);
   // Full-screen editor: a fixed layer over the wizard with its own toolbar, stage and side panel,
   // so nothing is clipped by the wizard's scrolling. "Fit" scales the preview down to show more of the page.
@@ -208,24 +203,9 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
 
   const bp = selected.breakpoint ?? viewport;
   const saved = selected.editId ? snap?.layout.elements[selected.editId]?.overrides[bp] : undefined;
-  const routes: RouteInfo[] = snap?.routes && snap.routes.length > 0 ? snap.routes : [{ path: "/", label: "Trang chủ", dynamic: false, file: "", files: [] }];
-  const pickedRoute = routes.find((r) => r.path === routePick) ?? null;
-
-  // until the operator adds or removes a page: every page that needs no parameter
+  // every page that needs no parameter
   const fixedPages = (snap?.routes ?? []).filter((r) => !r.dynamic).map((r, i) => ({ id: "p" + i, path: r.path, label: r.label }));
-  const pages = custom ?? (fixedPages.length > 0 ? fixedPages : [{ id: "p0", path: "/", label: "Trang chủ" }]);
-
-  /** Add a page that has parameters (or one that was removed), with the values typed in the toolbar. */
-  function addPage(p: string) {
-    const r = routes.find((x) => x.path === p);
-    const target = r?.dynamic ? fillRoute(p, params) : p;
-    if (target === null) {
-      setMessage("Nhập đủ tham số của trang rồi bấm Thêm.");
-      return;
-    }
-    setMessage(null);
-    setPages([...pages, { id: "p" + Date.now(), path: target, label: r?.label ?? target }]);
-  }
+  const pages = (fixedPages.length > 0 ? fixedPages : [{ id: "p0", path: "/", label: "Trang chủ" }]);
 
   /** A page scrolled far out of view is unloaded to save memory (its edits are already saved). */
   function hidePage(id: string) {
@@ -234,15 +214,6 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
       activeId.current = null;
       setSelected({ editId: null });
     }
-  }
-
-  function removePage(id: string) {
-    frames.current.delete(id);
-    if (activeId.current === id) {
-      activeId.current = null;
-      setSelected({ editId: null });
-    }
-    setPages(pages.filter((x) => x.id !== id));
   }
 
   const vw = VIEWPORTS.find((v) => v.key === viewport)!.width;
@@ -294,29 +265,17 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
             {fit ? `Vừa khung (${Math.round(scale * 100)}%)` : "100%"}
           </button>
           <span style={{ width: 8 }} />
-          <label style={{ fontSize: 12.5 }}>
-            Thêm trang{" "}
-            <select data-testid="ve-route" value={routePick} onChange={(e) => setRoutePick(e.target.value)}>
-              {routes.map((r) => (
-                <option key={r.path} value={r.path}>
-                  {r.label} ({r.path})
-                </option>
-              ))}
-            </select>
-          </label>
-          {pickedRoute?.dynamic &&
-            paramsOf(pickedRoute.path).map((k) => (
-              <input
-                key={k}
-                data-testid={`ve-param-${k === "*" ? "rest" : k}`}
-                placeholder={k === "*" ? "đường dẫn" : k}
-                value={params[k] ?? ""}
-                style={{ width: 110 }}
-                onChange={(e) => setParams((cur) => ({ ...cur, [k]: e.target.value }))}
-              />
-            ))}
-          <button className="chip" data-testid="ve-route-open" onClick={() => addPage(routePick)}>
-            +
+          <button
+            className="chip"
+            data-testid="ve-reset-all"
+            onClick={async () => {
+              await call("DELETE");
+              post("RESET", {});
+              post("RELOAD_CSS", {});
+              setSelected({ editId: null });
+            }}
+          >
+            Reset toàn trang
           </button>
           <label style={{ marginLeft: "auto", fontSize: 12.5 }}>
             <input data-testid="edit-mode" type="checkbox" checked={editMode} onChange={(e) => setEditMode(e.target.checked)} /> Chế độ chỉnh
@@ -341,11 +300,6 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
                     <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginBottom: 4, width: vw * scale }}>
                       <strong>{pg.label}</strong>
                       <span className="mono" style={{ color: "var(--muted)" }}>{pg.path}</span>
-                      {pages.length > 1 && (
-                        <button className="chip" style={{ marginLeft: "auto", padding: "0 6px" }} aria-label="Bỏ trang" onClick={() => removePage(pg.id)}>
-                          ×
-                        </button>
-                      )}
                     </div>
                     <PageSlot root={stageRef} width={vw * scale} height={availH - 24} onHide={() => hidePage(pg.id)}>
                       <iframe
@@ -465,20 +419,6 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
           </div>
         ) : null}
 
-        <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
-          <button
-            className="chip"
-            data-testid="ve-reset-all"
-            onClick={async () => {
-              await call("DELETE");
-              post("RESET", {});
-              post("RELOAD_CSS", {});
-              setSelected({ editId: null });
-            }}
-          >
-            Reset toàn trang
-          </button>
-        </div>
           </aside>
         </div>
       </div>

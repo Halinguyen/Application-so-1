@@ -248,7 +248,7 @@ Trang: `/` (`src/app/page.tsx`: GamePicker hoặc WizardShell), `/admin` (QA das
 | `wizard/AssetCompareTile.tsx` | Ô so sánh ảnh gốc / ảnh thay |
 | `wizard/FigmaSuggestions.tsx` | Gợi ý ảnh từ Figma (chấp nhận/bỏ qua, nhập link/ZIP); quyết định lưu localStorage |
 | `wizard/PreviewPane.tsx` | Iframe preview + kết quả clone/preview (`CloneResult`, `PreviewResult`) |
-| `wizard/EditorPanel.tsx` | Trình chỉnh layout toàn màn hình. **Từ 2026-11-06:** mọi trang không cần tham số (home, rank, tintuc…) dàn ngang, mỗi trang một iframe + inspector (`frames` map id→iframe; một lựa chọn tại một thời điểm, `activeId`); `PageSlot` chỉ render iframe khi gần vùng nhìn thấy và dỡ khi cuộn xa (8-9 trang cùng lúc làm sập trình duyệt); nút `+` thêm trang có tham số, `×` bỏ trang. Panel bên phải KHÔNG còn chữ hướng dẫn/ghi chú/danh sách phần tử/reset từng phần tử/khôi phục bản cũ: chỉ còn ô tỉ lệ, z-index, Ẩn, khối `MediaReplacer` (chọn file/link, Thay ảnh, Khôi phục gốc) và nút **Reset toàn trang** |
+| `wizard/EditorPanel.tsx` | Trình chỉnh layout toàn màn hình. **Từ 2026-11-06:** mọi trang không cần tham số (home, rank, tintuc…) dàn ngang, mỗi trang một iframe + inspector (`frames` map id→iframe; một lựa chọn tại một thời điểm, `activeId`); `PageSlot` chỉ render iframe khi gần vùng nhìn thấy và dỡ khi cuộn xa (8-9 trang cùng lúc làm sập trình duyệt); không còn "Thêm trang"/`×` (trang có tham số không dàn ra). Panel bên phải KHÔNG còn chữ hướng dẫn/ghi chú/danh sách phần tử/reset từng phần tử/khôi phục bản cũ: chỉ còn ô tỉ lệ, z-index, Ẩn và khối `MediaReplacer` (chọn file/link, Thay ảnh, Khôi phục gốc); nút **Reset toàn trang** nằm ở header (chỗ của "Thêm trang") |
 | `wizard/HoverHint.tsx`, `wizard/types.ts` | Gợi ý hover; kiểu `CloneParam`, `CloneSlot`, `CloneExternalSlot` |
 | `Gallery.tsx`, `GameSwitcher.tsx`, `RescanButton.tsx`, `Spinner.tsx` | Cho `/admin` và loading |
 
@@ -266,6 +266,7 @@ Trang: `/` (`src/app/page.tsx`: GamePicker hoặc WizardShell), `/admin` (QA das
 | File | Việc |
 |---|---|
 | `generate-registry.mjs` | Sinh `template-registry/<game>.json` từ repo template trên máy (đọc `GAME_REPO_MAP` bằng regex trên `config.ts`); `--check` exit 1 nếu manifest cũ; báo working copy khác commit |
+| `detector/prune-routes.ts` (+test) | Gọi trong `/api/clone` ngay sau khi copy template: bỏ các trang có segment đầu khớp `EXCLUDED_ROUTE_SEGMENTS` (hiện `/^choigame + số tùy ý$/i`, quyết định 2026-11-06) khỏi CLONE: dòng `<Route>` + import + file page (react-router) hoặc thư mục `app/**/choigame*` (Next), cùng asset local chỉ các trang đó dùng. Template không bị sửa. Hiện chỉ phuong-hoang-tru-tien và tuyetdinh-chiengioi có trang này (asset của chúng toàn CDN nên 0 asset local bị xóa) |
 | `ve-pages-smoke.mjs` | Smoke test giao diện đa trang hiện tại (Playwright): số trang, tải lười, chọn phần tử trên nhiều trang, panel chỉ còn Reset toàn trang. `node scripts/ve-pages-smoke.mjs <gameId>` (đã đạt cho phuong-hoang-tru-tien và than-ma-ao-hoa) |
 | `ve-e2e.mjs` | **LEGACY** — viết cho editor cũ (một iframe, danh sách phần tử, ghi chú), KHÔNG còn chạy với giao diện mới; cần port từng kiểm tra (mục 5.5); `TOOL` mặc định `http://localhost:3100`, Chrome mặc định `C:/Program Files/Google/Chrome/Application/chrome.exe` |
 | `ve-poc-clone.mjs` | PoC bước 1-2: gọi `/api/clone` với `visualEdit=1`, in kết quả gắn id (`tool` mặc định `http://localhost:3100`) |
@@ -535,7 +536,8 @@ Từ README/memory/plan (chưa xác minh lại từng cái trừ khi ghi chú):
 |---|---|---|
 | 2026-11-06 | `b4ace81` | Tạo mới toàn bộ tài liệu: tổng quan, cấu trúc, module, dữ liệu/cấu hình, visual editing, bảng 16 game, build/deploy, bẫy và việc còn mở |
 | 2026-11-06 | `c1411cc` | VE: adapter Next hỗ trợ nhiều root layout (route group); `edit-id.ts` phân giải ảnh import qua barrel (`barrelAliasRefs`); smoke test clone+VE 9 game còn lại đều `installed`, chưa e2e kéo thả; thêm `ve-barrel-layouts.test.ts` (165 test) |
-| 2026-11-06 | (commit kế tiếp) | Editor: dàn nhiều trang cạnh nhau (tải lười), panel bỏ hết chữ chỉ còn Reset toàn trang; detector tag thêm video và ảnh nền full-width trong luồng trang (chế độ `scale`; số phần tử sửa được: than-ma 106→118, phuong 40→57, tuyetdinh 39→56, daiminhtinh 70→75, giang-ho 95→99); `ve-pages-smoke.mjs` mới, `ve-e2e.mjs` đánh dấu legacy |
+| 2026-11-06 | `1080709` | Editor: dàn nhiều trang cạnh nhau (tải lười), panel bỏ hết chữ chỉ còn Reset toàn trang; detector tag thêm video và ảnh nền full-width trong luồng trang (chế độ `scale`; số phần tử sửa được: than-ma 106→118, phuong 40→57, tuyetdinh 39→56, daiminhtinh 70→75, giang-ho 95→99); `ve-pages-smoke.mjs` mới, `ve-e2e.mjs` đánh dấu legacy |
+| 2026-11-06 | (commit kế tiếp) | Bỏ "Thêm trang"/`×`, nút Reset toàn trang lên header; `prune-routes.ts` xóa trang /choigameN (và asset local riêng của chúng) khỏi clone; xóa cache clone/.next/template-materialized của các game |
 
 ## 10. Cách cập nhật tài liệu này
 

@@ -12,6 +12,7 @@ import { resizeUploadToMatchTarget, resizeUploadToMatchRemote, type CropAnchor }
 import { applyTextSlot } from "@/detector/site-text";
 import { ensureDependencies } from "@/detector/ensure-deps";
 import { applyVisualEditing } from "@/detector/visual-editing";
+import { pruneExcludedRoutes } from "@/detector/prune-routes";
 import { requireTemplate } from "@/detector/template-source";
 
 export const dynamic = "force-dynamic";
@@ -157,6 +158,8 @@ export async function POST(request: NextRequest) {
     await ensureDependencies(repoPath);
     await copyRepoSkeleton(repoPath, CLONE_DIR);
     await applyPersistedUploads(repoPath, CLONE_DIR);
+    // pages the clone does not carry (/choigameN): gone from the clone, the template is untouched
+    const pruned = await pruneExcludedRoutes(CLONE_DIR);
 
     const filesReplaced: { targetPath: string; originalBytes: number; finalBytes: number; resized: boolean }[] = [];
     const externalReplaced: {
@@ -170,6 +173,7 @@ export async function POST(request: NextRequest) {
     }[] = [];
     const textReplaced: string[] = [];
     const warnings: string[] = [];
+    if (pruned.routes.length > 0) warnings.push(`Đã bỏ ${pruned.routes.length} trang khỏi bản sao: ${pruned.routes.join(", ")} (${pruned.files.length} file, ${pruned.assets.length} asset).`);
     const env = await readBaseEnv(repoPath);
     const baseEnvKeyCount = Object.keys(env).length;
     const overriddenKeys: string[] = [];
