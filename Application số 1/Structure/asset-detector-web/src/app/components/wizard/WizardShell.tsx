@@ -51,7 +51,23 @@ function storageKey(gameId: string) {
   return `wizard-state:v3:${gameId}`;
 }
 
+/**
+ * Saving the steps in the browser is opt-in (2026-11-06): nothing is stored until the operator confirms with
+ * "Lưu tiến độ". The confirmation is remembered per game in its own key; without it every visit starts from the
+ * template's defaults and any state left by an older version is deleted.
+ */
+const consentKey = (gameId: string) => `wizard-save-consent:v1:${gameId}`;
+
+function hasConsent(gameId: string): boolean {
+  try {
+    return localStorage.getItem(consentKey(gameId)) === "1";
+  } catch {
+    return false;
+  }
+}
+
 function loadPersisted(gameId: string): Partial<PersistedState> {
+  if (!hasConsent(gameId)) return {};
   try {
     const raw = localStorage.getItem(storageKey(gameId));
     return raw ? JSON.parse(raw) : {};
@@ -87,7 +103,8 @@ export default function WizardShell({
   hideFigma?: boolean;
 }) {
   const persisted = useMemo(() => loadPersisted(gameId), [gameId]);
-
+  // whether the operator confirmed saving the steps in this browser
+  const [saveOn, setSaveOn] = useState<boolean>(() => hasConsent(gameId));
   const [currentStep, setCurrentStep] = useState<number>(persisted.currentStep ?? 2);
   const [files, setFiles] = useState<Record<string, File>>({});
   const [previews, setPreviews] = useState<Record<string, string>>({});
@@ -124,14 +141,37 @@ export default function WizardShell({
   const [visualEdit, setVisualEdit] = useState(false);
   const [previewResult, setPreviewResult] = useState<PreviewResult | null>(null);
 
+  // Without a confirmation nothing is kept: remove what an older version (or an earlier visit) left for this game.
   useEffect(() => {
+    if (saveOn) return;
+    try {
+      localStorage.removeItem(storageKey(gameId));
+      localStorage.removeItem(consentKey(gameId));
+      localStorage.removeItem(`figma-review:v1:${gameId}`);
+    } catch {
+      // storage unavailable: nothing to clear
+    }
+  }, [gameId, saveOn]);
+
+  // Only after the operator confirmed: keep the steps up to date.
+  useEffect(() => {
+    if (!saveOn) return;
     const toSave: PersistedState = { currentStep, textValues, values, urlValues, externalUrlValues, excludedIds, blankIds, projectName };
     try {
+      localStorage.setItem(consentKey(gameId), "1");
       localStorage.setItem(storageKey(gameId), JSON.stringify(toSave));
     } catch {
       // best-effort — private-browsing/storage-full shouldn't break the wizard
     }
-  }, [gameId, currentStep, textValues, values, urlValues, externalUrlValues, excludedIds, blankIds, projectName]);
+  }, [saveOn, gameId, currentStep, textValues, values, urlValues, externalUrlValues, excludedIds, blankIds, projectName]);
+
+  function confirmSave() {
+    if (window.confirm("Lưu các bước đã nhập (ô nhập, tick bỏ/ẩn, bước hiện tại) vào trình duyệt này cho game này?\nKhông xác nhận thì lần sau mở lại sẽ bắt đầu từ đầu. Ảnh đã chọn không được lưu.")) setSaveOn(true);
+  }
+
+  function clearSaved() {
+    if (window.confirm("Xóa bản lưu của game này? Lần sau mở lại sẽ bắt đầu từ đầu.")) setSaveOn(false);
+  }
 
   function setExcluded(id: string, excluded: boolean) {
     setExcludedIds((prev) => {
@@ -354,6 +394,19 @@ export default function WizardShell({
           <Link href="/" style={{ color: "var(--accent)" }}>
             đổi game khác
           </Link>
+          {" · "}
+          {saveOn ? (
+            <>
+              <span data-testid="save-state">Đã bật lưu tiến độ</span>{" "}
+              <button type="button" className="chip" data-testid="save-clear" onClick={clearSaved}>
+                Xóa bản lưu
+              </button>
+            </>
+          ) : (
+            <button type="button" className="chip" data-testid="save-confirm" onClick={confirmSave}>
+              Lưu tiến độ
+            </button>
+          )}
         </div>
       </header>
 

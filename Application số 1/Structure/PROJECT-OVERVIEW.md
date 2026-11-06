@@ -29,7 +29,7 @@ Repo git nằm ở `D:\Application-so-1` (không phải trong `asset-detector-we
 | 3 | Cấu hình | Chỉ **GameId** (một ô) + **Tên dự án** `[mã]-[tên]` (regex `^[a-z][0-9]{3}-[a-z0-9]+(-[a-z0-9]+)*$`); các param khác lấy từ template (`ConfigStep`) | — |
 | 4 | Xem trước & Hoàn tất | "Generate clone" (`/api/clone`) → chạy preview (`/api/clone/preview`) → iframe; bật "chỉnh layout" mở `EditorPanel` toàn màn hình; "Tạo repo trên GitHub" (`/api/repo`) | `/api/clone`, `/api/clone/preview`, `/api/layout`, `/api/asset`, `/api/repo` |
 
-- Trạng thái wizard (bước hiện tại, chữ, giá trị cấu hình, link, id loại trừ/blank, projectName) lưu `localStorage` theo gameId; **File object không lưu được** nên ảnh vừa chọn mất khi F5.
+- Trạng thái wizard (bước hiện tại, chữ, giá trị cấu hình, link, id loại trừ/blank, projectName) **chỉ lưu `localStorage` sau khi operator bấm "Lưu tiến độ" và xác nhận** (từ 2026-11-06; khoá `wizard-save-consent:v1:<gameId>` + `wizard-state:v3:<gameId>`). Không xác nhận thì mỗi lần mở bắt đầu từ mặc định của template và bản lưu cũ bị xóa; "Xóa bản lưu" tắt lại. **File object không lưu được** nên ảnh vừa chọn mất khi F5. Dữ liệu phía server (`home-page-uploads`, `home-page-layout`) là chuyện khác: vẫn áp dụng vào mỗi lần clone, xóa bằng "Reset toàn trang" của editor hoặc xóa thư mục.
 - Ảnh đã tải lên được **lưu bền** ở `<TEMPLATE_ROOT>/<game>/home-page-uploads/` và đắp lại sau mỗi lần clone (xem 4.6).
 - Hướng đang cân nhắc (chưa làm, plan 14 mục 16): chuyển danh sách bước 2 thành một tab trong bước 4 (không xóa được vì chỉ ~40-62% slot ảnh chọn được trong preview).
 
@@ -242,11 +242,11 @@ Trang: `/` (`src/app/page.tsx`: GamePicker hoặc WizardShell), `/admin` (QA das
 
 | File | Vai trò |
 |---|---|
-| `wizard/WizardShell.tsx` | Trạng thái và 3 bước wizard, lưu localStorage, gọi clone/preview/repo |
+| `wizard/WizardShell.tsx` | Trạng thái và 3 bước wizard, lưu localStorage chỉ sau khi xác nhận (`saveOn`, `confirmSave`), gọi clone/preview/repo |
 | `wizard/GamePicker.tsx` | Thẻ game (`GameOption {gameId, displayName, iconUrl, cloneReady}`), monogram khi thiếu icon |
 | `wizard/ConfigStep.tsx` | Form cấu hình bước 3 |
 | `wizard/AssetCompareTile.tsx` | Ô so sánh ảnh gốc / ảnh thay |
-| `wizard/FigmaSuggestions.tsx` | Gợi ý ảnh từ Figma (chấp nhận/bỏ qua, nhập link/ZIP); quyết định lưu localStorage |
+| `wizard/FigmaSuggestions.tsx` | Gợi ý ảnh từ Figma (chấp nhận/bỏ qua, nhập link/ZIP); quyết định chỉ giữ trong phiên (không còn localStorage; server vẫn lưu qua `/api/figma/review`) |
 | `wizard/PreviewPane.tsx` | Iframe preview + kết quả clone/preview (`CloneResult`, `PreviewResult`) |
 | `wizard/EditorPanel.tsx` | Trình chỉnh layout toàn màn hình. **Từ 2026-11-06:** mọi trang không cần tham số (home, rank, tintuc…) dàn ngang, mỗi trang một iframe + inspector (`frames` map id→iframe; một lựa chọn tại một thời điểm, `activeId`); `PageSlot` chỉ render iframe khi gần vùng nhìn thấy và dỡ khi cuộn xa (8-9 trang cùng lúc làm sập trình duyệt); không còn "Thêm trang"/`×` (trang có tham số không dàn ra). Panel bên phải KHÔNG còn chữ hướng dẫn/ghi chú/danh sách phần tử/reset từng phần tử/khôi phục bản cũ: chỉ còn ô tỉ lệ, z-index, Ẩn và khối `MediaReplacer` (chọn file/link, Thay ảnh, Khôi phục gốc); nút **Reset toàn trang** nằm ở header (chỗ của "Thêm trang") |
 | `wizard/HoverHint.tsx`, `wizard/types.ts` | Gợi ý hover; kiểu `CloneParam`, `CloneSlot`, `CloneExternalSlot` |
@@ -537,7 +537,8 @@ Từ README/memory/plan (chưa xác minh lại từng cái trừ khi ghi chú):
 | 2026-11-06 | `b4ace81` | Tạo mới toàn bộ tài liệu: tổng quan, cấu trúc, module, dữ liệu/cấu hình, visual editing, bảng 16 game, build/deploy, bẫy và việc còn mở |
 | 2026-11-06 | `c1411cc` | VE: adapter Next hỗ trợ nhiều root layout (route group); `edit-id.ts` phân giải ảnh import qua barrel (`barrelAliasRefs`); smoke test clone+VE 9 game còn lại đều `installed`, chưa e2e kéo thả; thêm `ve-barrel-layouts.test.ts` (165 test) |
 | 2026-11-06 | `1080709` | Editor: dàn nhiều trang cạnh nhau (tải lười), panel bỏ hết chữ chỉ còn Reset toàn trang; detector tag thêm video và ảnh nền full-width trong luồng trang (chế độ `scale`; số phần tử sửa được: than-ma 106→118, phuong 40→57, tuyetdinh 39→56, daiminhtinh 70→75, giang-ho 95→99); `ve-pages-smoke.mjs` mới, `ve-e2e.mjs` đánh dấu legacy |
-| 2026-11-06 | (commit kế tiếp) | Bỏ "Thêm trang"/`×`, nút Reset toàn trang lên header; `prune-routes.ts` xóa trang /choigameN (và asset local riêng của chúng) khỏi clone; xóa cache clone/.next/template-materialized của các game |
+| 2026-11-06 | `a907a31` | Bỏ "Thêm trang"/`×`, nút Reset toàn trang lên header; `prune-routes.ts` xóa trang /choigameN (và asset local riêng của chúng) khỏi clone; xóa cache clone/.next/template-materialized của các game |
+| 2026-11-06 | (commit kế tiếp) | Wizard: lưu tiến độ trong trình duyệt là tùy chọn, cần bấm "Lưu tiến độ" + xác nhận; không xác nhận thì không lưu và xóa bản lưu cũ; Figma review không còn localStorage |
 
 ## 10. Cách cập nhật tài liệu này
 

@@ -8,18 +8,6 @@ type Decision = "approved" | "rejected";
 const NO_DECISIONS: Record<string, { nodeId: string; decision: Decision }> = {};
 const subscribeNever = () => () => {};
 
-function storageKey(gameId: string) {
-  return `figma-review:v1:${gameId}`;
-}
-
-function loadDecisions(gameId: string): Record<string, { nodeId: string; decision: Decision }> {
-  try {
-    const raw = localStorage.getItem(storageKey(gameId));
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
 
 export default function FigmaSuggestions({
   gameId,
@@ -36,7 +24,7 @@ export default function FigmaSuggestions({
   onRevoke: (slot: CloneSlot) => void;
 }) {
   const slotById = useMemo(() => new Map(slots.map((s) => [s.id, s])), [slots]);
-  const [saved, setSaved] = useState<Record<string, { nodeId: string; decision: Decision }>>(() => loadDecisions(gameId));
+  const [saved, setSaved] = useState<Record<string, { nodeId: string; decision: Decision }>>({});
   // The server cannot see localStorage: the saved verdicts are shown only once the page is hydrated, otherwise the first client
   // render would differ from the server HTML (hydration error).
   const hydrated = useSyncExternalStore(subscribeNever, () => true, () => false);
@@ -181,11 +169,6 @@ export default function FigmaSuggestions({
       }
       const next = { ...saved, [s.slotId]: { nodeId, decision } };
       setSaved(next);
-      try {
-        localStorage.setItem(storageKey(gameId), JSON.stringify(next));
-      } catch {
-        // best-effort
-      }
       // The verdicts are also kept on the server: they are the hand-checked mapping the matcher is measured against.
       void fetch("/api/figma/review", {
         method: "POST",
