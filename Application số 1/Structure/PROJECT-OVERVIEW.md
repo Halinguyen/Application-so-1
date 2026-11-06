@@ -266,7 +266,9 @@ Trang: `/` (`src/app/page.tsx`: GamePicker hoặc WizardShell), `/admin` (QA das
 | File | Việc |
 |---|---|
 | `generate-registry.mjs` | Sinh `template-registry/<game>.json` từ repo template trên máy (đọc `GAME_REPO_MAP` bằng regex trên `config.ts`); `--check` exit 1 nếu manifest cũ; báo working copy khác commit |
+| `detector/color-scan.ts` (+test) | Màu thay bằng mã hex (2026-11-06): `scanColors(repoPath)` quét `src/**/*.{css,scss,tsx,jsx,ts}` lấy `#rgb/#rrggbb/#rrggbbaa` (3 chữ số chỉ tin trong CSS hoặc `[..]` Tailwind, không lấy `#anchor`), gom theo màu chuẩn hoá + khối trang (`blockOf`: Header, Chân trang, Bảng xếp hạng, Tin tức, Banner, Nút nổi, Popup, CSS chung); `replaceHex` thay nguyên màu (giữ alpha). `page.tsx` truyền `colors` vào `WizardShell` (mục "Màu sắc" trước danh sách ảnh); khi clone gửi `color:<{literals,files}>` = `#rrggbb`, `/api/clone` thay chữ trong bản CLONE (không lưu lại, như text; trả `colorsReplaced`). Chưa hỗ trợ `rgb()/rgba()/hsl()` và tên màu |
 | `detector/slot-merge.ts` (+test) | Gọi từ `buildCloneSlots` (`clone-slots.ts`): gộp thành MỘT slot (`targetPaths` = hợp, `merged: {count, kind}`) (1) họ icon: favicon-16/32, apple-touch-icon, android-chrome-*, favicon.ico tự quản + mọi ảnh trùng hash với chúng (icon game dùng trong trang); (2) các ảnh trùng hash khác. Ảnh chỉ trùng tên nhưng khác hash KHÔNG gộp. Một lần upload -> `/api/clone` cắt đúng cỡ từng file. Trên than-ma-ao-hoa gộp 15 nhóm, phuong-hoang có slot "Icon game" |
+| `detector/upload-store.ts` `sniffVideoExt` | nhận mp4/webm theo magic number; nhánh `external:` của `/api/clone` giờ nhận VIDEO (ghi nguyên byte, đổi đuôi theo file, vá `type="video/.."` của `<source>`); trước đó file không phải ảnh bị từ chối nên preview vẫn dùng video CDN của template |
 | `detector/resize-upload.ts` | thêm `buildIco()`: upload -> favicon.ico thật (PNG 16/32/48 trong container ICO); trước đây ghi nguyên byte PNG vào file .ico |
 | `detector/prune-routes.ts` (+test) | Gọi trong `/api/clone` ngay sau khi copy template: bỏ các trang có segment đầu khớp `EXCLUDED_ROUTE_SEGMENTS` (hiện `/^choigame + số tùy ý$/i`, quyết định 2026-11-06) khỏi CLONE: dòng `<Route>` + import + file page (react-router) hoặc thư mục `app/**/choigame*` (Next), cùng asset local chỉ các trang đó dùng. Template không bị sửa. Hiện chỉ phuong-hoang-tru-tien và tuyetdinh-chiengioi có trang này (asset của chúng toàn CDN nên 0 asset local bị xóa) |
 | `ve-pages-smoke.mjs` | Smoke test giao diện đa trang hiện tại (Playwright): số trang, tải lười, chọn phần tử trên nhiều trang, panel chỉ còn Reset toàn trang. `node scripts/ve-pages-smoke.mjs <gameId>` (đã đạt cho phuong-hoang-tru-tien và than-ma-ao-hoa) |
@@ -542,7 +544,8 @@ Từ README/memory/plan (chưa xác minh lại từng cái trừ khi ghi chú):
 | 2026-11-06 | `a907a31` | Bỏ "Thêm trang"/`×`, nút Reset toàn trang lên header; `prune-routes.ts` xóa trang /choigameN (và asset local riêng của chúng) khỏi clone; xóa cache clone/.next/template-materialized của các game |
 | 2026-11-06 | `6a29eb4` | Wizard: lưu tiến độ trong trình duyệt là tùy chọn, cần bấm "Lưu tiến độ" + xác nhận; không xác nhận thì không lưu và xóa bản lưu cũ; Figma review không còn localStorage |
 | 2026-11-06 | `daa6731` | Gộp slot: họ icon + ảnh trùng hash thành một slot, một upload ra mọi kích thước; `.ico` được tạo đúng định dạng |
-| 2026-11-06 | (commit kế tiếp) | Wizard bước 2: bỏ đoạn hướng dẫn trên danh sách ảnh và dòng "Đã bỏ qua N file ảnh không dùng" (prop `unusedAssets` của `WizardShell` bị gỡ) |
+| 2026-11-06 | `7d1dd4e` | Wizard bước 2: bỏ đoạn hướng dẫn trên danh sách ảnh và dòng "Đã bỏ qua N file ảnh không dùng" (prop `unusedAssets` của `WizardShell` bị gỡ) |
+| 2026-11-06 | (commit kế tiếp) | Sửa thay video banner (CDN) không có hiệu lực; thêm đổi màu bằng mã hex theo khối (`color-scan.ts`) |
 
 ## 10. Cách cập nhật tài liệu này
 

@@ -45,6 +45,13 @@ export async function readUploadBuffer(value: FormDataEntryValue): Promise<Buffe
   return Buffer.from(await res.arrayBuffer());
 }
 
+/** ".mp4" / ".webm" when the bytes are such a video (by magic number, not by name), else null. */
+export function sniffVideoExt(buf: Buffer): ".mp4" | ".webm" | null {
+  if (buf.length > 12 && buf.subarray(4, 8).toString("latin1") === "ftyp") return ".mp4"; // ISO base media (mp4, mov, m4v)
+  if (buf.length > 4 && buf[0] === 0x1a && buf[1] === 0x45 && buf[2] === 0xdf && buf[3] === 0xa3) return ".webm"; // EBML (webm, mkv)
+  return null;
+}
+
 export async function isRasterOrSvg(buf: Buffer): Promise<boolean> {
   if (await sharp(buf).metadata().then(() => true, () => false)) return true;
   return /^\s*(<\?xml|<svg)/i.test(buf.subarray(0, 256).toString("utf8"));

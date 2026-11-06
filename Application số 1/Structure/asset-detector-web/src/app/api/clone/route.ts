@@ -5,7 +5,7 @@ import path from "node:path";
 import { resolveGame, REAL_HUB_URL, REAL_RANKING_HOST } from "@/detector/config";
 import { readBaseEnv } from "@/detector/base-env";
 import { stopPreview, stopProcessesUsingDir } from "@/detector/preview-process";
-import { getUploadsDir, isRasterOrSvg, persistUpload, readUploadBuffer } from "@/detector/upload-store";
+import { getUploadsDir, isRasterOrSvg, persistUpload, readUploadBuffer, sniffVideoExt } from "@/detector/upload-store";
 import sharp from "sharp";
 import { writeBlankImage } from "@/detector/blank-image";
 import { resizeUploadToMatchTarget, resizeUploadToMatchRemote, type CropAnchor } from "@/detector/resize-upload";
@@ -13,6 +13,7 @@ import { applyTextSlot } from "@/detector/site-text";
 import { ensureDependencies } from "@/detector/ensure-deps";
 import { applyVisualEditing } from "@/detector/visual-editing";
 import { pruneExcludedRoutes } from "@/detector/prune-routes";
+import { isHexColor, replaceHex } from "@/detector/color-scan";
 import { requireTemplate } from "@/detector/template-source";
 
 export const dynamic = "force-dynamic";
@@ -172,6 +173,7 @@ export async function POST(request: NextRequest) {
       resized: boolean;
     }[] = [];
     const textReplaced: string[] = [];
+    const colorsReplaced: { from: string; to: string; replaced: number }[] = [];
     const warnings: string[] = [];
     if (pruned.routes.length > 0) warnings.push(`Đã bỏ ${pruned.routes.length} trang khỏi bản sao: ${pruned.routes.join(", ")} (${pruned.files.length} file, ${pruned.assets.length} asset).`);
     const env = await readBaseEnv(repoPath);
@@ -241,12 +243,13 @@ export async function POST(request: NextRequest) {
         // fake-news fallback patching: rewrite the clone's own copy only).
         const {
           url,
-          localPath,
+          localPath: declaredLocalPath,
           refFiles,
           anchor,
         }: { url: string; localPath: string; refFiles: string[]; anchor: CropAnchor } = JSON.parse(
           key.slice("external:".length)
         );
+        let localPath = declaredLocalPath; // the extension may change when the upload is a video of another type
         let uploadBuf: Buffer;
         try {
           uploadBuf = await readUploadBuffer(value);
@@ -254,16 +257,20 @@ export async function POST(request: NextRequest) {
           warnings.push(`${localPath}: ${e instanceof Error ? e.message : String(e)}`);
           continue;
         }
-        if (!(await isRasterOrSvg(uploadBuf))) {
-          warnings.push(`${localPath}: file không phải ảnh (PNG/JPG/WebP/SVG) — chưa thay, giữ nguyên asset gốc.`);
+        // A video (the home banner of phuong-hoang-tru-tien is a CDN .mp4) is written as it is: no crop, and its file
+        // extension follows the bytes so the <source type> stays right.
+        const videoExt = sniffVideoExt(uploadBuf);
+        if (!videoExt && !(await isRasterOrSvg(uploadBuf))) {
+          warnings.push(`${localPath}: file không phải ảnh hoặc video (PNG/JPG/WebP/SVG/MP4/WebM) — chưa thay, giữ nguyên asset gốc.`);
           continue;
         }
+        if (videoExt) localPath = localPath.replace(/\.[a-z0-9]+$/i, "") + videoExt;
         // Fetch the CDN URL being replaced to read ITS dimensions, then resize
         // the upload to match — the same "never write an off-size asset"
         // guarantee local file replacement already has (resize-upload.ts),
         // just sourced from a network fetch instead of a repo file since
         // there's no local original to read here.
-        const finalBuf = await resizeUploadToMatchRemote(uploadBuf, url, path.extname(localPath), anchor);
+        const finalBuf = videoExt ? uploadBuf : await resizeUploadToMatchRemote(uploadBuf, url, path.extname(localPath), anchor);
         const destPath = path.join(CLONE_DIR, "public", localPath);
         await fs.mkdir(path.dirname(destPath), { recursive: true });
         await fs.writeFile(destPath, finalBuf);
@@ -277,7 +284,14 @@ export async function POST(request: NextRequest) {
           if (!existsSync(srcPath)) continue;
           const content = await fs.readFile(srcPath, "utf-8");
           if (!content.includes(url)) continue;
-          await fs.writeFile(srcPath, content.split(url).join(publicUrl));
+          let patched = content.split(url).join(publicUrl);
+          // <source src="/x.webm" type="video/mp4"> would not play: keep the type in step with the new file
+          if (videoExt) {
+            const mime = videoExt === ".webm" ? "video/webm" : "video/mp4";
+            const escaped = publicUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+            patched = patched.replace(new RegExp("(src=[{\"'`]+" + escaped + "[^>]*?type=[\"'])video/[a-z0-9]+", "g"), "$1" + mime);
+          }
+          await fs.writeFile(srcPath, patched);
           refFilesPatched.push(refFile);
         }
         externalReplaced.push({
@@ -289,6 +303,32 @@ export async function POST(request: NextRequest) {
           finalBytes: finalBuf.byteLength,
           resized: finalBuf !== uploadBuf,
         });
+      } else if (key.startsWith("color:") && typeof value === "string") {
+        // "color:<{literals, files}>" = the new #rrggbb: every spelling of the old colour in those files of the CLONE becomes it
+        let spec: { literals?: unknown; files?: unknown };
+        try {
+          spec = JSON.parse(key.slice("color:".length));
+        } catch {
+          continue;
+        }
+        const to = value.trim();
+        const literals = Array.isArray(spec.literals) ? spec.literals.filter((l): l is string => typeof l === "string" && /^#[0-9a-fA-F]{3,8}$/.test(l)) : [];
+        const files = Array.isArray(spec.files) ? spec.files.filter((f): f is string => typeof f === "string" && f.startsWith("src/") && !f.includes("..")) : [];
+        if (!isHexColor(to)) {
+          warnings.push(`Màu "${to}" không hợp lệ (cần dạng #rrggbb) — giữ màu cũ.`);
+          continue;
+        }
+        let replaced = 0;
+        for (const f of files) {
+          const abs = path.join(CLONE_DIR, f);
+          if (!existsSync(abs)) continue;
+          const r = replaceHex(await fs.readFile(abs, "utf-8"), literals, to);
+          if (r.replaced > 0) {
+            await fs.writeFile(abs, r.text);
+            replaced += r.replaced;
+          }
+        }
+        colorsReplaced.push({ from: literals[0] ?? "", to, replaced });
       } else if (key.startsWith("text:") && typeof value === "string") {
         const textId = key.slice("text:".length);
         if (await applyTextSlot(CLONE_DIR, repoPath, textId, value.trim())) {
@@ -344,6 +384,7 @@ export async function POST(request: NextRequest) {
       filesReplaced,
       externalReplaced,
       textReplaced,
+      colorsReplaced,
       envWritten: envLines.length,
       baseEnvKeyCount,
       overriddenKeys,

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { CloneSlot, CloneParam, CloneExternalSlot, CloneTextSlot, CropAnchor, FigmaSuggestionView } from "./types";
+import type { ColorSlot } from "@/detector/color-scan";
 import Spinner from "../Spinner";
 import AssetCompareTile from "./AssetCompareTile";
 import ConfigStep from "./ConfigStep";
@@ -84,6 +85,7 @@ export default function WizardShell({
   params,
   externalSlots,
   textSlots,
+  colors = [],
   figmaSuggestions = [],
   hideFigma = false,
 }: {
@@ -94,6 +96,8 @@ export default function WizardShell({
   params: CloneParam[];
   externalSlots: CloneExternalSlot[];
   textSlots: CloneTextSlot[];
+  /** colours found in the template's source, changeable by typing a hex code */
+  colors?: ColorSlot[];
   /** Nodes of the Figma design proposed for the game's slots; empty when none was captured. */
   figmaSuggestions?: FigmaSuggestionView[];
   /** Temporarily show nothing that comes from the Figma design (see FIGMA_HIDDEN_GAMES in config.ts). */
@@ -116,6 +120,8 @@ export default function WizardShell({
   const [textValues, setTextValues] = useState<Record<string, string>>(
     persisted.textValues ?? Object.fromEntries(textSlots.map((t) => [t.id, t.defaultValue]))
   );
+  // new colour typed for an old one (key: the old #rrggbb)
+  const [colorValues, setColorValues] = useState<Record<string, string>>({});
   const [values, setValues] = useState<Record<string, string>>(
     persisted.values ?? Object.fromEntries(params.map((p) => [p.envKey, p.defaultValue]))
   );
@@ -346,6 +352,10 @@ export default function WizardShell({
           form.append(`text:${slot.id}`, value.trim());
         }
       }
+      for (const c of colors) {
+        const to = colorValues[c.hex]?.trim().toLowerCase();
+        if (to && /^#[0-9a-f]{6}$/.test(to) && to !== c.hex) form.append(`color:${JSON.stringify({ literals: c.literals, files: c.files })}`, to);
+      }
       const res = await fetch("/api/clone", { method: "POST", body: form });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Không tạo được bản sao");
@@ -440,6 +450,52 @@ export default function WizardShell({
                   </label>
                 ))}
               </div>
+            </div>
+          )}
+
+          {colors.length > 0 && (
+            <div style={{ marginBottom: 28 }} data-testid="color-section">
+              <h2>Màu sắc ({colors.length})</h2>
+              {[...new Set(colors.map((c) => c.blocks[0]))].map((block) => (
+                <div key={block} style={{ marginTop: 10 }}>
+                  <strong style={{ fontSize: 13 }}>{block}</strong>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginTop: 6 }}>
+                    {colors.filter((c) => c.blocks[0] === block).map((c) => {
+                      const typed = colorValues[c.hex] ?? "";
+                      const valid = /^#[0-9a-fA-F]{6}$/.test(typed);
+                      return (
+                        <div key={c.hex} data-testid="color-row" data-hex={c.hex} style={{ display: "flex", alignItems: "center", gap: 6, border: "1px solid var(--border)", borderRadius: 8, padding: "4px 8px" }} title={c.files.join(", ")}>
+                          <span style={{ width: 22, height: 22, borderRadius: 4, background: c.hex, border: "1px solid var(--border)" }} />
+                          <span className="mono" style={{ fontSize: 12 }}>{c.hex}</span>
+                          <span style={{ color: "var(--muted)", fontSize: 11 }}>×{c.count}</span>
+                          <span>→</span>
+                          <input
+                            type="color"
+                            aria-label={"Màu mới cho " + c.hex}
+                            value={valid ? typed : c.hex}
+                            onChange={(e) => setColorValues((v) => ({ ...v, [c.hex]: e.target.value }))}
+                            style={{ width: 28, height: 24, padding: 0, border: 0, background: "none" }}
+                          />
+                          <input
+                            type="text"
+                            data-testid="color-input"
+                            placeholder="#rrggbb"
+                            value={typed}
+                            maxLength={7}
+                            onChange={(e) => setColorValues((v) => ({ ...v, [c.hex]: e.target.value.startsWith("#") || e.target.value === "" ? e.target.value : "#" + e.target.value }))}
+                            style={{ width: 82, borderColor: typed && !valid ? "var(--warn)" : undefined }}
+                          />
+                          {typed && (
+                            <button type="button" className="chip" aria-label="Bỏ thay đổi" onClick={() => setColorValues((v) => { const n = { ...v }; delete n[c.hex]; return n; })}>
+                              ↺
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
