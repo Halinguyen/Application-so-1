@@ -44,12 +44,16 @@ function isApiFilled(a: DetectedAsset): boolean {
   return !NEWS_SECTIONS.has(a.section) || NEWS_CONTENT_RE.test(a.fileName);
 }
 
-export function buildCloneSlots(data: DetectionResult): { slots: CloneSlot[]; unusedAssets: string[] } {
+/**
+ * Every picture that is a file of the repo is listed, also in the rank/news areas (operator, 2026-11-06: the API only supplies
+ * text, so pictures there are static). `includeApiSections: false` brings the old filter back (hides those areas).
+ */
+export function buildCloneSlots(data: DetectionResult, opts: { includeApiSections?: boolean } = {}): { slots: CloneSlot[]; unusedAssets: string[] } {
   // Only assets the source code actually uses (favicons are always kept: they are wired
   // through index.html/manifest). Files that merely sit in the assets folder are listed
   // separately so the operator is not asked to replace images nothing displays.
   const candidates = data.assets.filter(
-    (a) => (a.metadata?.operatorEditable || a.isAutoManaged) && !a.isExternal && !isApiFilled(a)
+    (a) => (a.metadata?.operatorEditable || a.isAutoManaged) && !a.isExternal && (opts.includeApiSections !== false || !isApiFilled(a))
   );
   const unusedAssets = candidates.filter((a) => !a.isAutoManaged && a.referenceCount === 0).map((a) => a.canonicalPath);
   const slots = withUniqueLabels(

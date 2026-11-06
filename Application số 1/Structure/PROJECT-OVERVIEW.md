@@ -273,6 +273,8 @@ Trang: `/` (`src/app/page.tsx`: GamePicker hoặc WizardShell), `/admin` (QA das
 | `detector/upload-store.ts` `sniffVideoExt` | nhận mp4/webm theo magic number; nhánh `external:` của `/api/clone` giờ nhận VIDEO (ghi nguyên byte, đổi đuôi theo file, vá `type="video/.."` của `<source>`); trước đó file không phải ảnh bị từ chối nên preview vẫn dùng video CDN của template |
 | `detector/resize-upload.ts` | thêm `buildIco()`: upload -> favicon.ico thật (PNG 16/32/48 trong container ICO); trước đây ghi nguyên byte PNG vào file .ico |
 | `detector/prune-routes.ts` (+test) | Gọi trong `/api/clone` ngay sau khi copy template: bỏ các trang có segment đầu khớp `EXCLUDED_ROUTE_SEGMENTS` (hiện `/^choigame + số tùy ý$/i`, quyết định 2026-11-06) khỏi CLONE: dòng `<Route>` + import + file page (react-router) hoặc thư mục `app/**/choigame*` (Next), cùng asset local chỉ các trang đó dùng. Template không bị sửa. Hiện chỉ phuong-hoang-tru-tien và tuyetdinh-chiengioi có trang này (asset của chúng toàn CDN nên 0 asset local bị xóa) |
+| `ve-replace-smoke.mjs` | Thay ảnh của một TRANG CON ngay trong editor và kiểm tra preview đổi ngay, rồi "Khôi phục gốc" (đạt với /rank và /tintuc của phuong-hoang-tru-tien). Truyền `PAGE=rank` KHÔNG kèm dấu `/` (Git Bash đổi `/x` thành đường dẫn Windows) |
+| `ve-color-smoke.mjs` | Đổi màu trực tiếp trong editor rồi Reset toàn trang |
 | `ve-pages-smoke.mjs` | Smoke test giao diện đa trang hiện tại (Playwright): số trang, tải lười, chọn phần tử trên nhiều trang, panel chỉ còn Reset toàn trang. `node scripts/ve-pages-smoke.mjs <gameId>` (đã đạt cho phuong-hoang-tru-tien và than-ma-ao-hoa) |
 | `ve-e2e.mjs` | **LEGACY** — viết cho editor cũ (một iframe, danh sách phần tử, ghi chú), KHÔNG còn chạy với giao diện mới; cần port từng kiểm tra (mục 5.5); `TOOL` mặc định `http://localhost:3100`, Chrome mặc định `C:/Program Files/Google/Chrome/Application/chrome.exe` |
 | `ve-poc-clone.mjs` | PoC bước 1-2: gọi `/api/clone` với `visualEdit=1`, in kết quả gắn id (`tool` mặc định `http://localhost:3100`) |
@@ -548,7 +550,8 @@ Từ README/memory/plan (chưa xác minh lại từng cái trừ khi ghi chú):
 | 2026-11-06 | `daa6731` | Gộp slot: họ icon + ảnh trùng hash thành một slot, một upload ra mọi kích thước; `.ico` được tạo đúng định dạng |
 | 2026-11-06 | `7d1dd4e` | Wizard bước 2: bỏ đoạn hướng dẫn trên danh sách ảnh và dòng "Đã bỏ qua N file ảnh không dùng" (prop `unusedAssets` của `WizardShell` bị gỡ) |
 | 2026-11-06 | `0e6dfb7` | Sửa thay video banner (CDN) không có hiệu lực; thêm đổi màu bằng mã hex theo khối (`color-scan.ts`) |
-| 2026-11-06 | (commit kế tiếp) | Editor các trang con: bấm khu vực bất kỳ -> đổi màu bằng mã hex ngay tại chỗ (`color-store.ts`, `/api/colors`); ảnh/video CDN thay trực tiếp (`external-replace.ts`, `/api/asset` `external`, `external-slots.json`) |
+| 2026-11-06 | `96e58d2` | Editor các trang con: bấm khu vực bất kỳ -> đổi màu bằng mã hex ngay tại chỗ (`color-store.ts`, `/api/colors`); ảnh/video CDN thay trực tiếp (`external-replace.ts`, `/api/asset` `external`, `external-slots.json`) |
+| 2026-11-06 | (commit kế tiếp) | Quyết định của operator: API chỉ sinh chữ, ảnh ở rank/tin tức là ảnh tĩnh. `buildCloneSlots` không còn loại khu vực rank/news (`includeApiSections: false` để bật lại bộ lọc cũ); editor cho thay ảnh bất cứ khi nào ảnh khớp một file trong repo (kể cả ảnh JSX lấy đường dẫn từ object dữ liệu); inspector liệt kê cả ảnh đang ẩn ở cỡ màn hình hiện tại khi không có ảnh nào hiện; `ve-replace-smoke.mjs` |
 
 ## 10. Cách cập nhật tài liệu này
 

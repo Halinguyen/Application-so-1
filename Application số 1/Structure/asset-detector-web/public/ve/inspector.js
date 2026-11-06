@@ -262,12 +262,18 @@
     // the pictures/videos this element shows right now (for <picture>: the source the browser picked at
     // this width): what the operator sees, so the editor can offer to replace exactly those files
     var media = [];
+    var hiddenMedia = [];
     var nodes = el.matches("img, video") ? [el] : el.querySelectorAll("img, video");
     for (var i = 0; i < nodes.length && media.length < 12; i++) {
       var n = nodes[i];
       var q = n.getBoundingClientRect();
       var src = n.currentSrc || n.getAttribute("src") || "";
-      if (!src || q.width === 0 || q.height === 0) continue;
+      if (!src) continue;
+      // a picture hidden at this screen size (its other-size twin is shown) is still listed, after the visible ones
+      if (q.width === 0 || q.height === 0) {
+        hiddenMedia.push(n);
+        continue;
+      }
       media.push({
         kind: n.tagName.toLowerCase(),
         src: String(src).slice(0, 500),
@@ -275,6 +281,19 @@
         naturalHeight: n.naturalHeight || n.videoHeight || 0,
         shownWidth: Math.round(q.width),
       });
+    }
+    // nothing visible at this size: offer the hidden ones so the area can still be replaced
+    if (media.length === 0) {
+      for (var h = 0; h < hiddenMedia.length && media.length < 4; h++) {
+        var hn = hiddenMedia[h];
+        media.push({
+          kind: hn.tagName.toLowerCase(),
+          src: String(hn.currentSrc || hn.getAttribute("src") || "").slice(0, 500),
+          naturalWidth: hn.naturalWidth || hn.videoWidth || 0,
+          naturalHeight: hn.naturalHeight || hn.videoHeight || 0,
+          shownWidth: 0,
+        });
+      }
     }
     var sc = null;
     try {

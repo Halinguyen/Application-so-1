@@ -452,7 +452,6 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
                     externalSlots={snap?.externalSlots ?? []}
                     origin={origin}
                     gameId={gameId}
-                    dataDriven={!!selected.dataDriven}
                     onExternalDone={() => {
                       // the clone's source now names another file: every page reloads to show it
                       setReloadKey((k) => k + 1);
@@ -573,7 +572,6 @@ function MediaReplacer({
   externalSlots,
   origin,
   gameId,
-  dataDriven,
   onDone,
   onExternalDone,
 }: {
@@ -583,7 +581,6 @@ function MediaReplacer({
   externalSlots: { url: string; type: "image" | "video"; label: string }[];
   origin: string;
   gameId: string;
-  dataDriven: boolean;
   onDone: (publicPaths: string[]) => void;
   onExternalDone: () => void;
 }) {
@@ -667,7 +664,9 @@ function MediaReplacer({
   }
 
   const name = media.src.split("?")[0].split("/").pop();
-  const canReplace = !dataDriven && !!match && !remote && media.kind === "img";
+  // The API only supplies text (operator, 2026-11-06): a picture that matches a file of the repo is always replaceable, even when
+  // the JSX reads its path from a data object (tabs, button lists). Only a picture with no file behind it stays locked.
+  const canReplace = !!match && !remote && media.kind === "img";
   return (
     <div style={{ marginTop: 8, padding: 8, border: "1px solid var(--border)", borderRadius: 8 }} data-testid="ve-media-item" data-index={index}>
       <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
@@ -683,7 +682,7 @@ function MediaReplacer({
         </div>
       </div>
 
-      {!dataDriven && !!ext && (
+      {!!ext && (
         <div style={{ marginTop: 6, display: "grid", gap: 6 }} data-testid="ve-external">
           <input data-testid="ve-asset-file" type="file" accept={ext.type === "video" ? "video/*,image/*" : "image/*"} onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
           <input data-testid="ve-asset-url" type="text" placeholder={ext.type === "video" ? "…hoặc dán link video" : "…hoặc dán link ảnh"} value={url} disabled={!!file} onChange={(e) => setUrl(e.target.value)} />
