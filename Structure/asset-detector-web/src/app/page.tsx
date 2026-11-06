@@ -49,7 +49,15 @@ export default async function Home({
     return <GamePicker games={games} />;
   }
 
-  const unavailable = await requireTemplate(game);
+  let unavailable = await requireTemplate(game);
+  if (!unavailable) {
+    try {
+      // opens the template (extracts a frozen snapshot, finds the folder): a failure here is reported to the operator
+      resolveGame(game);
+    } catch (e) {
+      unavailable = (e instanceof Error ? e.message : String(e)) + " — kiểm tra mã nguồn template/snapshot (template-store/*/template.tgz không nằm trong git) và biến môi trường APP_DATA_DIR, TEMPLATE_ROOT, TEMPLATE_GIT_TOKEN.";
+    }
+  }
   if (unavailable) {
     return (
       <div className="wrap" style={{ paddingTop: 28 }}>
