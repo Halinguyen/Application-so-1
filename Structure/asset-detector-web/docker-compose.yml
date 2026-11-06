@@ -1,0 +1,30 @@
+# Full-function demo on ONE machine with Docker (a VM, a server, a laptop). See deploy/demo/README.md.
+#   docker compose up -d --build
+# The tool opens on :3000. Each preview (a game's dev server) listens on its own port: the whole range below is published.
+services:
+  tool:
+    build:
+      context: .
+      args:
+        DEPLOY: develop # copies deploy/develop/.env.example to .env (paths under /data, tokens empty)
+    ports:
+      - "3000:3000"
+      - "6000-6050:6000-6050"
+    environment:
+      PORT: "3000"
+      PREVIEW_PORT_RANGE: "6000-6050"
+      # optional: tokens for fetching templates from git / publishing (leave empty for a seeded demo)
+      TEMPLATE_GIT_TOKEN: "${TEMPLATE_GIT_TOKEN:-}"
+      GITHUB_TOKEN: "${GITHUB_TOKEN:-}"
+      GITHUB_ORG: "${GITHUB_ORG:-}"
+      FIGMA_TOKEN: "${FIGMA_TOKEN:-}"
+    volumes:
+      # templates (seeded from templates-seed.tgz), clones, uploads, layouts: kept between restarts
+      - ./demo-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s

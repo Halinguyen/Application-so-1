@@ -25,6 +25,8 @@ function isCloneReady(framework: string): boolean {
   return framework === "vite-spa" || framework === "nextjs";
 }
 
+export const maxDuration = 60; // seconds: scanning a template can take ~25 s
+
 export default async function Home({
   searchParams,
 }: {

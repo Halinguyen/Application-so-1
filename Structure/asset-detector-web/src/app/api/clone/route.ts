@@ -130,6 +130,12 @@ function withHost(url: string | undefined, domain: string): string {
 
 export async function POST(request: NextRequest) {
   try {
+    if (process.env.VERCEL) {
+      return NextResponse.json(
+        { error: "Chức năng này cần máy chủ chạy liên tục (npm install, build, server xem trước) nên không chạy được trên Vercel. Dùng bản Docker/K8s — xem Structure/asset-detector-web/deploy/vercel/README.md." },
+        { status: 501 }
+      );
+    }
     const form = await request.formData();
     const gameIdField = form.get("gameId");
     const unavailable = await requireTemplate(typeof gameIdField === "string" ? gameIdField : undefined);

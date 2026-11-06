@@ -1,0 +1,5 @@
+data
+dev.log
+*.log
+.next
+node_modules

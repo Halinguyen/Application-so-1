@@ -1,4 +1,5 @@
 import { existsSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 // Where the tool keeps its working data. Every folder can be moved with an environment variable (a Kubernetes volume,
@@ -13,7 +14,8 @@ function fromEnv(name: string): string | null {
   return v ? path.resolve(v) : null;
 }
 
-const DATA = fromEnv("APP_DATA_DIR") ?? path.join(APP, "data");
+// On Vercel the deployment is read-only: /tmp is the only place a function may write (and it is lost with the instance).
+const DATA = fromEnv("APP_DATA_DIR") ?? (process.env.VERCEL ? path.join(os.tmpdir(), "asset-detector") : path.join(APP, "data"));
 
 function dataDir(envName: string, legacySibling: string, name: string): string {
   return fromEnv(envName) ?? (existsSync(legacySibling) ? legacySibling : path.join(DATA, name));

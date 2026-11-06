@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { spawn } from "node:child_process";
 import net from "node:net";
+import { findFreePort } from "@/detector/preview-port";
 import { existsSync, openSync, closeSync } from "node:fs";
 import path from "node:path";
 import { getCloneDir } from "../route";
@@ -11,19 +12,6 @@ import { getPreview, setPreview, stopPreview } from "@/detector/preview-process"
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-function findFreePort(): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const srv = net.createServer();
-    srv.unref();
-    srv.on("error", reject);
-    srv.listen(0, () => {
-      const address = srv.address();
-      const port = typeof address === "object" && address ? address.port : null;
-      srv.close(() => (port ? resolve(port) : reject(new Error("no port"))));
-    });
-  });
-}
 
 function waitForPort(port: number, timeoutMs: number, hasExited: () => boolean = () => false): Promise<boolean> {
   const start = Date.now();
@@ -52,6 +40,12 @@ function previewUrl(request: NextRequest, port: number): string {
 }
 
 export async function POST(request: NextRequest) {
+  if (process.env.VERCEL) {
+    return NextResponse.json(
+      { error: "Chức năng này cần máy chủ chạy liên tục (npm install, build, server xem trước) nên không chạy được trên Vercel. Dùng bản Docker/K8s — xem Structure/asset-detector-web/deploy/vercel/README.md." },
+      { status: 501 }
+    );
+  }
   const unavailable = await requireTemplate(request.nextUrl.searchParams.get("game"));
   if (unavailable) return NextResponse.json({ error: unavailable }, { status: 424 });
   const { gameId, repoPath } = resolveGame(request.nextUrl.searchParams.get("game"));

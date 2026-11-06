@@ -6,6 +6,7 @@ import { promisify } from "node:util";
 import { DEFAULT_GAME_ID, GAME_REPO_MAP } from "./config";
 import { readCloneSchema } from "./clone-schema";
 import { REGISTRY_DIR, TEMPLATE_ROOT } from "./paths";
+import { fetchSeedTemplate } from "./template-seed";
 
 const run = promisify(execFile);
 
@@ -147,6 +148,15 @@ async function doEnsure(gameId: string, opts: { allowFile?: boolean }): Promise<
   if (!repoDir) return { gameId, repoPath: null, state: "unknown-game" };
   const repoPath = path.join(TEMPLATE_ROOT, gameId, repoDir);
   if (existsSync(repoPath)) return { gameId, repoPath, state: "present" };
+  // A host without git / the company git (Vercel): the template comes as one archive per game (scripts/pack-templates.mjs --per-game).
+  if (process.env.TEMPLATE_SEED_BASE_URL) {
+    try {
+      await fetchSeedTemplate(gameId, repoDir, TEMPLATE_ROOT, { base: process.env.TEMPLATE_SEED_BASE_URL, token: process.env.TEMPLATE_SEED_TOKEN });
+      return { gameId, repoPath, state: "fetched" };
+    } catch (e) {
+      return { gameId, repoPath: null, state: "failed", message: e instanceof Error ? e.message : String(e) };
+    }
+  }
   if (readCloneSchema(gameId)?.status === "frozen") return { gameId, repoPath: null, state: "snapshot" };
 
   const entry = readRegistryEntry(gameId);
