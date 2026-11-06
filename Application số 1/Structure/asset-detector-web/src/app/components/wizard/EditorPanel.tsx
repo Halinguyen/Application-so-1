@@ -548,7 +548,9 @@ function PageSlot({
 }
 
 const ANCHORS: [string, string][] = [
-  ["attention", "Tự động (vùng nổi bật)"],
+  ["attention", "Tự động (ảnh lệch tỉ lệ nhiều thì giữ trọn ảnh, nền mờ)"],
+  ["fit", "Giữ trọn ảnh (nền mờ)"],
+  ["crop", "Luôn cắt (vùng nổi bật)"],
   ["top", "Giữ phần trên"],
   ["bottom", "Giữ phần dưới"],
   ["left", "Giữ bên trái"],

@@ -6,8 +6,13 @@ import path from "node:path";
 // well most of the time, but it occasionally misjudges the focal point on
 // small/detail assets (icons, buttons, logos) — these let the operator pin
 // the crop to a specific edge/corner instead of guessing again.
+// "attention" is also AUTOMATIC about the shape: when the upload and the target differ a lot in proportion (a wide banner for a
+// tall phone banner), cutting a slice would throw most of the picture away, so the whole picture is kept instead (see
+// FIT_RATIO). "crop" always cuts (the salient part), "fit" always keeps the whole picture.
 export type CropAnchor =
   | "attention"
+  | "crop"
+  | "fit"
   | "top"
   | "bottom"
   | "left"
@@ -17,7 +22,7 @@ export type CropAnchor =
   | "bottom-left"
   | "bottom-right";
 
-const SHARP_POSITION: Record<Exclude<CropAnchor, "attention">, string> = {
+const SHARP_POSITION: Record<Exclude<CropAnchor, "attention" | "crop" | "fit">, string> = {
   top: "top",
   bottom: "bottom",
   left: "left",
@@ -29,7 +34,7 @@ const SHARP_POSITION: Record<Exclude<CropAnchor, "attention">, string> = {
 };
 
 function resolvePosition(anchor: CropAnchor): string {
-  return anchor === "attention" ? "attention" : SHARP_POSITION[anchor];
+  return anchor === "attention" || anchor === "crop" || anchor === "fit" ? "attention" : SHARP_POSITION[anchor];
 }
 
 /** Sizes packed into a favicon.ico built from an upload. */
@@ -144,6 +149,40 @@ export async function resizeUploadToMatchRemote(
   return resizeUploadToDimensions(uploadBuf, width, height, ext, anchor, maxFileSize);
 }
 
+/** Proportion difference (as a factor) above which "attention" keeps the whole picture instead of cutting a slice of it. */
+export const FIT_RATIO = 1.8;
+
+/**
+ * When the whole picture should be kept: the upload is laid on a canvas of the target's exact size. A picture with
+ * transparency (logo, button) gets transparent padding; a photo/artwork gets a blurred, enlarged copy of itself behind it.
+ * Returns null when the picture is to be cut as usual.
+ */
+export async function keepWholePicture(uploadBuf: Buffer, width: number, height: number, anchor: CropAnchor, ext = ".png"): Promise<Buffer | null> {
+  if (anchor !== "fit" && anchor !== "attention") return null;
+  const meta = await sharp(uploadBuf).metadata();
+  if (!meta.width || !meta.height) return null;
+  const src = meta.width / meta.height;
+  const dst = width / height;
+  const factor = Math.max(src / dst, dst / src);
+  if (anchor === "attention" && factor <= FIT_RATIO) return null;
+  if (factor < 1.02) return null; // same shape: nothing to keep apart
+
+  // Transparent padding only when the picture really has see-through pixels AND the target format can hold them (a PNG saved
+  // with an all-opaque alpha channel, or a .jpg target, would turn the padding black).
+  const seeThrough = !!meta.hasAlpha && !(await sharp(uploadBuf).stats()).isOpaque && !/^\.jpe?g$/i.test(ext);
+  let insideSrc = sharp(uploadBuf);
+  if (meta.hasAlpha && !seeThrough) insideSrc = insideSrc.flatten({ background: "#ffffff" });
+  const inside = await insideSrc.resize(width, height, { fit: "inside" }).png().toBuffer();
+  if (seeThrough) {
+    return sharp({ create: { width, height, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+      .composite([{ input: inside, gravity: "centre" }])
+      .png()
+      .toBuffer();
+  }
+  const backdrop = await sharp(uploadBuf).flatten({ background: "#ffffff" }).resize(width, height, { fit: "cover", position: "attention" }).blur(28).modulate({ brightness: 0.75 }).png().toBuffer();
+  return sharp(backdrop).composite([{ input: inside, gravity: "centre" }]).png().toBuffer();
+}
+
 async function resizeUploadToDimensions(
   uploadBuf: Buffer,
   width: number,
@@ -157,7 +196,8 @@ async function resizeUploadToDimensions(
   if (!(await sharp(uploadBuf).metadata().then(() => true, () => false))) return uploadBuf;
 
   const normalizedExt = ext.toLowerCase();
-  const pipeline = sharp(uploadBuf).resize(width, height, { fit: "cover", position: resolvePosition(anchor) });
+  const source = await keepWholePicture(uploadBuf, width, height, anchor, normalizedExt);
+  const pipeline = sharp(source ?? uploadBuf).resize(width, height, { fit: "cover", position: resolvePosition(anchor) });
 
   const encode = (quality: number) => {
     if (normalizedExt === ".jpg" || normalizedExt === ".jpeg") return pipeline.clone().jpeg({ quality });

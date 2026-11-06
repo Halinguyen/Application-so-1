@@ -4,6 +4,8 @@
 
 export type CropAnchor =
   | "attention"
+  | "crop"
+  | "fit"
   | "top"
   | "bottom"
   | "left"
