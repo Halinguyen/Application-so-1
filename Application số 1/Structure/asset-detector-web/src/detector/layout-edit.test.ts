@@ -90,33 +90,33 @@ describe("injectEditIds", () => {
   const r = injectEditIds(BANNER, "src/components/Banner.tsx", REFS);
 
   it("puts one id on each positioned element, named after its first asset slot", () => {
-    expect(r.entries.map((e) => e.editId)).toEqual(["banner.logo", "banner.btn-a", "banner.other.logo"]);
+    expect(r.entries.map((e) => e.editId)).toEqual(["banner.bg", "banner.logo", "banner.btn-a", "banner.other.logo"]);
     expect(r.code).toMatch(/<a data-edit-id="banner.logo" className=/);
     expect(r.code).toMatch(/<div data-edit-id="banner.btn-a" className='absolute bottom-0'/);
   });
 
   it("lists every asset of a shared element and merges the two breakpoint files of one slot", () => {
-    expect(r.entries[0].assets).toEqual(["${}/banner/768/logo.png", "${}/banner/1920/logo.png"]);
-    expect(r.entries[1].assets).toEqual(["${}/banner/1920/btn-a.png", "${}/banner/1920/btn-b.png"]);
+    expect(r.entries[1].assets).toEqual(["${}/banner/768/logo.png", "${}/banner/1920/logo.png"]);
+    expect(r.entries[2].assets).toEqual(["${}/banner/1920/btn-a.png", "${}/banner/1920/btn-b.png"]);
   });
 
-  it("skips and reports an image that is not inside any absolute element", () => {
-    expect(r.skipped).toHaveLength(1);
-    expect(r.skipped[0]).toMatchObject({ line: 4, assetPath: "/images/banner/768/bg.jpg" });
+  it("tags a full-width picture that is not inside any absolute element as zoom-only, and skips nothing", () => {
+    expect(r.skipped).toHaveLength(0);
+    expect(r.entries[0]).toMatchObject({ editId: "banner.bg", mode: "scale" });
     expect(r.code).not.toMatch(/<section[^>]*data-edit-id/);
-    expect(r.code).not.toMatch(/<img[^>]*data-edit-id/);
+    expect(r.code).toMatch(/<img data-edit-id="banner.bg" data-edit-mode="scale"/);
   });
 
   it("names the same asset on another page after that page, no suffix needed", () => {
     const used = new Set(r.entries.map((e) => e.editId));
     const again = injectEditIds(BANNER, "src/app/rank/page.tsx", REFS, used);
-    expect(again.entries.map((e) => e.editId)).toEqual(["rank.banner.logo", "rank.banner.btn-a", "rank.other.logo"]);
+    expect(again.entries.map((e) => e.editId)).toEqual(["rank.banner.bg", "rank.banner.logo", "rank.banner.btn-a", "rank.other.logo"]);
   });
 
   it("uses ~N only for a real clash, and numbers it per file", () => {
     const used = new Set(["banner.logo"]);
     const again = injectEditIds(BANNER, "src/components/Banner.tsx", REFS, used);
-    expect(again.entries[0].editId).toBe("banner.logo~2");
+    expect(again.entries[1].editId).toBe("banner.logo~2");
   });
 
   it("does not depend on line numbers: the same slot keeps its id after the file shifts", () => {
@@ -125,7 +125,7 @@ describe("injectEditIds", () => {
   });
 
   it("only adds attributes: stripping them returns the original source", () => {
-    expect(r.code.replace(/ data-edit-id="[^"]*"/g, "")).toBe(BANNER);
+    expect(r.code.replace(/ data-edit-id="[^"]*"/g, "").replace(/ data-edit-mode="[^"]*"/g, "")).toBe(BANNER);
   });
 });
 
@@ -233,7 +233,7 @@ const A = () => (
   const r = injectEditIds(SRC, "src/components/Pagination.tsx", REFS);
 
   it("tags the <img> itself, marked scale-only", () => {
-    expect(r.entries.map((e) => [e.editId, e.mode])).toEqual([
+    expect(r.entries.slice(0, 2).map((e) => [e.editId, e.mode])).toEqual([
       ["pagination.tintuc.chevrons-left", "scale"],
       ["pagination.header.logo", "scale"],
     ]);
@@ -246,13 +246,12 @@ const A = () => (
     expect(r.entries[1].assets).toEqual(["/assets/header/768/logo.png", "/assets/header/1920/logo.png"]);
   });
 
-  it("refuses full-width backgrounds, full-bleed pictures and videos, and says why", () => {
-    const why = Object.fromEntries(r.skipped.map((s) => [s.assetPath, s.reason]));
-    expect(why["/assets/rank/1920/bg-rank.png"]).toMatch(/background/);
-    expect(why["/assets/rank/1920/frame.png"]).toMatch(/background/);
-    expect(why["/assets/rank/768/frame.png"]).toMatch(/background/);
-    expect(why["/assets/clips/intro.mp4"]).toMatch(/video/);
-    expect(r.entries.some((e) => e.assets.some((a) => /bg-rank|frame|intro/.test(a)))).toBe(false);
+  it("tags full-width backgrounds, full-bleed pictures and videos as zoom-only too (2026-11-06)", () => {
+    expect(r.skipped).toHaveLength(0);
+    expect(r.entries.every((e) => e.mode === "scale")).toBe(true);
+    expect(r.code).toMatch(/<video data-edit-id="[^"]*" data-edit-mode="scale"/);
+    expect(r.entries.some((e) => e.assets.some((a) => /bg-rank/.test(a)))).toBe(true);
+    expect(r.entries.some((e) => e.assets.some((a) => /intro.mp4/.test(a)))).toBe(true);
   });
 
   it("a positioned host still wins: its picture is not offered a second time as scale-only", () => {
@@ -304,7 +303,7 @@ const A = ({ slide, tab, siteConfig }) => (
   const r = injectEditIds(SRC, "src/components/news/SliderPC.tsx", []);
 
   it("names the picture after the data field it shows", () => {
-    expect(r.entries.map((e) => e.editId)).toEqual(["slider-pc.data-image", "slider-pc.data-image~2", "slider-pc.data-site-logo-url"]);
+    expect(r.entries.map((e) => e.editId)).toEqual(["slider-pc.data-image", "slider-pc.data-image~2", "slider-pc.data-site-logo-url", "slider-pc.data-cover", "slider-pc.data-clip"]);
   });
 
   it("marks it as API data, with nothing to replace, and keeps the mode of its place", () => {
@@ -315,11 +314,9 @@ const A = ({ slide, tab, siteConfig }) => (
     expect(r.code).toMatch(/<img data-edit-id="slider-pc.data-image~2" data-edit-mode="scale" data-edit-source="api"/);
   });
 
-  it("still refuses full-bleed data pictures and dynamic videos, with the reason", () => {
-    const why = r.skipped.map((s) => s.reason).join("|");
-    expect(why).toMatch(/background/);
-    expect(why).toMatch(/video/);
-    expect(r.code).not.toMatch(/<video[^>]*data-edit-id/);
+  it("tags full-bleed data pictures and dynamic videos too", () => {
+    expect(r.skipped).toHaveLength(0);
+    expect(r.code).toMatch(/<video data-edit-id="slider-pc.data-clip" data-edit-mode="scale" data-edit-source="api"/);
   });
 
   it("ignores a plain string src (that is a file, the detector's job)", () => {

@@ -5,7 +5,7 @@ import protocol from "../../../../public/ve/protocol.js";
 import type { EditManifest, LayoutBreakpoint, LayoutConflicts, LayoutFile } from "@/detector/layout-schema";
 import { matchMediaToSlot, type EditSlot } from "@/detector/asset-match";
 import type { RouteInfo } from "@/detector/routes";
-import { fillRoute, matchRoute, paramsOf, routesOfFile } from "@/detector/route-path";
+import { fillRoute, paramsOf } from "@/detector/route-path";
 
 interface Snapshot {
   layout: LayoutFile;
@@ -49,21 +49,18 @@ const VIEWPORTS: { key: LayoutBreakpoint; label: string; width: number }[] = [
  * whitelisted postMessage protocol and saves results through /api/layout.
  */
 export default function EditorPanel({ gameId, url }: { gameId: string; url: string }) {
-  const frameRef = useRef<HTMLIFrameElement>(null);
+  // one iframe per page, all drawn side by side; `frames` maps a page id to its iframe
+  const frames = useRef(new Map<string, HTMLIFrameElement>());
+  const activeId = useRef<string | null>(null);
   const [editMode, setEditMode] = useState(true);
   const [viewport, setViewport] = useState<LayoutBreakpoint>("desktop");
   const [snap, setSnap] = useState<Snapshot | null>(null);
   const [selected, setSelected] = useState<Selected>({ editId: null });
-  const [present, setPresent] = useState<string[] | null>(null);
-  // which page the preview is on: the address we asked for, and an element to select as soon as the page it lives
-  // on has loaded
-  const [framePath, setFramePath] = useState<string>(() => new URL(url).pathname + new URL(url).search);
+  // the pages shown side by side. Starts with every page that needs no parameter; the operator can add a page with parameters
+  const [custom, setPages] = useState<{ id: string; path: string; label: string }[] | null>(null);
   const [routePick, setRoutePick] = useState<string>("/");
   const [params, setParams] = useState<Record<string, string>>({});
-  const pendingSelect = useRef<string | null>(null);
-  const routesRef = useRef<RouteInfo[]>([]);
   const [message, setMessage] = useState<string | null>(null);
-  const [warnings, setWarnings] = useState<string[]>([]);
   // Full-screen editor: a fixed layer over the wizard with its own toolbar, stage and side panel,
   // so nothing is clipped by the wizard's scrolling. "Fit" scales the preview down to show more of the page.
   const [open, setOpen] = useState(true);
@@ -117,9 +114,14 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
     };
   }, [url]);
 
+  /** Send a command to one page (by id) or, without an id, to every page. */
   const post = useCallback(
-    (type: string, payload: unknown) => {
-      frameRef.current?.contentWindow?.postMessage(protocol.make(type, payload), origin);
+    (type: string, payload: unknown, only?: string | null) => {
+      const msg = protocol.make(type, payload);
+      for (const [id, f] of frames.current) {
+        if (only && id !== only) continue;
+        f.contentWindow?.postMessage(msg, origin);
+      }
     },
     [origin]
   );
@@ -171,27 +173,26 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
 
   useEffect(() => {
     function onMessage(ev: MessageEvent) {
-      if (ev.origin !== origin || ev.source !== frameRef.current?.contentWindow) return;
+      if (ev.origin !== origin) return;
+      let fromId: string | null = null;
+      for (const [id, f] of frames.current) if (f.contentWindow === ev.source) fromId = id;
+      if (!fromId) return;
       const r = protocol.validate(ev.data, "toEditor");
       if (!r.ok) return;
-      if (r.type === "READY" || r.type === "STATE") {
-        setPresent(r.payload.editIds);
-        // follow the page the preview is really on (the operator may have clicked a link with the edit mode off)
-        if (typeof r.payload.path === "string") {
-          const m = matchRoute(routesRef.current, r.payload.path);
-          if (m) setRoutePick(m.path);
-        }
-        if (r.type === "READY") post("INIT", { editMode: editModeRef.current });
-        // an element picked from another page: select it once that page is there
-        const want = pendingSelect.current;
-        if (want && r.payload.editIds.includes(want)) {
-          pendingSelect.current = null;
-          post("SELECT", { editId: want });
-        }
+      if (r.type === "READY") {
+        post("INIT", { editMode: editModeRef.current }, fromId);
       } else if (r.type === "SELECTED") {
+        if (r.payload.editId === null) {
+          // a page that merely cleared its own selection must not wipe the one picked on another page
+          if (activeId.current === fromId) setSelected(r.payload);
+          return;
+        }
+        // one selection at a time: clear it on the other pages
+        const prev = activeId.current;
+        activeId.current = fromId;
+        if (prev && prev !== fromId) post("SELECT", { editId: null }, prev);
         setSelected(r.payload);
       } else if (r.type === "LAYOUT_CHANGED") {
-        setWarnings(r.payload.warnings ?? []);
         void save(r.payload.editId, r.payload.breakpoint, r.payload.override);
       } else if (r.type === "ERROR") {
         setMessage(r.payload.message);
@@ -207,62 +208,49 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
 
   const bp = selected.breakpoint ?? viewport;
   const saved = selected.editId ? snap?.layout.elements[selected.editId]?.overrides[bp] : undefined;
-  const entries = snap?.manifest?.entries ?? [];
   const routes: RouteInfo[] = snap?.routes && snap.routes.length > 0 ? snap.routes : [{ path: "/", label: "Trang chủ", dynamic: false, file: "", files: [] }];
   const pickedRoute = routes.find((r) => r.path === routePick) ?? null;
-  useEffect(() => {
-    routesRef.current = routes;
-  });
 
-  function openRoute(p: string) {
+  // until the operator adds or removes a page: every page that needs no parameter
+  const fixedPages = (snap?.routes ?? []).filter((r) => !r.dynamic).map((r, i) => ({ id: "p" + i, path: r.path, label: r.label }));
+  const pages = custom ?? (fixedPages.length > 0 ? fixedPages : [{ id: "p0", path: "/", label: "Trang chủ" }]);
+
+  /** Add a page that has parameters (or one that was removed), with the values typed in the toolbar. */
+  function addPage(p: string) {
     const r = routes.find((x) => x.path === p);
     const target = r?.dynamic ? fillRoute(p, params) : p;
     if (target === null) {
-      setMessage("Nhập đủ tham số của trang rồi bấm Mở.");
+      setMessage("Nhập đủ tham số của trang rồi bấm Thêm.");
       return;
     }
     setMessage(null);
-    setPresent(null);
-    setFramePath(target);
+    setPages([...pages, { id: "p" + Date.now(), path: target, label: r?.label ?? target }]);
   }
 
-  /** Changing the screen size re-flows the page: ask for the selection again once it has settled. */
-  function switchViewport(v: LayoutBreakpoint) {
-    const id = selected.editId;
-    setViewport(v);
-    setTimeout(() => {
-      if (id) post("SELECT", { editId: id });
-    }, 900);
+  /** A page scrolled far out of view is unloaded to save memory (its edits are already saved). */
+  function hidePage(id: string) {
+    frames.current.delete(id);
+    if (activeId.current === id) {
+      activeId.current = null;
+      setSelected({ editId: null });
+    }
   }
 
-  /** Select an element; when it lives on another page, open that page first and select it there. */
-  function goTo(editId: string) {
-    if (present?.includes(editId)) {
-      post("SELECT", { editId });
-      return;
+  function removePage(id: string) {
+    frames.current.delete(id);
+    if (activeId.current === id) {
+      activeId.current = null;
+      setSelected({ editId: null });
     }
-    const entry = entries.find((e) => e.editId === editId);
-    const owners = entry ? routesOfFile(routes, entry.sourcePath) : [];
-    const target = owners.find((r) => !r.dynamic) ?? owners[0];
-    if (!target) {
-      post("SELECT", { editId });
-      return;
-    }
-    pendingSelect.current = editId;
-    setRoutePick(target.path);
-    if (target.dynamic) {
-      setMessage(`"${editId}" nằm ở trang ${target.path}: nhập tham số rồi bấm Mở.`);
-      return;
-    }
-    openRoute(target.path);
+    setPages(pages.filter((x) => x.id !== id));
   }
-  const skipped = snap?.manifest?.skipped.length ?? 0;
+
   const vw = VIEWPORTS.find((v) => v.key === viewport)!.width;
 
   const PAD = 12;
   const availW = Math.max(200, stage.w - PAD * 2);
   const availH = Math.max(200, stage.h - PAD * 2);
-  const scale = fit ? Math.min(1, availW / vw) : 1;
+  const scale = fit ? Math.min(1, availW / (vw * Math.min(pages.length, 2) + 12 * (Math.min(pages.length, 2) - 1))) : 1;
 
   return (
     <>
@@ -307,41 +295,29 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
           </button>
           <span style={{ width: 8 }} />
           <label style={{ fontSize: 12.5 }}>
-            Trang{" "}
-            <select
-              data-testid="ve-route"
-              value={routePick}
-              onChange={(e) => {
-                setRoutePick(e.target.value);
-                const r = routes.find((x) => x.path === e.target.value);
-                if (r && !r.dynamic) openRoute(r.path);
-              }}
-            >
+            Thêm trang{" "}
+            <select data-testid="ve-route" value={routePick} onChange={(e) => setRoutePick(e.target.value)}>
               {routes.map((r) => (
                 <option key={r.path} value={r.path}>
-                  {r.label}
-                  {r.dynamic ? " (cần tham số)" : ""} · {entries.filter((en) => r.files.includes(en.sourcePath)).length} phần tử
+                  {r.label} ({r.path})
                 </option>
               ))}
             </select>
           </label>
-          {pickedRoute?.dynamic && (
-            <span style={{ display: "inline-flex", gap: 6, alignItems: "center" }} data-testid="ve-route-params">
-              {paramsOf(pickedRoute.path).map((k) => (
-                <input
-                  key={k}
-                  data-testid={`ve-param-${k === "*" ? "rest" : k}`}
-                  placeholder={k === "*" ? "đường dẫn" : k}
-                  value={params[k] ?? ""}
-                  style={{ width: 110 }}
-                  onChange={(e) => setParams((p) => ({ ...p, [k]: e.target.value }))}
-                />
-              ))}
-              <button className="chip" data-testid="ve-route-open" onClick={() => openRoute(pickedRoute.path)}>
-                Mở
-              </button>
-            </span>
-          )}
+          {pickedRoute?.dynamic &&
+            paramsOf(pickedRoute.path).map((k) => (
+              <input
+                key={k}
+                data-testid={`ve-param-${k === "*" ? "rest" : k}`}
+                placeholder={k === "*" ? "đường dẫn" : k}
+                value={params[k] ?? ""}
+                style={{ width: 110 }}
+                onChange={(e) => setParams((cur) => ({ ...cur, [k]: e.target.value }))}
+              />
+            ))}
+          <button className="chip" data-testid="ve-route-open" onClick={() => addPage(routePick)}>
+            +
+          </button>
           <label style={{ marginLeft: "auto", fontSize: 12.5 }}>
             <input data-testid="edit-mode" type="checkbox" checked={editMode} onChange={(e) => setEditMode(e.target.checked)} /> Chế độ chỉnh
             (tắt để thao tác trang như bình thường)
@@ -352,31 +328,50 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
         </div>
 
         <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-          <div ref={stageRef} style={{ flex: 1, minWidth: 0, padding: PAD, overflow: fit ? "hidden" : "auto", background: "var(--bg, #f3f4f6)" }}>
+          <div ref={stageRef} data-testid="ve-stage" style={{ flex: 1, minWidth: 0, padding: PAD, overflow: "auto", background: "var(--bg, #f3f4f6)" }}>
             {!up && (
               <div className="hint" style={{ padding: 24 }} data-testid="ve-starting">
                 Đang khởi động bản xem trước… (lần đầu có thể mất vài chục giây)
               </div>
             )}
             {up && (
-              <div style={{ width: vw * scale, height: availH, margin: "0 auto", position: "relative", overflow: "hidden", boxShadow: "0 0 0 1px var(--border)" }}>
-                <iframe
-                  ref={frameRef}
-                  data-testid="ve-frame"
-                  title="Xem trước và chỉnh layout"
-                  src={new URL(framePath, url).href}
-                  onLoad={() => post("INIT", { editMode: editModeRef.current })}
-                  style={{
-                    width: vw,
-                    height: availH / scale,
-                    maxWidth: "none",
-                    border: 0,
-                    display: "block",
-                    background: "#fff",
-                    transform: `scale(${scale})`,
-                    transformOrigin: "0 0",
-                  }}
-                />
+              <div style={{ display: "flex", gap: 12, alignItems: "flex-start", width: "max-content" }}>
+                {pages.map((pg) => (
+                  <div key={pg.id} data-testid="ve-page" data-path={pg.path} style={{ flex: "none" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, marginBottom: 4, width: vw * scale }}>
+                      <strong>{pg.label}</strong>
+                      <span className="mono" style={{ color: "var(--muted)" }}>{pg.path}</span>
+                      {pages.length > 1 && (
+                        <button className="chip" style={{ marginLeft: "auto", padding: "0 6px" }} aria-label="Bỏ trang" onClick={() => removePage(pg.id)}>
+                          ×
+                        </button>
+                      )}
+                    </div>
+                    <PageSlot root={stageRef} width={vw * scale} height={availH - 24} onHide={() => hidePage(pg.id)}>
+                      <iframe
+                        ref={(el) => {
+                          if (el) frames.current.set(pg.id, el);
+                          else frames.current.delete(pg.id);
+                        }}
+                        data-testid="ve-frame"
+                        data-path={pg.path}
+                        title={"Trang " + pg.label}
+                        src={new URL(pg.path, url).href}
+                        onLoad={() => post("INIT", { editMode: editModeRef.current }, pg.id)}
+                        style={{
+                          width: vw,
+                          height: (availH - 24) / scale,
+                          maxWidth: "none",
+                          border: 0,
+                          display: "block",
+                          background: "#fff",
+                          transform: `scale(${scale})`,
+                          transformOrigin: "0 0",
+                        }}
+                      />
+                    </PageSlot>
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -386,44 +381,13 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
             style={{ flex: "0 0 320px", fontSize: 13, overflowY: "auto", margin: 0, borderRadius: 0, border: 0, borderLeft: "1px solid var(--border)" }}
             data-testid="ve-panel"
           >
-        <h3 style={{ marginTop: 0 }}>Chỉnh layout</h3>
         {message && (
           <div className="ext-note" style={{ borderColor: "var(--warn)", marginBottom: 8 }} data-testid="ve-message">
             {message}
           </div>
         )}
-        {snap && (snap.conflicts.templateChanged || snap.conflicts.missing.length > 0) && (
-          <div className="ext-note" style={{ borderColor: "var(--warn)", marginBottom: 8 }} data-testid="ve-conflict">
-            {snap.conflicts.templateChanged
-              ? "Template đã đổi so với lúc lưu layout — layout cũ chưa được áp dụng."
-              : `${snap.conflicts.missing.length} phần tử đã lưu không còn trong template (${snap.conflicts.missing.join(", ")}) — bỏ qua.`}
-          </div>
-        )}
-
-        {warnings.length > 0 && (
-          <div className="ext-note" style={{ borderColor: "var(--warn)", marginBottom: 8 }} data-testid="ve-warning">
-            Lưu ý: {warnings.join("; ")}. Kiểm tra lại bố cục, hoặc bấm “Reset phần tử này”.
-          </div>
-        )}
-
-        <div className="hint">
-          Click một ảnh trong trang để chọn, kéo để dời (hoặc kéo nút ✥ khi ảnh bị lớp khác che; ảnh nằm trong luồng trang thì không dời được, chỉ phóng/thu nhỏ). Ảnh có 8 ô vuông để phóng to/thu nhỏ:
-          4 góc giữ tỷ lệ (giữ <strong>Shift</strong> để kéo giãn tự do), 4 cạnh kéo giãn một chiều. Phóng cả ảnh bên trong, kể cả ảnh
-          có kích thước cố định. Gõ số tỉ lệ bên dưới (100% = kích thước gốc của template).
-          Đang chỉnh cho: <strong>{bp}</strong>. Kéo không ra ngoài khung chứa được, không nhỏ hơn 24px và không to quá khung chứa;
-          tỉ lệ 10–500%; z-index từ −10 đến 999.
-        </div>
-
         {selected.editId ? (
           <div style={{ marginTop: 10 }} data-testid="ve-selected">
-            <div className="mono" style={{ fontSize: 12 }}>{selected.editId}</div>
-            {saved && <div className="mono" style={{ fontSize: 11, color: "var(--muted)" }}>{JSON.stringify(saved)}</div>}
-            {selected.responsiveScale && (
-              <div className="ext-note" style={{ borderColor: "var(--warn)", marginTop: 8 }} data-testid="ve-responsive-scale">
-                Phần tử này tự đổi tỉ lệ theo cỡ màn hình (md:/lg:/xl: scale). Tỉ lệ bạn chỉnh là một giá trị cố định cho cả dải
-                {" "}{bp}, thay cho hành vi đó.
-              </div>
-            )}
             {selected.scale && (
               <div style={{ display: "flex", gap: 10, marginTop: 8, flexWrap: "wrap" }}>
                 {([["scaleX", "x", "Ngang"], ["scaleY", "y", "Dọc"]] as const).map(([key, axis, label]) => {
@@ -453,7 +417,6 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
             )}
             {selected.media && selected.media.length > 0 && (
               <div style={{ marginTop: 10 }} data-testid="ve-media">
-                <div style={{ fontWeight: 600 }}>Ảnh trong phần tử ({selected.media.length})</div>
                 {selected.media.map((m, i) => (
                   <MediaReplacer
                     key={`${selected.editId}-${i}-${m.src.split("?")[0]}`}
@@ -466,35 +429,10 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
                     onDone={(paths) => {
                       post("RELOAD_MEDIA", { paths });
                       // read the element again so the thumbnail and sizes shown here are the new ones
-                      setTimeout(() => selected.editId && post("SELECT", { editId: selected.editId }), 700);
+                      setTimeout(() => selected.editId && post("SELECT", { editId: selected.editId }, activeId.current), 700);
                     }}
                   />
                 ))}
-              </div>
-            )}
-            {selected.hidden && !saved?.hidden && (
-              <div className="ext-note" style={{ borderColor: "var(--warn)", marginTop: 8 }} data-testid="ve-hidden-note">
-                Phần tử này đang không hiển thị ở kích thước {bp} (template ẩn nó ở đây). Xem ở:{" "}
-                {VIEWPORTS.filter((v) => v.key !== viewport).map((v) => (
-                  <button key={v.key} className="chip" style={{ marginRight: 6 }} onClick={() => switchViewport(v.key)}>
-                    {v.label}
-                  </button>
-                ))}
-              </div>
-            )}
-            {selected.dataDriven && (
-              <div className="hint" style={{ marginTop: 8 }} data-testid="ve-data-note">
-                Ảnh lấy từ dữ liệu (API): nội dung không sửa được, chỉ chỉnh vị trí, kích thước và ẩn.
-              </div>
-            )}
-            {(selected.instances ?? 1) > 1 && (
-              <div className="hint" style={{ marginTop: 8 }} data-testid="ve-instances-note">
-                Trang đang vẽ {selected.instances} bản giống nhau của phần tử này (dữ liệu lặp): chỉnh một bản là chỉnh tất cả.
-              </div>
-            )}
-            {selected.mode === "scale" && (
-              <div className="hint" style={{ marginTop: 8 }} data-testid="ve-flow-note">
-                Ảnh này nằm trong luồng trang nên không dời được: chỉ phóng to/thu nhỏ (quanh tâm ảnh) hoặc ẩn. Muốn đổi chỗ phải sửa bố cục của trang.
               </div>
             )}
             {selected.mode !== "scale" && (
@@ -524,46 +462,8 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
               />{" "}
               Ẩn trên {bp}
             </label>
-            <button
-              className="chip"
-              data-testid="ve-reset-one"
-              style={{ marginTop: 8 }}
-              onClick={async () => {
-                if (!selected.editId) return;
-                await call("DELETE", { query: `&editId=${encodeURIComponent(selected.editId)}` });
-                post("RESET", { editId: selected.editId });
-                post("RELOAD_CSS", {});
-              }}
-            >
-              Reset phần tử này
-            </button>
           </div>
-        ) : (
-          <div className="hint" style={{ marginTop: 10 }}>Chưa chọn phần tử nào.</div>
-        )}
-
-        <div style={{ marginTop: 14, fontWeight: 600 }}>
-          Phần tử chỉnh được ({entries.length}
-          {present ? `, ${present.length} có trên trang này` : ""})
-        </div>
-        <ul style={{ margin: "6px 0 0", paddingLeft: 16, maxHeight: 160, overflow: "auto" }}>
-          {entries.map((e) => (
-            <li key={e.editId}>
-              <button className="chip" style={{ fontSize: 11 }} onClick={() => goTo(e.editId)}>
-                {e.editId}
-              </button>
-              {snap?.layout.elements[e.editId] ? " ✎" : ""}
-              {present && !present.includes(e.editId) ? (
-                <span style={{ color: "var(--muted)" }}> (trang: {routesOfFile(routes, e.sourcePath).slice(0, 2).map((r) => r.path).join(", ") || "khác"})</span>
-              ) : null}
-            </li>
-          ))}
-        </ul>
-        {skipped > 0 && (
-          <div className="hint" style={{ marginTop: 6 }}>
-            {skipped} ảnh không chỉnh được vì nằm trong luồng trang (không có khung định vị) — giữ nguyên.
-          </div>
-        )}
+        ) : null}
 
         <div style={{ marginTop: 14, display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button
@@ -578,28 +478,55 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
           >
             Reset toàn trang
           </button>
-          {snap && snap.history.length > 0 && (
-            <select
-              data-testid="ve-history"
-              defaultValue=""
-              onChange={async (e) => {
-                if (!e.target.value) return;
-                await call("PUT", { body: { gameId, restore: e.target.value } });
-                post("RELOAD_CSS", {});
-                e.target.value = "";
-              }}
-            >
-              <option value="">Khôi phục bản cũ…</option>
-              {snap.history.map((h) => (
-                <option key={h} value={h}>{h.replace(".json", "")}</option>
-              ))}
-            </select>
-          )}
         </div>
           </aside>
         </div>
       </div>
     </>
+  );
+}
+
+/**
+ * Holds the iframe of one page and only renders it while the slot is near the visible part of the stage.
+ * Eight full pages in iframes at once exhaust the browser's memory.
+ */
+function PageSlot({
+  root,
+  width,
+  height,
+  onHide,
+  children,
+}: {
+  root: React.RefObject<HTMLDivElement | null>;
+  width: number;
+  height: number;
+  onHide: () => void;
+  children: React.ReactNode;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [near, setNear] = useState(false);
+  const hide = useRef(onHide);
+  useEffect(() => {
+    hide.current = onHide;
+  });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        const on = entries[entries.length - 1].isIntersecting;
+        setNear(on);
+        if (!on) hide.current();
+      },
+      { root: root.current, rootMargin: "0px 300px 0px 300px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [root]);
+  return (
+    <div ref={ref} style={{ width, height, position: "relative", overflow: "hidden", boxShadow: "0 0 0 1px var(--border)", background: near ? undefined : "var(--bg, #f3f4f6)" }}>
+      {near ? children : null}
+    </div>
   );
 }
 
@@ -707,25 +634,6 @@ function MediaReplacer({
           </div>
         </div>
       </div>
-
-      {media.kind !== "img" && (
-        <div className="hint" style={{ marginTop: 6 }}>Video: thay ở bước 2 (chưa hỗ trợ ngay trong bản xem trước).</div>
-      )}
-      {media.kind === "img" && dataDriven && (
-        <div className="hint" style={{ marginTop: 6 }} data-testid="ve-media-data">
-          Ảnh này đến từ dữ liệu (API) nên không có file để thay. Bạn vẫn chỉnh được vị trí và kích thước của nó.
-        </div>
-      )}
-      {media.kind === "img" && !dataDriven && remote && (
-        <div className="hint" style={{ marginTop: 6 }} data-testid="ve-media-remote">
-          Ảnh này tải từ nguồn ngoài (CDN hoặc dữ liệu API) nên ảnh thay vào sẽ không hiện trong bản xem trước. Nếu là asset CDN thì thay ở bước 2; nếu là dữ liệu API thì không sửa được.
-        </div>
-      )}
-      {media.kind === "img" && !dataDriven && !remote && !match && (
-        <div className="hint" style={{ marginTop: 6 }} data-testid="ve-media-unknown">
-          Ảnh này không thuộc asset nào đã nhận diện (ví dụ ảnh từ API) nên không thay ở đây.
-        </div>
-      )}
 
       {canReplace && (
         <div style={{ marginTop: 6, display: "grid", gap: 6 }}>

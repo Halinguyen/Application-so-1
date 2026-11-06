@@ -108,32 +108,27 @@ export function dataSlotFromExpression(ex: Any): string {
   return "data-" + (kebab || "image");
 }
 
-/** Classes that mark a picture as the full-bleed background of a whole area: its size defines the area, leave it alone. */
-const FULL_BLEED = /(^|[^a-z0-9_-])(w-full|w-screen|h-full|h-screen|object-cover|inset-0)($|[^a-z0-9_-])/;
-
 /**
  * A picture that flows in the page (no absolute/fixed element around it) cannot be moved with left/top, but it
  * can be scaled. Finds the <img> to tag: the img itself, or for a <source> the <img> of the same <picture>
- * (an inline <picture> is not transformable, its <img> is). Videos and full-bleed backgrounds are refused.
+ * (an inline <picture> is not transformable, its <img> is). A <video> (or the <video> of a <source>) is tagged the same way. Full-width
+ * section backgrounds are tagged too (2026-11-06): the operator may zoom or hide them; Reset puts them back.
  */
 function flowTarget(elementPath: Any): { opening?: Any; reason?: string } {
   const node = elementPath.node;
   const tag = node.openingElement.name?.name;
   const parent = elementPath.parentPath?.node;
   const inVideo = parent?.type === "JSXElement" && parent.openingElement.name?.name === "video";
-  if (tag === "video" || (tag === "source" && inVideo)) return { reason: "video (replace it in the wizard's step 2)" };
+  if (tag === "video") return { opening: node.openingElement };
+  if (tag === "source" && inVideo) return { opening: parent.openingElement };
   const inPicture = parent?.type === "JSXElement" && parent.openingElement.name?.name === "picture";
   let img: Any = null;
-  let wrapper: Any = null;
   if (tag === "img") {
     img = node.openingElement;
-    wrapper = inPicture ? parent.openingElement : null;
   } else if (tag === "source" && inPicture) {
-    wrapper = parent.openingElement;
     img = parent.children.find((c: Any) => c.type === "JSXElement" && c.openingElement.name?.name === "img")?.openingElement ?? null;
   }
   if (!img) return { reason: "not an <img> in the page flow" };
-  if (FULL_BLEED.test(classText(img)) || (wrapper && FULL_BLEED.test(classText(wrapper)))) return { reason: "full-width section background" };
   return { opening: img };
 }
 

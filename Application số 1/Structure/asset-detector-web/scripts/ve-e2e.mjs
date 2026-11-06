@@ -1,3 +1,6 @@
+// LEGACY (2026-11-06): written for the old editor (one iframe, element list, per-element notes, "Reset phần tử này").
+// The editor now lays every page side by side and its panel has no list or notes, so this script no longer runs as is.
+// Use scripts/ve-pages-smoke.mjs for the current UI; port the checks here one by one when needed.
 // PoC end-to-end: drives the REAL wizard (step 4) with Playwright and checks the
 // acceptance criteria of Structure/14-PLAN-visual-editing.md section 11.
 // Needs the tool running (default http://localhost:3100) and Chrome installed.

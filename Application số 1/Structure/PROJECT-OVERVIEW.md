@@ -248,7 +248,7 @@ Trang: `/` (`src/app/page.tsx`: GamePicker hoặc WizardShell), `/admin` (QA das
 | `wizard/AssetCompareTile.tsx` | Ô so sánh ảnh gốc / ảnh thay |
 | `wizard/FigmaSuggestions.tsx` | Gợi ý ảnh từ Figma (chấp nhận/bỏ qua, nhập link/ZIP); quyết định lưu localStorage |
 | `wizard/PreviewPane.tsx` | Iframe preview + kết quả clone/preview (`CloneResult`, `PreviewResult`) |
-| `wizard/EditorPanel.tsx` | Trình chỉnh layout toàn màn hình (toolbar Desktop/Tablet/Mobile, chọn Trang, panel phần tử, `MediaReplacer`) — file dài nhất (~770 dòng) |
+| `wizard/EditorPanel.tsx` | Trình chỉnh layout toàn màn hình. **Từ 2026-11-06:** mọi trang không cần tham số (home, rank, tintuc…) dàn ngang, mỗi trang một iframe + inspector (`frames` map id→iframe; một lựa chọn tại một thời điểm, `activeId`); `PageSlot` chỉ render iframe khi gần vùng nhìn thấy và dỡ khi cuộn xa (8-9 trang cùng lúc làm sập trình duyệt); nút `+` thêm trang có tham số, `×` bỏ trang. Panel bên phải KHÔNG còn chữ hướng dẫn/ghi chú/danh sách phần tử/reset từng phần tử/khôi phục bản cũ: chỉ còn ô tỉ lệ, z-index, Ẩn, khối `MediaReplacer` (chọn file/link, Thay ảnh, Khôi phục gốc) và nút **Reset toàn trang** |
 | `wizard/HoverHint.tsx`, `wizard/types.ts` | Gợi ý hover; kiểu `CloneParam`, `CloneSlot`, `CloneExternalSlot` |
 | `Gallery.tsx`, `GameSwitcher.tsx`, `RescanButton.tsx`, `Spinner.tsx` | Cho `/admin` và loading |
 
@@ -266,7 +266,8 @@ Trang: `/` (`src/app/page.tsx`: GamePicker hoặc WizardShell), `/admin` (QA das
 | File | Việc |
 |---|---|
 | `generate-registry.mjs` | Sinh `template-registry/<game>.json` từ repo template trên máy (đọc `GAME_REPO_MAP` bằng regex trên `config.ts`); `--check` exit 1 nếu manifest cũ; báo working copy khác commit |
-| `ve-e2e.mjs` | e2e Playwright qua wizard thật (mục 5.5); `TOOL` mặc định `http://localhost:3100`, Chrome mặc định `C:/Program Files/Google/Chrome/Application/chrome.exe` |
+| `ve-pages-smoke.mjs` | Smoke test giao diện đa trang hiện tại (Playwright): số trang, tải lười, chọn phần tử trên nhiều trang, panel chỉ còn Reset toàn trang. `node scripts/ve-pages-smoke.mjs <gameId>` (đã đạt cho phuong-hoang-tru-tien và than-ma-ao-hoa) |
+| `ve-e2e.mjs` | **LEGACY** — viết cho editor cũ (một iframe, danh sách phần tử, ghi chú), KHÔNG còn chạy với giao diện mới; cần port từng kiểm tra (mục 5.5); `TOOL` mặc định `http://localhost:3100`, Chrome mặc định `C:/Program Files/Google/Chrome/Application/chrome.exe` |
 | `ve-poc-clone.mjs` | PoC bước 1-2: gọi `/api/clone` với `visualEdit=1`, in kết quả gắn id (`tool` mặc định `http://localhost:3100`) |
 
 ---
@@ -521,7 +522,7 @@ Từ README/memory/plan (chưa xác minh lại từng cái trừ khi ghi chú):
 
 - **Deploy K8s dev**: (a) preview lắng nghe cổng ngẫu nhiên trong pod, không qua được một Ingress -> cần proxy theo host/port hoặc pod preview riêng; (b) 6 game `-web` chưa có git remote (`source: null`) nên deploy sạch không lấy được template; (c) tiến trình preview kế thừa env của tool (lộ token); (d) Dockerfile/K8s/Jenkinsfile chưa chạy thật, placeholder domain/namespace/storage class; (e) fetch từ `source.vtvlive.vn` chưa chạy thử từ máy này (chỉ test với git cục bộ).
 - **GitHub/GitLab**: `/api/repo` chưa test với GitHub thật; clone chưa có `deploy/`, Jenkinsfile của clone còn domain/service_name của game gốc; clone có thể 80-270MB; chưa nối CI trigger; group GitLab/token/branch Jenkins chưa chốt.
-- **Visual editing**: các mục "chưa xác minh" ở 5.6; chưa e2e cho 9 game còn lại; cân nhắc gộp bước 2 vào bước 4 như một tab.
+- **Visual editing**: các mục "chưa xác minh" ở 5.6; `ve-e2e.mjs` cần port sang UI đa trang (số kiểm tra kéo/resize/thay ảnh 45 và 73 trước đây chưa chạy lại); 7 game chưa e2e kéo thả; ảnh nền truyền qua prop của component tự viết (vd `SectionWrapper mobileSrc=... desktopSrc=...` ở tamquoc-daiminhtinh, 18 mục) vẫn chưa gắn thẻ được vì phải sửa component; cân nhắc gộp bước 2 vào bước 4 như một tab.
 - **Figma**: đang ẩn cho phuong-hoang-tru-tien. Để khôi phục: xóa id khỏi `FIGMA_HIDDEN_GAMES` trong `config.ts` **và** đổi tên `game-template-repo/phuong-hoang-tru-tien/home-page-uploads.figma-hidden-20261105` về `home-page-uploads`, rồi Generate clone. Upload mới tạo thư mục `home-page-uploads` mới, áp dụng bình thường; layout (`home-page-layout`) tách riêng, vẫn áp dụng.
 - **AI asset generation** (`13-PLAN`): chưa có code; chờ user trả lời (nguồn tham chiếu phong cách, nhà cung cấp + key, chạy trong wizard hay nền). Quy tắc đã nêu: slot < 70% tin cậy không sinh; mọi ảnh sinh ra phải được operator duyệt; không làm theo file deepseek (không khớp dự án).
 - **Dữ liệu cũ**: thư mục `r005-fullweb`, `r005-fullweb-web`, `home-page-clone` của thao-tung-tamquoc chưa xóa (cần user đồng ý); `STRUCT/` còn `06`, `08*`, `11`, `13`, `14`, `openapi.yaml`, 3 PNG untracked, `figma-exporter/`, `asset-detector-poc/` đang giữ chờ user.
@@ -533,7 +534,8 @@ Từ README/memory/plan (chưa xác minh lại từng cái trừ khi ghi chú):
 | Ngày | Commit | Thay đổi tài liệu |
 |---|---|---|
 | 2026-11-06 | `b4ace81` | Tạo mới toàn bộ tài liệu: tổng quan, cấu trúc, module, dữ liệu/cấu hình, visual editing, bảng 16 game, build/deploy, bẫy và việc còn mở |
-| 2026-11-06 | (commit kế tiếp) | VE: adapter Next hỗ trợ nhiều root layout (route group); `edit-id.ts` phân giải ảnh import qua barrel (`barrelAliasRefs`); smoke test clone+VE 9 game còn lại đều `installed`, chưa e2e kéo thả; thêm `ve-barrel-layouts.test.ts` (165 test) |
+| 2026-11-06 | `c1411cc` | VE: adapter Next hỗ trợ nhiều root layout (route group); `edit-id.ts` phân giải ảnh import qua barrel (`barrelAliasRefs`); smoke test clone+VE 9 game còn lại đều `installed`, chưa e2e kéo thả; thêm `ve-barrel-layouts.test.ts` (165 test) |
+| 2026-11-06 | (commit kế tiếp) | Editor: dàn nhiều trang cạnh nhau (tải lười), panel bỏ hết chữ chỉ còn Reset toàn trang; detector tag thêm video và ảnh nền full-width trong luồng trang (chế độ `scale`; số phần tử sửa được: than-ma 106→118, phuong 40→57, tuyetdinh 39→56, daiminhtinh 70→75, giang-ho 95→99); `ve-pages-smoke.mjs` mới, `ve-e2e.mjs` đánh dấu legacy |
 
 ## 10. Cách cập nhật tài liệu này
 
