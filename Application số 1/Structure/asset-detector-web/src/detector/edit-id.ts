@@ -142,6 +142,18 @@ function isDomTag(opening: Any): boolean {
 }
 
 /**
+ * A reference to inject for. `alias` is set for a picture imported through a barrel file
+ * (import { bannerPC } from "../assets/banner"): the JSX never spells the file name, only the
+ * identifier, so the attribute is matched by that identifier and not by line/file name.
+ */
+export type EditRef = Pick<AssetReference, "line" | "attribute" | "assetPath"> & { alias?: string };
+
+function mentionsIdentifier(text: string, name: string): boolean {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp("(?<![\\w$])" + escaped + "(?![\\w$])").test(text);
+}
+
+/**
  * Adds `data-edit-id` to the positioned element that holds each detected asset
  * reference. Works on the CLONE only. A reference is skipped (and reported) when
  * its asset is not inside any absolute/fixed element: such an image flows in the
@@ -152,7 +164,7 @@ function isDomTag(opening: Any): boolean {
 export function injectEditIds(
   source: string,
   relPath: string,
-  refs: Pick<AssetReference, "line" | "attribute" | "assetPath">[],
+  refs: EditRef[],
   usedIds: Set<string> = new Set()
 ): { code: string; entries: EditManifestEntry[]; skipped: EditManifest["skipped"] } {
   const ast = parse(source, { sourceType: "module", plugins: ["jsx", "typescript"], errorRecovery: true });
@@ -177,13 +189,19 @@ export function injectEditIds(
       // is NOT the line the attribute starts on. So match by line range AND by the asset's file name
       // appearing in the attribute's own text (keeps two attributes sharing a line apart).
       const text = source.slice(attr.start, attr.end);
-      const matches = ordered.filter((r) => {
+      const matches: EditRef[] = ordered.filter((r) => {
+        if (r.alias) return false;
         if (r.line < first || r.line > last) return false;
         const base = (r.assetPath.split(/[?#]/)[0].split("/").pop() ?? "").trim();
         return base !== "" && text.includes(base);
       });
       // A picture whose src is an expression has no asset path for the detector to report: it is data
       // (an API response, a CMS value). Its place and size can still be edited, its content cannot.
+      if (matches.length === 0 && ["src", "srcSet", "poster"].includes(attr.name?.name)) {
+        for (const r of ordered) {
+          if (r.alias && mentionsIdentifier(text, r.alias)) matches.push({ ...r, line: first });
+        }
+      }
       let items: { line: number; assetPath: string; slot?: string; dynamic?: boolean }[] = matches;
       if (matches.length === 0) {
         const opening = p.parent;
@@ -267,15 +285,16 @@ const IGNORE = ["**/node_modules/**", "**/*footer*", "**/*Footer*", "**/sdk/**",
 export async function injectEditIdsInDir(
   cloneDir: string,
   gameId: string,
-  references: Pick<AssetReference, "file" | "line" | "attribute" | "assetPath">[]
+  references: Pick<AssetReference, "file" | "line" | "attribute" | "assetPath" | "type">[]
 ): Promise<EditManifest> {
-  const byFile = new Map<string, typeof references>();
+  const byFile = new Map<string, (Pick<AssetReference, "file" | "line" | "attribute" | "assetPath"> & { alias?: string })[]>();
   for (const r of references) {
     const f = r.file.replace(/\\/g, "/");
     if (!/\.(tsx|jsx)$/.test(f)) continue;
     byFile.set(f, [...(byFile.get(f) ?? []), r]);
   }
   const allowed = new Set(await fg(["src/**/*.{tsx,jsx}", "app/**/*.{tsx,jsx}", "pages/**/*.{tsx,jsx}"], { cwd: cloneDir, ignore: IGNORE }));
+  for (const [file, refs] of await barrelAliasRefs(cloneDir, references, allowed)) byFile.set(file, [...(byFile.get(file) ?? []), ...refs]);
 
   const usedIds = new Set<string>();
   const manifest: EditManifest = { schemaVersion: LAYOUT_SCHEMA_VERSION, gameId, entries: [], skipped: [] };
@@ -295,4 +314,49 @@ export async function injectEditIdsInDir(
     }
   }
   return manifest;
+}
+
+/**
+ * Pictures imported through a barrel file (src/assets/banner/index.ts does `import bannerPC from "./1920/banner.png"`
+ * and re-exports it; a component does `import { bannerPC } from "../assets/banner"`). The detector reports those
+ * references in the barrel, where nothing can be tagged, so for every component that imports from a barrel we
+ * synthesize one reference per imported name, carrying that name as `alias`.
+ */
+type AliasRef = Pick<AssetReference, "file" | "line" | "attribute" | "assetPath"> & { alias: string };
+
+async function barrelAliasRefs(
+  cloneDir: string,
+  references: Pick<AssetReference, "file" | "line" | "attribute" | "assetPath" | "type">[],
+  componentFiles: Set<string>
+): Promise<Map<string, AliasRef[]>> {
+  // barrel module (no extension, no /index) -> imported name -> asset path relative to the clone root
+  const barrels = new Map<string, Map<string, string>>();
+  for (const r of references) {
+    const f = r.file.split("\\").join("/");
+    const m = /^(.*)\/index\.(?:ts|js)$/.exec(f);
+    if (!m || r.type !== "import") continue;
+    const names = barrels.get(m[1]) ?? new Map<string, string>();
+    barrels.set(m[1], names);
+    const text = await readFile(path.join(cloneDir, f), "utf-8").catch(() => "");
+    const line = text.split(/\r?\n/)[r.line - 1] ?? "";
+    const id = /import\s+([\w$]+)\s+from/.exec(line)?.[1];
+    if (id) names.set(id, path.posix.normalize(path.posix.join(m[1], r.assetPath)));
+  }
+  const out = new Map<string, AliasRef[]>();
+  if (barrels.size === 0) return out;
+  for (const file of componentFiles) {
+    const text = await readFile(path.join(cloneDir, file), "utf-8").catch(() => "");
+    for (const imp of text.matchAll(/import\s*\{([^}]*)\}\s*from\s*["'](\.[^"']*)["']/g)) {
+      const mod = path.posix.normalize(path.posix.join(path.posix.dirname(file), imp[2].replace(/\/index$/, "")));
+      const names = barrels.get(mod);
+      if (!names) continue;
+      for (const part of imp[1].split(",")) {
+        const [imported, local] = part.trim().split(/\s+as\s+/);
+        const assetPath = imported ? names.get(imported) : undefined;
+        if (!assetPath) continue;
+        out.set(file, [...(out.get(file) ?? []), { file, line: 0, attribute: "src", assetPath, alias: local ?? imported }]);
+      }
+    }
+  }
+  return out;
 }
