@@ -8,11 +8,11 @@ import { stopPreview, stopProcessesUsingDir } from "@/detector/preview-process";
 import { getUploadsDir, isRasterOrSvg, persistUpload, readUploadBuffer } from "@/detector/upload-store";
 import { writeBlankImage } from "@/detector/blank-image";
 import { resizeUploadToMatchTarget, type CropAnchor } from "@/detector/resize-upload";
-import { applyTextSlot } from "@/detector/site-text";
+import { applyTextColor, applyTextSlot } from "@/detector/site-text";
 import { ensureDependencies } from "@/detector/ensure-deps";
 import { applyVisualEditing } from "@/detector/visual-editing";
 import { pruneExcludedRoutes } from "@/detector/prune-routes";
-import { isHexColor, replaceHex } from "@/detector/color-scan";
+import { isHexColor } from "@/detector/color-scan";
 import { applyPersistedColors } from "@/detector/color-store";
 import { readExternalManifest, replaceExternalAsset } from "@/detector/external-replace";
 import { requireTemplate } from "@/detector/template-source";
@@ -157,7 +157,7 @@ export async function POST(request: NextRequest) {
       resized: boolean;
     }[] = [];
     const textReplaced: string[] = [];
-    const colorsReplaced: { from: string; to: string; replaced: number }[] = [];
+    const textColorsApplied: string[] = [];
     const warnings: string[] = [];
     if (pruned.routes.length > 0) warnings.push(`Đã bỏ ${pruned.routes.length} trang khỏi bản sao: ${pruned.routes.join(", ")} (${pruned.files.length} file, ${pruned.assets.length} asset).`);
     const env = await readBaseEnv(repoPath);
@@ -230,32 +230,16 @@ export async function POST(request: NextRequest) {
         const { ok: _ok, ...done } = r;
         void _ok;
         externalReplaced.push(done);
-      } else if (key.startsWith("color:") && typeof value === "string") {
-        // "color:<{literals, files}>" = the new #rrggbb: every spelling of the old colour in those files of the CLONE becomes it
-        let spec: { literals?: unknown; files?: unknown };
-        try {
-          spec = JSON.parse(key.slice("color:".length));
-        } catch {
-          continue;
+      } else if (key.startsWith("textcolor:") && typeof value === "string") {
+        // "textcolor:<slot id>" = #rrggbb: the element that draws that text gets the colour (inline style, in the clone)
+        const id = key.slice("textcolor:".length);
+        if (!isHexColor(value.trim())) {
+          warnings.push(`Màu chữ "${value}" không hợp lệ (cần dạng #rrggbb) — giữ màu cũ.`);
+        } else if (await applyTextColor(CLONE_DIR, repoPath, id, value.trim())) {
+          textColorsApplied.push(id);
+        } else {
+          warnings.push(`Không đổi được màu chữ của "${id}" (thẻ có style riêng hoặc không tìm thấy).`);
         }
-        const to = value.trim();
-        const literals = Array.isArray(spec.literals) ? spec.literals.filter((l): l is string => typeof l === "string" && /^#[0-9a-fA-F]{3,8}$/.test(l)) : [];
-        const files = Array.isArray(spec.files) ? spec.files.filter((f): f is string => typeof f === "string" && f.startsWith("src/") && !f.includes("..")) : [];
-        if (!isHexColor(to)) {
-          warnings.push(`Màu "${to}" không hợp lệ (cần dạng #rrggbb) — giữ màu cũ.`);
-          continue;
-        }
-        let replaced = 0;
-        for (const f of files) {
-          const abs = path.join(CLONE_DIR, f);
-          if (!existsSync(abs)) continue;
-          const r = replaceHex(await fs.readFile(abs, "utf-8"), literals, to);
-          if (r.replaced > 0) {
-            await fs.writeFile(abs, r.text);
-            replaced += r.replaced;
-          }
-        }
-        colorsReplaced.push({ from: literals[0] ?? "", to, replaced });
       } else if (key.startsWith("text:") && typeof value === "string") {
         const textId = key.slice("text:".length);
         if (await applyTextSlot(CLONE_DIR, repoPath, textId, value.trim())) {
@@ -311,7 +295,7 @@ export async function POST(request: NextRequest) {
       filesReplaced,
       externalReplaced,
       textReplaced,
-      colorsReplaced,
+      textColorsApplied,
       envWritten: envLines.length,
       baseEnvKeyCount,
       overriddenKeys,

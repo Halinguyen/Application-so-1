@@ -20,6 +20,8 @@ interface TextSlotDef {
   // should hide, while applyTextSlot still needs the RAW captured string
   // (markup included) to find-and-replace the exact block in the file.
   toDisplay?: (raw: string) => string;
+  // The text is drawn on the page (not a <title>/meta tag): the operator may give it a colour.
+  colorable?: boolean;
 }
 
 function stripInlineTags(raw: string): string {
@@ -59,6 +61,7 @@ const TEXT_SLOTS: TextSlotDef[] = [
     // back out for the operator-facing value.
     pattern: /<h1[^>]*>\s*([\s\S]*?)\s*<\/h1>/,
     toDisplay: stripInlineTags,
+    colorable: true,
   },
 ];
 
@@ -66,6 +69,7 @@ export interface TextSlotValue {
   id: string;
   label: string;
   defaultValue: string;
+  colorable?: boolean;
 }
 
 async function readCached(fileCache: Map<string, string>, repoPath: string, file: string): Promise<string> {
@@ -112,7 +116,7 @@ export async function readTextSlots(repoPath: string): Promise<TextSlotValue[]> 
     const { match } = resolveSlotFile(slot, fileCache);
     if (!match) continue; // slot not present, or not plain text — don't offer it
     const raw = match[1];
-    values.push({ id: slot.id, label: slot.label, defaultValue: slot.toDisplay ? slot.toDisplay(raw) : raw });
+    values.push({ id: slot.id, label: slot.label, defaultValue: slot.toDisplay ? slot.toDisplay(raw) : raw, ...(slot.colorable ? { colorable: true } : {}) });
   }
 
   return values;
@@ -140,5 +144,43 @@ export async function applyTextSlot(
   if (!content.includes(original)) return false;
 
   await fs.writeFile(clonePath, content.split(original).join(newValue));
+  return true;
+}
+
+/**
+ * Gives the text of a slot a colour: the opening tag of the element that holds it (the <h1> of the header) gets an inline
+ * style, which wins over the template's own colour class. Done on the CLONE only. Returns null when nothing can be changed.
+ */
+export function setTagColor(content: string, matchIndex: number, hex: string): string | null {
+  const open = /^<[A-Za-z][\w.-]*([^>]*)>/.exec(content.slice(matchIndex));
+  if (!open) return null;
+  const tag = open[0];
+  // a ">" inside an expression (an arrow function) ended the match early: the braces do not balance, so do not guess
+  if ((tag.match(/\{/g) ?? []).length !== (tag.match(/\}/g) ?? []).length) return null;
+  let next: string;
+  if (/\sstyle=\{\{/.test(tag)) {
+    next = tag.replace(/style=\{\{\s*(color:\s*["'][^"']*["']\s*,?\s*)?/, `style={{ color: "${hex}", `);
+  } else if (/\sstyle=/.test(tag)) {
+    return null; // a style that is not an object literal: do not guess
+  } else {
+    next = tag.replace(/\s*(\/?)>$/, ` style={{ color: "${hex}" }}$1>`);
+  }
+  return content.slice(0, matchIndex) + next + content.slice(matchIndex + tag.length);
+}
+
+export async function applyTextColor(cloneDir: string, repoPath: string, id: string, hex: string): Promise<boolean> {
+  const slot = TEXT_SLOTS.find((s) => s.id === id);
+  if (!slot || !slot.colorable || !/^#[0-9a-fA-F]{6}$/.test(hex)) return false;
+  const fileCache = new Map<string, string>();
+  for (const file of slot.files) await readCached(fileCache, repoPath, file);
+  const { file, match } = resolveSlotFile(slot, fileCache);
+  if (!match) return false;
+  const clonePath = path.join(cloneDir, file);
+  const content = await fs.readFile(clonePath, "utf-8");
+  const m = content.match(slot.pattern);
+  if (!m || m.index === undefined) return false;
+  const next = setTagColor(content, m.index, hex);
+  if (next === null) return false;
+  await fs.writeFile(clonePath, next);
   return true;
 }

@@ -1,7 +1,6 @@
 import { runDetection } from "@/detector/run";
 import { readBaseEnv } from "@/detector/base-env";
 import { readTextSlots } from "@/detector/site-text";
-import { scanColors } from "@/detector/color-scan";
 import { resolveGame, GAME_REPO_MAP, getGameDisplayName, getGameIconUrl, isFigmaHidden } from "@/detector/config";
 import { detectFramework } from "@/detector/framework-detector";
 import { readRegistryEntry, requireTemplate } from "@/detector/template-source";
@@ -88,7 +87,6 @@ export default async function Home({
   const data = await runDetection(game);
   const baseEnv = await readBaseEnv(repoPath);
   const textSlots = await readTextSlots(repoPath);
-  const colors = await scanColors(repoPath);
 
   const { slots } = buildCloneSlots(data);
   const figmaHidden = isFigmaHidden(gameId);
@@ -155,6 +153,6 @@ export default async function Home({
   const params: CloneParam[] = [...gameIdParams, ...heroVideoParams];
 
   return (
-    <WizardShell key={gameId} gameId={gameId} displayName={getGameDisplayName(gameId)} iconUrl={getGameIconUrl(gameId)} slots={slots} params={params} externalSlots={externalSlots} textSlots={textSlots} colors={colors} figmaSuggestions={figmaSuggestions} hideFigma={figmaHidden} />
+    <WizardShell key={gameId} gameId={gameId} displayName={getGameDisplayName(gameId)} iconUrl={getGameIconUrl(gameId)} slots={slots} params={params} externalSlots={externalSlots} textSlots={textSlots} figmaSuggestions={figmaSuggestions} hideFigma={figmaHidden} />
   );
 }

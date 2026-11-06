@@ -83,4 +83,6 @@ export interface CloneTextSlot {
   id: string;
   label: string;
   defaultValue: string;
+  /** the text is drawn on the page (not a <title>/meta tag): its colour can be changed */
+  colorable?: boolean;
 }
