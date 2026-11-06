@@ -1,6 +1,7 @@
 import { runDetection } from "@/detector/run";
 import { readBaseEnv } from "@/detector/base-env";
 import { readTextSlots } from "@/detector/site-text";
+import { keepRatioSlotIds } from "@/detector/flow-image";
 import { resolveGame, GAME_REPO_MAP, getGameDisplayName, getGameIconUrl, isFigmaHidden } from "@/detector/config";
 import { detectFramework } from "@/detector/framework-detector";
 import { readRegistryEntry, requireTemplate } from "@/detector/template-source";
@@ -88,7 +89,9 @@ export default async function Home({
   const baseEnv = await readBaseEnv(repoPath);
   const textSlots = await readTextSlots(repoPath);
 
-  const { slots } = buildCloneSlots(data);
+  const built = buildCloneSlots(data);
+  const keepRatio = await keepRatioSlotIds(repoPath, built.slots);
+  const slots = built.slots.map((s) => (keepRatio.has(s.id) ? { ...s, keepRatio: true } : s));
   const figmaHidden = isFigmaHidden(gameId);
   const figmaSuggestions = figmaHidden ? [] : await suggestFigmaMatches(gameId, data, repoPath);
 

@@ -2,72 +2,67 @@ import { describe, expect, it } from "vitest";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { applyPersistedColors, changeColor, readColorChanges, revertColors } from "./color-store";
+import { clearColorRules, colorRulesCss, colorRulesToCss, readColorRules, setColorRule } from "./color-store";
 
-async function setup() {
-  const root = await fs.mkdtemp(path.join(os.tmpdir(), "colorstore-"));
-  const repo = path.join(root, "home-page");
-  const clone = path.join(root, "home-page-clone");
-  for (const dir of [repo, clone]) {
-    await fs.mkdir(path.join(dir, "src/components"), { recursive: true });
-    await fs.writeFile(path.join(dir, "src/index.scss"), "a{color:#FAEA05;border:1px solid #818181}");
-    await fs.writeFile(path.join(dir, "src/components/Rank.tsx"), 'export const R = () => <div className="bg-[#faea05]" />;');
-  }
-  return { root, repo, clone };
+async function repo() {
+  const root = await fs.mkdtemp(path.join(os.tmpdir(), "colorrules-"));
+  return { root, repoPath: path.join(root, "home-page") };
 }
-const read = (dir: string, f: string) => fs.readFile(path.join(dir, f), "utf-8");
+const SEL = "#root > div:nth-child(1) > header:nth-child(1) > h1:nth-child(2)";
 
-describe("color store", () => {
-  it("changes a colour everywhere in the clone, keeps the template, and remembers it", async () => {
-    const { root, repo, clone } = await setup();
+describe("colour rules (one area, never every use of a colour)", () => {
+  it("stores a rule for one selector and turns it into one CSS rule", async () => {
+    const { root, repoPath } = await repo();
     try {
-      const r = await changeColor(repo, clone, "#faea05", "#00FF66");
-      expect(r).toMatchObject({ ok: true, hex: "#faea05", to: "#00ff66", replaced: 2 });
-      expect(await read(clone, "src/index.scss")).toBe("a{color:#00ff66;border:1px solid #818181}");
-      expect(await read(clone, "src/components/Rank.tsx")).toContain("bg-[#00ff66]");
-      expect(await read(repo, "src/index.scss")).toContain("#FAEA05"); // the template is untouched
-      expect((await readColorChanges(repo))["#faea05"].to).toBe("#00ff66");
+      const r = await setColorRule(repoPath, { selector: SEL, prop: "text", to: "#FF3366" });
+      expect(r.ok).toBe(true);
+      expect(await readColorRules(repoPath)).toEqual([{ selector: SEL, prop: "text", to: "#ff3366" }]);
+      expect(await colorRulesCss(repoPath)).toContain(`${SEL}{color:#ff3366 !important}`);
     } finally {
       await fs.rm(root, { recursive: true, force: true });
     }
   });
 
-  it("changing the same colour again (picked as its new value) does not stack", async () => {
-    const { root, repo, clone } = await setup();
+  it("replaces the colour of the same area and property, and keeps other areas separate", async () => {
+    const { root, repoPath } = await repo();
     try {
-      await changeColor(repo, clone, "#faea05", "#00ff66");
-      const r = await changeColor(repo, clone, "#00ff66", "#112233");
-      expect(r).toMatchObject({ ok: true, hex: "#faea05", to: "#112233" });
-      expect(await read(clone, "src/index.scss")).toBe("a{color:#112233;border:1px solid #818181}");
-      expect(Object.keys(await readColorChanges(repo))).toEqual(["#faea05"]);
+      await setColorRule(repoPath, { selector: SEL, prop: "text", to: "#111111" });
+      await setColorRule(repoPath, { selector: SEL, prop: "text", to: "#222222" });
+      await setColorRule(repoPath, { selector: SEL, prop: "background", to: "#333333" });
+      await setColorRule(repoPath, { selector: "#menu > a:nth-child(1)", prop: "text", to: "#444444" });
+      const rules = await readColorRules(repoPath);
+      expect(rules).toHaveLength(3);
+      expect(rules.find((r) => r.selector === SEL && r.prop === "text")!.to).toBe("#222222");
+      expect(colorRulesToCss(rules)).toMatch(/background-color:#333333 !important/);
     } finally {
       await fs.rm(root, { recursive: true, force: true });
     }
   });
 
-  it("reverts everything, and re-applies after a fresh copy of the template", async () => {
-    const { root, repo, clone } = await setup();
+  it("refuses anything that could break out of the rule, and bad colours", async () => {
+    const { root, repoPath } = await repo();
     try {
-      await changeColor(repo, clone, "#faea05", "#00ff66");
-      // a fresh clone: template copied again, then the remembered colours applied
-      await fs.copyFile(path.join(repo, "src/index.scss"), path.join(clone, "src/index.scss"));
-      expect(await applyPersistedColors(repo, clone)).toBeGreaterThan(0);
-      expect(await read(clone, "src/index.scss")).toContain("#00ff66");
-      expect(await revertColors(repo, clone)).toBeGreaterThan(0);
-      expect((await read(clone, "src/index.scss")).toLowerCase()).toContain("#faea05");
-      expect(await readColorChanges(repo)).toEqual({});
+      for (const selector of ["a{color:red}", "a; b", "a\\9", "", "x".repeat(601), "a/*", 'a[x="1"]']) {
+        expect((await setColorRule(repoPath, { selector, prop: "text", to: "#111111" })).ok).toBe(false);
+      }
+      expect((await setColorRule(repoPath, { selector: SEL, prop: "text", to: "red" })).ok).toBe(false);
+      expect((await setColorRule(repoPath, { selector: SEL, prop: "fill", to: "#111111" })).ok).toBe(false);
+      expect(await readColorRules(repoPath)).toEqual([]);
     } finally {
       await fs.rm(root, { recursive: true, force: true });
     }
   });
 
-  it("says so when the colour is not a hex code in the source, and rejects bad input", async () => {
-    const { root, repo, clone } = await setup();
+  it("clears every rule, and ignores a file in the older global format", async () => {
+    const { root, repoPath } = await repo();
     try {
-      const r = await changeColor(repo, clone, "#010203", "#00ff66");
-      expect(r.ok).toBe(false);
-      expect(r.ok === false && r.error).toMatch(/không có dưới dạng mã hex/);
-      expect((await changeColor(repo, clone, "#faea05", "red")).ok).toBe(false);
+      await fs.mkdir(repoPath, { recursive: true });
+      await fs.writeFile(path.join(root, "home-page-colors.json"), JSON.stringify({ "#970000": { literals: ["#970000"], files: ["src/a.tsx"], to: "#088967" } }));
+      expect(await readColorRules(repoPath)).toEqual([]);
+      await setColorRule(repoPath, { selector: SEL, prop: "text", to: "#111111" });
+      await clearColorRules(repoPath);
+      expect(await readColorRules(repoPath)).toEqual([]);
+      expect(await colorRulesCss(repoPath)).toBe("");
     } finally {
       await fs.rm(root, { recursive: true, force: true });
     }

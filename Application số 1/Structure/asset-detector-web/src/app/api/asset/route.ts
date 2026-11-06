@@ -13,7 +13,7 @@ import { getUploadsDir, isRasterOrSvg, persistUpload, readUploadBuffer, removePe
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-const ANCHORS: CropAnchor[] = ["attention", "crop", "fit", "top", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right"];
+const ANCHORS: CropAnchor[] = ["attention", "crop", "fit", "original", "top", "bottom", "left", "right", "top-left", "top-right", "bottom-left", "bottom-right"];
 
 function setup(gameId: string | null) {
   const g = resolveGame(gameId);

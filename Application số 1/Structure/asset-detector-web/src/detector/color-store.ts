@@ -1,100 +1,73 @@
 import fs from "node:fs/promises";
-import { existsSync } from "node:fs";
 import path from "node:path";
-import { isHexColor, normalizeHex, replaceHex, scanColors } from "./color-scan";
 
 /**
- * Colours changed from the preview editor. Kept next to the template (like uploads and layout) so every
- * "Generate clone" applies them again; the clone's own source files are rewritten as plain text.
- * Key = the colour as the TEMPLATE has it (#rrggbb), so changing it twice never stacks.
+ * Colours changed from the preview editor, each for ONE area of a page (2026-11-06). A change is a CSS rule on the element
+ * the operator pressed — written into the overrides stylesheet next to the layout — so it never leaks to other places that
+ * happen to use the same colour (the mobile side menu, another block). Kept next to the template like uploads and layout.
  */
-export interface ColorChange {
-  literals: string[];
-  files: string[];
+export type ColorProp = "background" | "text" | "border";
+
+export interface ColorRule {
+  /** CSS selector of the pressed element, built by the inspector from the page's own structure */
+  selector: string;
+  prop: ColorProp;
+  /** #rrggbb */
   to: string;
 }
-export type ColorChanges = Record<string, ColorChange>;
+
+const CSS_PROP: Record<ColorProp, string> = { background: "background-color", text: "color", border: "border-color" };
+
+/** Only plain structural selectors: tags, ids, classes, :nth-child(n), combinators. Nothing that could close a rule. */
+export const SELECTOR_OK = /^[A-Za-z0-9_\-:#.>()+~ ]{1,600}$/;
+
+export const isHexColor = (v: string) => /^#[0-9a-fA-F]{6}$/.test(v);
+export const isColorProp = (v: unknown): v is ColorProp => v === "background" || v === "text" || v === "border";
 
 const storeFile = (repoPath: string) => path.join(path.dirname(repoPath), "home-page-colors.json");
 
-export async function readColorChanges(repoPath: string): Promise<ColorChanges> {
+/** The saved rules. A file in the older format (a table keyed by colour) counts as none: those changes were global. */
+export async function readColorRules(repoPath: string): Promise<ColorRule[]> {
   try {
-    return JSON.parse(await fs.readFile(storeFile(repoPath), "utf-8"));
+    const parsed: unknown = JSON.parse(await fs.readFile(storeFile(repoPath), "utf-8"));
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (r): r is ColorRule => !!r && typeof r.selector === "string" && SELECTOR_OK.test(r.selector) && isColorProp(r.prop) && isHexColor(String(r.to))
+    );
   } catch {
-    return {};
+    return [];
   }
 }
 
-async function writeColorChanges(repoPath: string, changes: ColorChanges): Promise<void> {
-  if (Object.keys(changes).length === 0) {
-    await fs.rm(storeFile(repoPath), { force: true });
-    return;
-  }
-  await fs.writeFile(storeFile(repoPath), JSON.stringify(changes, null, 2));
+async function write(repoPath: string, rules: ColorRule[]): Promise<void> {
+  if (rules.length === 0) await fs.rm(storeFile(repoPath), { force: true });
+  else await fs.writeFile(storeFile(repoPath), JSON.stringify(rules, null, 2));
 }
 
-async function rewrite(cloneDir: string, files: string[], from: string[], to: string): Promise<number> {
-  let replaced = 0;
-  for (const f of files) {
-    if (!f.startsWith("src/") || f.includes("..")) continue;
-    const abs = path.join(cloneDir, f);
-    if (!existsSync(abs)) continue;
-    const r = replaceHex(await fs.readFile(abs, "utf-8"), from, to);
-    if (r.replaced > 0) {
-      await fs.writeFile(abs, r.text);
-      replaced += r.replaced;
-    }
-  }
-  return replaced;
+export type SetResult = { ok: true; rules: ColorRule[] } | { ok: false; error: string };
+
+/** Adds the rule, or replaces the colour of the same selector + property. */
+export async function setColorRule(repoPath: string, rule: { selector: unknown; prop: unknown; to: unknown }): Promise<SetResult> {
+  const { selector, prop, to } = rule;
+  if (typeof selector !== "string" || !SELECTOR_OK.test(selector)) return { ok: false, error: "Không xác định được vùng cần đổi màu — bấm lại vào vùng đó." };
+  if (!isColorProp(prop)) return { ok: false, error: "Loại màu không hợp lệ." };
+  if (typeof to !== "string" || !isHexColor(to)) return { ok: false, error: "Mã màu phải có dạng #rrggbb." };
+  const rules = (await readColorRules(repoPath)).filter((r) => !(r.selector === selector && r.prop === prop));
+  rules.push({ selector, prop, to: to.toLowerCase() });
+  await write(repoPath, rules);
+  return { ok: true, rules };
 }
 
-export type ApplyResult = { ok: true; hex: string; to: string; replaced: number } | { ok: false; error: string };
-
-/**
- * Changes one colour in the CLONE. `picked` is what the browser showed (#rrggbb): either a colour of the template or one
- * that was already changed (then it maps back to its template colour).
- */
-export async function changeColor(repoPath: string, cloneDir: string, picked: string, to: string): Promise<ApplyResult> {
-  if (!isHexColor(picked) || !isHexColor(to)) return { ok: false, error: "Mã màu phải có dạng #rrggbb." };
-  const target = to.toLowerCase();
-  const changes = await readColorChanges(repoPath);
-  const p = normalizeHex(picked);
-  let key = Object.keys(changes).find((k) => changes[k].to.toLowerCase() === p) ?? null;
-  let current: string[];
-  let files: string[];
-  let literals: string[];
-  if (key) {
-    current = [changes[key].to];
-    files = changes[key].files;
-    literals = changes[key].literals;
-  } else {
-    const slot = (await scanColors(repoPath)).find((c) => c.hex === p);
-    if (!slot) return { ok: false, error: `Màu ${p} không có dưới dạng mã hex trong mã nguồn (có thể là class Tailwind hoặc rgba) nên chưa đổi được ở đây.` };
-    key = slot.hex;
-    current = slot.literals;
-    files = slot.files;
-    literals = slot.literals;
-  }
-  const replaced = await rewrite(cloneDir, files, current, target);
-  changes[key] = { literals, files, to: target };
-  if (normalizeHex(target) === key) delete changes[key]; // typed the original back: nothing left to remember
-  await writeColorChanges(repoPath, changes);
-  return { ok: true, hex: key, to: target, replaced };
+export async function clearColorRules(repoPath: string): Promise<void> {
+  await write(repoPath, []);
 }
 
-/** Puts every changed colour back in the clone and forgets them. */
-export async function revertColors(repoPath: string, cloneDir: string): Promise<number> {
-  const changes = await readColorChanges(repoPath);
-  let n = 0;
-  for (const c of Object.values(changes)) n += await rewrite(cloneDir, c.files, [c.to], c.literals[0]);
-  await writeColorChanges(repoPath, {});
-  return n;
+/** The stylesheet for the saved rules. !important: it must beat the template's own colour classes and inline styles. */
+export function colorRulesToCss(rules: ColorRule[]): string {
+  return rules.map((r) => `${r.selector}{${CSS_PROP[r.prop]}:${r.to} !important}`).join("\n");
 }
 
-/** After a fresh copy of the template: apply the colours the operator changed earlier. */
-export async function applyPersistedColors(repoPath: string, cloneDir: string): Promise<number> {
-  const changes = await readColorChanges(repoPath);
-  let n = 0;
-  for (const c of Object.values(changes)) n += await rewrite(cloneDir, c.files, c.literals, c.to);
-  return n;
+export async function colorRulesCss(repoPath: string): Promise<string> {
+  const css = colorRulesToCss(await readColorRules(repoPath));
+  return css ? "\n/* colours changed in the editor */\n" + css + "\n" : "";
 }

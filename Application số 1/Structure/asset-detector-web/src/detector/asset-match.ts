@@ -11,6 +11,8 @@ export interface EditSlot {
   targetPaths: string[];
   previewPath: string;
   sizeLabel: string;
+  /** the page draws it by its own proportion: uploads keep their proportion */
+  keepRatio?: boolean;
 }
 
 const ROOT = /^(public|static|wwwroot)\//;

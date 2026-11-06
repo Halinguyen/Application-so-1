@@ -3,9 +3,11 @@ import path from "node:path";
 import { runDetection } from "./run";
 import { readCloneSchema } from "./clone-schema";
 import { injectEditIdsInDir } from "./edit-id";
+import { keepRatioSlotIds } from "./flow-image";
+import { colorRulesCss, readColorRules } from "./color-store";
 import { installNextAdapter } from "./ve-adapter-next";
 import { installViteAdapter } from "./ve-adapter-vite";
-import { buildCss, readLayout, writeExternalSlots, writeManifest, writeRoutes, writeSlots } from "./layout-store";
+import { buildCss, readLayout, readManifest, writeExternalSlots, writeManifest, writeRoutes, writeSlots } from "./layout-store";
 import { discoverRoutes } from "./routes";
 import { buildCloneSlots } from "./clone-slots";
 import type { LayoutConflicts } from "./layout-schema";
@@ -39,7 +41,8 @@ export async function applyVisualEditing(
   const saved = await readLayout(repoPath);
   // An empty layout (everything was reset) is the same as none: a plain clone must stay exactly as it was built.
   const hasLayout = !!saved && Object.keys(saved.elements).length > 0;
-  if (!hasLayout && !editorOrigin) return null;
+  const hasColors = (await readColorRules(repoPath)).length > 0;
+  if (!hasLayout && !hasColors && !editorOrigin) return null;
 
   const detection = await runDetection(gameId);
   const framework = detection.framework.framework;
@@ -62,7 +65,11 @@ export async function applyVisualEditing(
   // the asset slots, so the preview editor can offer "replace this picture" for exactly the files the wizard would
   await writeSlots(
     repoPath,
-    buildCloneSlots(detection).slots.map((s) => ({ id: s.id, label: s.label, targetPaths: s.targetPaths, previewPath: s.previewPath, sizeLabel: s.sizeLabel }))
+    await (async () => {
+      const built = buildCloneSlots(detection).slots;
+      const keep = await keepRatioSlotIds(repoPath, built);
+      return built.map((s) => ({ id: s.id, label: s.label, targetPaths: s.targetPaths, previewPath: s.previewPath, sizeLabel: s.sizeLabel, ...(keep.has(s.id) ? { keepRatio: true } : {}) }));
+    })()
   );
 
   // CDN-hosted pictures/videos: same address and local name the wizard's step 2 uses, so both write the same files
@@ -79,7 +86,9 @@ export async function applyVisualEditing(
       }))
   );
 
-  const { css, conflicts } = buildCss(saved, manifest, gameId, templateHash(gameId));
+  const built = buildCss(saved, manifest, gameId, templateHash(gameId));
+  const conflicts = built.conflicts;
+  const css = built.css + (await colorRulesCss(repoPath)); // colours changed in the editor ride along with the layout
   const install = framework === "nextjs" ? await installNextAdapter(cloneDir, { editorOrigin, css }) : await installViteAdapter(cloneDir, { editorOrigin, css });
   return {
     framework,
@@ -101,4 +110,10 @@ export async function rewriteCloneCss(cloneDir: string, css: string): Promise<bo
   }
   await fs.writeFile(path.join(dir, "layout-overrides.css"), css);
   return true;
+}
+
+/** Rebuilds the overrides stylesheet (layout + colour rules) of an existing clone, e.g. after a colour was changed. */
+export async function refreshOverridesCss(repoPath: string, cloneDir: string, gameId: string): Promise<boolean> {
+  const { css } = buildCss(await readLayout(repoPath), await readManifest(repoPath), gameId, templateHash(gameId));
+  return rewriteCloneCss(cloneDir, css + (await colorRulesCss(repoPath)));
 }

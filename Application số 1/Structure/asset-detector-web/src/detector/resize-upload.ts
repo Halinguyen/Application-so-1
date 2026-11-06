@@ -8,11 +8,13 @@ import path from "node:path";
 // the crop to a specific edge/corner instead of guessing again.
 // "attention" is also AUTOMATIC about the shape: when the upload and the target differ a lot in proportion (a wide banner for a
 // tall phone banner), cutting a slice would throw most of the picture away, so the whole picture is kept instead (see
-// FIT_RATIO). "crop" always cuts (the salient part), "fit" always keeps the whole picture.
+// FIT_RATIO). "crop" always cuts (the salient part), "fit" always keeps the whole picture inside the frame of the original file,
+// "original" keeps the picture's own proportion (the file is not forced into the original file's frame at all).
 export type CropAnchor =
   | "attention"
   | "crop"
   | "fit"
+  | "original"
   | "top"
   | "bottom"
   | "left"
@@ -22,7 +24,7 @@ export type CropAnchor =
   | "bottom-left"
   | "bottom-right";
 
-const SHARP_POSITION: Record<Exclude<CropAnchor, "attention" | "crop" | "fit">, string> = {
+const SHARP_POSITION: Record<Exclude<CropAnchor, "attention" | "crop" | "fit" | "original">, string> = {
   top: "top",
   bottom: "bottom",
   left: "left",
@@ -34,7 +36,7 @@ const SHARP_POSITION: Record<Exclude<CropAnchor, "attention" | "crop" | "fit">, 
 };
 
 function resolvePosition(anchor: CropAnchor): string {
-  return anchor === "attention" || anchor === "crop" || anchor === "fit" ? "attention" : SHARP_POSITION[anchor];
+  return anchor === "attention" || anchor === "crop" || anchor === "fit" || anchor === "original" ? "attention" : SHARP_POSITION[anchor];
 }
 
 /** Sizes packed into a favicon.ico built from an upload. */
@@ -197,7 +199,12 @@ async function resizeUploadToDimensions(
 
   const normalizedExt = ext.toLowerCase();
   const source = await keepWholePicture(uploadBuf, width, height, anchor, normalizedExt);
-  const pipeline = sharp(source ?? uploadBuf).resize(width, height, { fit: "cover", position: resolvePosition(anchor) });
+  // "original": the file keeps the proportion of the picture the operator gave (scaled to fit inside the original file's size, no
+  // crop, no padding). For a picture the page lays out by its own proportion (w-full, height follows the file).
+  const pipeline =
+    anchor === "original"
+      ? sharp(uploadBuf).resize(width, height, { fit: "inside" })
+      : sharp(source ?? uploadBuf).resize(width, height, { fit: "cover", position: resolvePosition(anchor) });
 
   const encode = (quality: number) => {
     if (normalizedExt === ".jpg" || normalizedExt === ".jpeg") return pipeline.clone().jpeg({ quality });

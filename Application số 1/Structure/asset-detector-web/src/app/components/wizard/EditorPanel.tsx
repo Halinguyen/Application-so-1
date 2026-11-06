@@ -59,7 +59,9 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
   // the pages shown side by side. Starts with every page that needs no parameter; the operator can add a page with parameters
   const [message, setMessage] = useState<string | null>(null);
   // colours under the last press in a page (any area, with or without a picture) and what the operator typed for each
-  const [picked, setPicked] = useState<{ prop: "background" | "text" | "border"; hex: string }[]>([]);
+  const [picked, setPicked] = useState<{ prop: "background" | "text" | "border"; hex: string; selector: string; similar?: string; count?: number }[]>([]);
+  // rows whose colour goes to every alike item (list of posts / rows) instead of only the pressed one
+  const [wholeList, setWholeList] = useState<Record<string, boolean>>({});
   const [typedColor, setTypedColor] = useState<Record<string, string>>({});
   const [colorBusy, setColorBusy] = useState(false);
   // bumped after a CDN picture/video was replaced: the pages are loaded again
@@ -352,10 +354,11 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
         {picked.length > 0 && (
           <div style={{ marginBottom: 12 }} data-testid="ve-colors">
             {picked.map((c) => {
-              const typed = typedColor[c.hex] ?? "";
+              const rowKey = c.prop + "|" + c.selector;
+              const typed = typedColor[rowKey] ?? "";
               const valid = /^#[0-9a-fA-F]{6}$/.test(typed);
               return (
-                <div key={c.prop + c.hex} data-testid="ve-color-row" data-hex={c.hex} style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
+                <div key={rowKey} data-testid="ve-color-row" data-hex={c.hex} style={{ display: "flex", alignItems: "center", gap: 6, marginTop: 6 }}>
                   <span style={{ width: 44, fontSize: 12 }}>{c.prop === "background" ? "Nền" : c.prop === "text" ? "Chữ" : "Viền"}</span>
                   <span style={{ width: 22, height: 22, borderRadius: 4, background: c.hex, border: "1px solid var(--border)" }} />
                   <span className="mono" style={{ fontSize: 12 }}>{c.hex}</span>
@@ -364,7 +367,7 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
                     type="color"
                     aria-label={"Màu mới cho " + c.hex}
                     value={valid ? typed : c.hex}
-                    onChange={(e) => setTypedColor((v) => ({ ...v, [c.hex]: e.target.value }))}
+                    onChange={(e) => setTypedColor((v) => ({ ...v, [rowKey]: e.target.value }))}
                     style={{ width: 28, height: 24, padding: 0, border: 0, background: "none" }}
                   />
                   <input
@@ -373,9 +376,15 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
                     placeholder="#rrggbb"
                     maxLength={7}
                     value={typed}
-                    onChange={(e) => setTypedColor((v) => ({ ...v, [c.hex]: e.target.value === "" || e.target.value.startsWith("#") ? e.target.value : "#" + e.target.value }))}
+                    onChange={(e) => setTypedColor((v) => ({ ...v, [rowKey]: e.target.value === "" || e.target.value.startsWith("#") ? e.target.value : "#" + e.target.value }))}
                     style={{ width: 74, borderColor: typed && !valid ? "var(--warn)" : undefined }}
                   />
+                  {c.similar && (
+                    <label style={{ fontSize: 11.5, display: "inline-flex", alignItems: "center", gap: 3 }} data-testid="ve-color-scope">
+                      <input type="checkbox" checked={wholeList[rowKey] !== false} onChange={(e) => setWholeList((v) => ({ ...v, [rowKey]: e.target.checked }))} />
+                      Mọi mục cùng loại ({c.count})
+                    </label>
+                  )}
                   <button
                     className="chip"
                     data-testid="ve-color-apply"
@@ -383,14 +392,15 @@ export default function EditorPanel({ gameId, url }: { gameId: string; url: stri
                     onClick={async () => {
                       setColorBusy(true);
                       try {
-                        const res = await fetch("/api/colors", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ gameId, from: c.hex, to: typed }) });
+                        const res = await fetch("/api/colors", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ gameId, selector: c.similar && wholeList[rowKey] !== false ? c.similar : c.selector, prop: c.prop, to: typed }) });
                         const json = await res.json();
                         if (!res.ok) throw new Error(json.error || "Không đổi được màu");
                         setMessage(null);
-                        setPicked((list) => list.map((x) => (x.hex === c.hex && x.prop === c.prop ? { ...x, hex: typed.toLowerCase() } : x)));
+                        post("RELOAD_CSS", {});
+                        setPicked((list) => list.map((x) => (x.selector === c.selector && x.prop === c.prop ? { ...x, hex: typed.toLowerCase() } : x)));
                         setTypedColor((v) => {
                           const n = { ...v };
-                          delete n[c.hex];
+                          delete n[rowKey];
                           return n;
                         });
                       } catch (e) {
@@ -549,6 +559,7 @@ function PageSlot({
 
 const ANCHORS: [string, string][] = [
   ["attention", "Tự động (ảnh lệch tỉ lệ nhiều thì giữ trọn ảnh, nền mờ)"],
+  ["original", "Giữ đúng tỉ lệ ảnh gốc (không cắt, không nền)"],
   ["fit", "Giữ trọn ảnh (nền mờ)"],
   ["crop", "Luôn cắt (vùng nổi bật)"],
   ["top", "Giữ phần trên"],
@@ -588,7 +599,7 @@ function MediaReplacer({
 }) {
   const [file, setFile] = useState<File | null>(null);
   const [url, setUrl] = useState("");
-  const [anchor, setAnchor] = useState("attention");
+  const [anchor, setAnchor] = useState(() => (matchMediaToSlot(media.src, slots, origin).match?.slot.keepRatio ? "original" : "attention"));
   const [onlyShown, setOnlyShown] = useState(false);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<{ ok: boolean; text: string } | null>(null);

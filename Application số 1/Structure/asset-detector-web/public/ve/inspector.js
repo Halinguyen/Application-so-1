@@ -340,13 +340,72 @@
     }
     return "#" + h(m[1]) + h(m[2]) + h(m[3]);
   }
+  function alikeSiblings(el) {
+    var p = el.parentElement;
+    if (!p) return 0;
+    var n = 0;
+    for (var i = 0; i < p.children.length; i++) {
+      var c = p.children[i];
+      if (c.tagName === el.tagName && c.getAttribute("class") === el.getAttribute("class")) n++;
+    }
+    return n;
+  }
+  // A CSS selector that points at exactly this element, from the page's own structure: #id of the nearest ancestor with a plain
+  // id (or body), then tag:nth-child(n) steps down. Built so a colour change reaches this area and not every element that
+  // happens to use the same colour.
+  function selectorOf(el, similar) {
+    var parts = [];
+    var cur = el;
+    var generalised = false;
+    while (cur && cur.nodeType === 1 && cur !== document.documentElement) {
+      if (cur === document.body) {
+        parts.unshift("body");
+        break;
+      }
+      var id = cur.getAttribute("id");
+      if (id && /^[A-Za-z][A-Za-z0-9_-]*$/.test(id)) {
+        parts.unshift("#" + id);
+        break;
+      }
+      var idx = 1;
+      var sib = cur;
+      while ((sib = sib.previousElementSibling)) idx++;
+      // one of several alike siblings (a list item: a news post, a ranking row): without its index the rule reaches all of them,
+      // also those that the API adds later
+      if (similar && !generalised && alikeSiblings(cur) > 1) {
+        generalised = true;
+        parts.unshift(cur.tagName.toLowerCase());
+      } else {
+        parts.unshift(cur.tagName.toLowerCase() + ":nth-child(" + idx + ")");
+      }
+      cur = cur.parentElement;
+      if (parts.length > 16) return "";
+    }
+    var out = parts.join(" > ");
+    return /^[A-Za-z0-9_\-:#.>()+~ ]+$/.test(out) && out.length <= 600 ? out : "";
+  }
   function pickColors(target) {
     var out = [];
     var seen = {};
-    function add(prop, hex) {
-      if (hex && !seen[hex]) {
-        seen[hex] = 1;
-        out.push({ prop: prop, hex: hex });
+    function add(prop, hex, owner) {
+      var sel = hex && owner ? selectorOf(owner, false) : "";
+      if (sel && !seen[prop + hex + sel]) {
+        seen[prop + hex + sel] = 1;
+        var entry = { prop: prop, hex: hex, selector: sel };
+        // the same area in every alike item (list of API posts / rows): offered as a second scope
+        var sim = selectorOf(owner, true);
+        if (sim && sim !== sel) {
+          try {
+            var n = document.querySelectorAll(sim).length;
+            if (n >= 2) {
+              entry.similar = sim;
+              entry.count = n;
+            }
+          } catch (_) {
+            /* a selector the browser refuses: no second scope */
+          }
+        }
+        out.push(entry);
       }
     }
     try {
@@ -356,13 +415,15 @@
       // the nearest non-transparent background, from the element up
       var bgEl = el;
       var bg = null;
+      var bgOwner = null;
       while (bgEl && bgEl.nodeType === 1 && !bg) {
         bg = toHex(getComputedStyle(bgEl).backgroundColor);
+        if (bg) bgOwner = bgEl;
         bgEl = bgEl.parentElement;
       }
-      add("background", bg);
-      if (el.textContent && el.textContent.trim()) add("text", toHex(cs.color));
-      if (parseFloat(cs.borderTopWidth) > 0 && cs.borderTopStyle !== "none") add("border", toHex(cs.borderTopColor));
+      add("background", bg, bgOwner);
+      if (el.textContent && el.textContent.trim()) add("text", toHex(cs.color), el);
+      if (parseFloat(cs.borderTopWidth) > 0 && cs.borderTopStyle !== "none") add("border", toHex(cs.borderTopColor), el);
     } catch (_) {
       /* an unusual element: no colours */
     }
@@ -676,6 +737,8 @@
   });
 
   // read-only hook so the end-to-end tests measure against the SAME containing block the inspector uses
+  // read-only hook for the tests of the colour scopes
+  window.__veSelectorOf = selectorOf;
   window.__veContainerOf = function (el) {
     return containingBlock(el, getComputedStyle(el).position);
   };

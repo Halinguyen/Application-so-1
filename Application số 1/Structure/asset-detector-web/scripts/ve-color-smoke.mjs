@@ -1,14 +1,11 @@
-// Smoke test: change a colour directly in a page of the editor, see it applied, then reset the whole page.
-// Usage: TOOL=http://localhost:3100 CLONE=<path of the game's home-page-clone> node scripts/ve-color-smoke.mjs [gameId]
-// It changes a colour in the clone and the colour store; "Reset toàn trang" at the end puts everything back.
+// Smoke test: change a colour for ONE area in a page of the editor; other places using the same colour must NOT change.
+// Usage: TOOL=http://localhost:3100 node scripts/ve-color-smoke.mjs [gameId]
+// "Reset toàn trang" at the end forgets the change.
 import { chromium } from "playwright-core";
-import { readFileSync, existsSync } from "node:fs";
-import { join } from "node:path";
 
 const TOOL = process.env.TOOL ?? "http://localhost:3100";
 const GAME = process.argv[2] ?? "phuong-hoang-tru-tien";
-const CLONE = process.env.CLONE;
-const FROM = process.env.FROM ?? "#faea05";
+const FROM = process.env.FROM ?? "#ffffff"; // a colour that many places use (white text)
 const TO = "#00ff66";
 const CHROME = process.env.CHROME ?? "C:/Program Files/Google/Chrome/Application/chrome.exe";
 const results = [];
@@ -27,47 +24,43 @@ await page.getByRole("button", { name: "Xem trước", exact: true }).click();
 await page.getByTestId("ve-frame").first().waitFor({ timeout: 120000 });
 await page.waitForTimeout(8000);
 
-// find an element showing the colour, in any loaded page, and press it (a pointer event inside the frame)
 const frames = page.getByTestId("ve-frame");
-let found = null;
-for (let i = 0; i < (await frames.count()) && !found; i++) {
-  const fr = await (await frames.nth(i).elementHandle()).contentFrame();
-  const ok = await fr.evaluate(([rgb]) => {
-    const all = [...document.querySelectorAll("body *")];
-    const el = all.find((e) => { const r = e.getBoundingClientRect(); const s = getComputedStyle(e); return r.width > 4 && r.height > 4 && (s.color === rgb || s.backgroundColor === rgb) && e.textContent.trim(); }) ?? all.find((e) => getComputedStyle(e).backgroundColor === rgb);
-    if (!el) return false;
-    window.__colorEl = el;
-    const r = el.getBoundingClientRect();
-    const o = { bubbles: true, cancelable: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, pointerId: 1, button: 0, isPrimary: true };
-    el.dispatchEvent(new PointerEvent("pointerdown", o));
-    el.dispatchEvent(new PointerEvent("pointerup", o));
-    return true;
-  }, [rgbOf(FROM)]);
-  if (ok) found = fr;
-}
-check(`an element showing ${FROM} was found and pressed`, !!found);
+const fr = await (await frames.first().elementHandle()).contentFrame();
+// all elements with visible text in the colour; press the first
+const info = await fr.evaluate(([rgb]) => {
+  const all = [...document.querySelectorAll("body *")].filter((e) => {
+    const r = e.getBoundingClientRect();
+    return r.width > 4 && r.height > 4 && getComputedStyle(e).color === rgb && [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim());
+  });
+  if (all.length === 0) return null;
+  all.forEach((e, i) => e.setAttribute("data-smoke", String(i)));
+  const el = all[0];
+  const r = el.getBoundingClientRect();
+  const o = { bubbles: true, cancelable: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2, pointerId: 1, button: 0, isPrimary: true };
+  el.dispatchEvent(new PointerEvent("pointerdown", o));
+  el.dispatchEvent(new PointerEvent("pointerup", o));
+  return { total: all.length };
+}, [rgbOf(FROM)]);
+check(`texts showing ${FROM} were found (several, to prove the scope)`, !!info && info.total >= 2, JSON.stringify(info));
 await page.waitForTimeout(800);
-const row = page.locator(`[data-testid="ve-color-row"][data-hex="${FROM}"]`);
-check("the panel lists that colour for the pressed area", (await row.count()) >= 1);
+const row = page.locator('[data-testid="ve-color-row"]').filter({ hasText: "Chữ" }).filter({ has: page.locator(`xpath=.//*[contains(text(), "${FROM}")]`) });
+check("the panel lists the text colour of the pressed area", (await row.count()) >= 1);
 await row.first().getByTestId("ve-color-input").fill(TO);
 await row.first().getByTestId("ve-color-apply").click();
-await page.waitForTimeout(6000);
-const now = await found.evaluate(() => { const e = window.__colorEl; if (!e || !e.isConnected) return null; const s = getComputedStyle(e); return [s.color, s.backgroundColor]; }).catch(() => null);
-check("the page shows the new colour", !now || now.includes(rgbOf(TO)), JSON.stringify(now));
-if (CLONE) {
-  const scss = readFileSync(join(CLONE, "src/index.scss"), "utf-8").toLowerCase();
-  check("the clone's source has the new colour", scss.includes(TO) || readFileSync(join(CLONE, "src/layout/HeaderHome.tsx"), "utf-8").toLowerCase().includes(TO));
-}
-const store = await (await fetch(`${TOOL}/api/colors?gameId=${GAME}`)).json();
-check("the change is remembered for the next build", store.changes?.[FROM]?.to === TO, JSON.stringify(store.changes?.[FROM]?.to));
+await page.waitForTimeout(3000);
+
+const after = await fr.evaluate(([from, to]) => {
+  const els = [...document.querySelectorAll("[data-smoke]")];
+  return { changed: els.filter((e) => getComputedStyle(e).color === to).length, kept: els.filter((e) => getComputedStyle(e).color === from).length, total: els.length };
+}, [rgbOf(FROM), rgbOf(TO)]);
+check("the pressed area shows the new colour", after.changed >= 1, JSON.stringify(after));
+check("the other places that used the same colour are unchanged", after.kept === after.total - after.changed && after.kept >= 1, JSON.stringify(after));
+const rules = await (await fetch(`${TOOL}/api/colors?gameId=${GAME}`)).json();
+check("exactly one rule is remembered for the next build", rules.rules?.length === 1, JSON.stringify(rules.rules));
 
 await page.getByTestId("ve-reset-all").click();
-await page.waitForTimeout(3000);
-const after = await (await fetch(`${TOOL}/api/colors?gameId=${GAME}`)).json();
-check("Reset toàn trang forgets the colour change", Object.keys(after.changes ?? {}).length === 0);
-if (CLONE) {
-  const all = ["src/index.scss", "src/layout/HeaderHome.tsx", "src/components/home/Rank.tsx"].filter((f) => existsSync(join(CLONE, f))).map((f) => readFileSync(join(CLONE, f), "utf-8").toLowerCase()).join("\n");
-  check("and the clone has the old colour back", !all.includes(TO) && all.includes(FROM));
-}
+await page.waitForTimeout(2500);
+const gone = await (await fetch(`${TOOL}/api/colors?gameId=${GAME}`)).json();
+check("Reset toàn trang forgets the colour change", (gone.rules ?? []).length === 0);
 await browser.close();
 process.exit(results.every(Boolean) ? 0 : 1);

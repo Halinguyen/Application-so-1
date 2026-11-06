@@ -111,14 +111,31 @@
           }));
       return !!p && isEditId(p.editId) && isBreakpoint(p.breakpoint) && isOverride(p.override) && warningsOk;
     },
-    // The colours at the point the operator pressed (any element, tagged or not): [{ prop, hex }]
+    // The colours at the point the operator pressed (any element, tagged or not): [{ prop, hex, selector }]
+    // `selector` names exactly the element that carries the colour, so a change colours that area and nothing else.
     COLOR_PICKED: function (p) {
       return (
         !!p &&
         Array.isArray(p.colors) &&
         p.colors.length <= 3 &&
         p.colors.every(function (c) {
-          return !!c && (c.prop === "background" || c.prop === "text" || c.prop === "border") && /^#[0-9a-f]{6}$/.test(c.hex);
+          return (
+            !!c &&
+            (c.prop === "background" || c.prop === "text" || c.prop === "border") &&
+            /^#[0-9a-f]{6}$/.test(c.hex) &&
+            typeof c.selector === "string" &&
+            c.selector.length > 0 &&
+            c.selector.length <= 600 &&
+            /^[A-Za-z0-9_\-:#.>()+~ ]+$/.test(c.selector) &&
+            (c.similar === undefined ||
+              (typeof c.similar === "string" &&
+                c.similar.length > 0 &&
+                c.similar.length <= 600 &&
+                /^[A-Za-z0-9_\-:#.>()+~ ]+$/.test(c.similar) &&
+                typeof c.count === "number" &&
+                c.count >= 2 &&
+                c.count <= 5000))
+          );
         })
       );
     },

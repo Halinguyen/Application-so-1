@@ -12,8 +12,7 @@ import { applyTextColor, applyTextSlot } from "@/detector/site-text";
 import { ensureDependencies } from "@/detector/ensure-deps";
 import { applyVisualEditing } from "@/detector/visual-editing";
 import { pruneExcludedRoutes } from "@/detector/prune-routes";
-import { isHexColor } from "@/detector/color-scan";
-import { applyPersistedColors } from "@/detector/color-store";
+import { isHexColor } from "@/detector/color-store";
 import { readExternalManifest, replaceExternalAsset } from "@/detector/external-replace";
 import { requireTemplate } from "@/detector/template-source";
 
@@ -141,8 +140,6 @@ export async function POST(request: NextRequest) {
     await ensureDependencies(repoPath);
     await copyRepoSkeleton(repoPath, CLONE_DIR);
     await applyPersistedUploads(repoPath, CLONE_DIR);
-    // colours the operator changed in the preview editor earlier
-    await applyPersistedColors(repoPath, CLONE_DIR);
     // pages the clone does not carry (/choigameN): gone from the clone, the template is untouched
     const pruned = await pruneExcludedRoutes(CLONE_DIR);
 

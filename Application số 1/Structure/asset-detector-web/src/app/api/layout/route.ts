@@ -15,6 +15,7 @@ import {
   writeLayout,
 } from "@/detector/layout-store";
 import { rewriteCloneCss, templateHash } from "@/detector/visual-editing";
+import { colorRulesCss } from "@/detector/color-store";
 import { emptyLayout, isValidEditId, LAYOUT_BREAKPOINTS, type LayoutBreakpoint } from "@/detector/layout-schema";
 import { isOverridePatch, patchAllowedFor } from "@/detector/layout-patch";
 
@@ -29,7 +30,7 @@ function game(input: string | null) {
 async function snapshot(gameId: string, repoPath: string, cloneDir: string, extra: Record<string, unknown> = {}) {
   const [layout, manifest, history, slots, routes, externalSlots] = await Promise.all([readLayout(repoPath), readManifest(repoPath), listHistory(repoPath), readSlots(repoPath), readRoutes(repoPath), readExternalSlots(repoPath)]);
   const { css, conflicts } = buildCss(layout, manifest, gameId, templateHash(gameId));
-  const cssWritten = await rewriteCloneCss(cloneDir, css);
+  const cssWritten = await rewriteCloneCss(cloneDir, css + (await colorRulesCss(repoPath)));
   return { layout: layout ?? emptyLayout(gameId), manifest, conflicts, history, slots, externalSlots, routes, cssWritten, ...extra };
 }
 

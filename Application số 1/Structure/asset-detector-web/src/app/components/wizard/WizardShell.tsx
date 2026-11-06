@@ -318,7 +318,7 @@ export default function WizardShell({
         }
         const file = files[slot.id];
         const url = urlValues[slot.id];
-        const key = `file:${JSON.stringify({ targetPaths: slot.targetPaths, anchor: anchors[slot.id] || "attention" })}`;
+        const key = `file:${JSON.stringify({ targetPaths: slot.targetPaths, anchor: anchors[slot.id] || (slot.keepRatio ? "original" : "attention") })}`;
         if (file) form.append(key, file);
         else if (url) form.append(key, url);
       }
