@@ -84,7 +84,6 @@ export default function WizardShell({
   params,
   externalSlots,
   textSlots,
-  unusedAssets = [],
   figmaSuggestions = [],
   hideFigma = false,
 }: {
@@ -95,8 +94,6 @@ export default function WizardShell({
   params: CloneParam[];
   externalSlots: CloneExternalSlot[];
   textSlots: CloneTextSlot[];
-  /** Repo files no source code refers to — skipped, listed for transparency. */
-  unusedAssets?: string[];
   /** Nodes of the Figma design proposed for the game's slots; empty when none was captured. */
   figmaSuggestions?: FigmaSuggestionView[];
   /** Temporarily show nothing that comes from the Figma design (see FIGMA_HIDDEN_GAMES in config.ts). */
@@ -447,27 +444,6 @@ export default function WizardShell({
           )}
 
           <h2>Hình ảnh & video ({slots.length} mục)</h2>
-          <div className="hint">
-            Sắp xếp theo vị trí trên trang, từ trên xuống dưới (đầu trang → nội dung → chân trang). Gồm cả favicon và icon trang. Để trống ô nào thì giữ nguyên ảnh gốc của ô đó.
-          </div>
-          <ul className="hint" style={{ margin: "6px 0 12px 18px", lineHeight: 1.6 }}>
-            <li><strong>Khu vực</strong>: ảnh nằm ở phần nào của trang.</li>
-            <li><strong>Kích thước ảnh gốc</strong>: nên chọn ảnh có cùng tỉ lệ; tool tự cắt và nén cho vừa.</li>
-            <li><strong>Hiển thị / Mỗi thiết bị dùng ảnh riêng</strong>: cho biết ảnh bạn tải lên sẽ thay ở máy tính, máy tính bảng hay điện thoại.</li>
-            <li><strong>Tải ảnh mới lên</strong>: thay ảnh. <strong>Không dùng asset này</strong>: ẩn ảnh, không đưa vào bản sao (bấm ↺ ở mục &quot;Đã ẩn&quot; để hiện lại).</li>
-          </ul>
-          {unusedAssets.length > 0 && (
-            <details className="hint" style={{ margin: "0 0 14px" }}>
-              <summary>
-                Đã bỏ qua {unusedAssets.length} file ảnh có trong repo nhưng code không dùng
-              </summary>
-              <ul style={{ margin: "6px 0 0 18px", lineHeight: 1.6 }}>
-                {unusedAssets.map((p) => (
-                  <li key={p} className="mono">{p}</li>
-                ))}
-              </ul>
-            </details>
-          )}
           {!hideFigma && (
             <FigmaSuggestions
               gameId={gameId}

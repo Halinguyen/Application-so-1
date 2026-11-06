@@ -88,7 +88,7 @@ export default async function Home({
   const baseEnv = await readBaseEnv(repoPath);
   const textSlots = await readTextSlots(repoPath);
 
-  const { slots, unusedAssets } = buildCloneSlots(data);
+  const { slots } = buildCloneSlots(data);
   const figmaHidden = isFigmaHidden(gameId);
   const figmaSuggestions = figmaHidden ? [] : await suggestFigmaMatches(gameId, data, repoPath);
 
@@ -153,6 +153,6 @@ export default async function Home({
   const params: CloneParam[] = [...gameIdParams, ...heroVideoParams];
 
   return (
-    <WizardShell key={gameId} gameId={gameId} displayName={getGameDisplayName(gameId)} iconUrl={getGameIconUrl(gameId)} slots={slots} params={params} externalSlots={externalSlots} textSlots={textSlots} unusedAssets={unusedAssets} figmaSuggestions={figmaSuggestions} hideFigma={figmaHidden} />
+    <WizardShell key={gameId} gameId={gameId} displayName={getGameDisplayName(gameId)} iconUrl={getGameIconUrl(gameId)} slots={slots} params={params} externalSlots={externalSlots} textSlots={textSlots} figmaSuggestions={figmaSuggestions} hideFigma={figmaHidden} />
   );
 }

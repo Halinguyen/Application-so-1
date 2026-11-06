@@ -541,7 +541,8 @@ Từ README/memory/plan (chưa xác minh lại từng cái trừ khi ghi chú):
 | 2026-11-06 | `1080709` | Editor: dàn nhiều trang cạnh nhau (tải lười), panel bỏ hết chữ chỉ còn Reset toàn trang; detector tag thêm video và ảnh nền full-width trong luồng trang (chế độ `scale`; số phần tử sửa được: than-ma 106→118, phuong 40→57, tuyetdinh 39→56, daiminhtinh 70→75, giang-ho 95→99); `ve-pages-smoke.mjs` mới, `ve-e2e.mjs` đánh dấu legacy |
 | 2026-11-06 | `a907a31` | Bỏ "Thêm trang"/`×`, nút Reset toàn trang lên header; `prune-routes.ts` xóa trang /choigameN (và asset local riêng của chúng) khỏi clone; xóa cache clone/.next/template-materialized của các game |
 | 2026-11-06 | `6a29eb4` | Wizard: lưu tiến độ trong trình duyệt là tùy chọn, cần bấm "Lưu tiến độ" + xác nhận; không xác nhận thì không lưu và xóa bản lưu cũ; Figma review không còn localStorage |
-| 2026-11-06 | (commit kế tiếp) | Gộp slot: họ icon + ảnh trùng hash thành một slot, một upload ra mọi kích thước; `.ico` được tạo đúng định dạng |
+| 2026-11-06 | `daa6731` | Gộp slot: họ icon + ảnh trùng hash thành một slot, một upload ra mọi kích thước; `.ico` được tạo đúng định dạng |
+| 2026-11-06 | (commit kế tiếp) | Wizard bước 2: bỏ đoạn hướng dẫn trên danh sách ảnh và dòng "Đã bỏ qua N file ảnh không dùng" (prop `unusedAssets` của `WizardShell` bị gỡ) |
 
 ## 10. Cách cập nhật tài liệu này
 
