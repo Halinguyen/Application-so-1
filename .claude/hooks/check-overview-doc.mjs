@@ -24,7 +24,7 @@ process.stdout.write(JSON.stringify({
     permissionDecision: "deny",
     permissionDecisionReason:
       `Commit này đổi ${relevant.length} file của công cụ (vd: ${relevant.slice(0, 3).join(", ")}) nhưng chưa cập nhật ` +
-      `Application số 1/Structure/${DOC}. Hãy sửa mục liên quan trong tài liệu (module, bảng game, việc còn mở, ` +
+      `Structure/${DOC}. Hãy sửa mục liên quan trong tài liệu (module, bảng game, việc còn mở, ` +
       `thêm 1 dòng vào "Nhật ký cập nhật"), \`git add\` file đó rồi commit lại. ` +
       `Nếu thay đổi không ảnh hưởng tài liệu, thêm [skip-docs] vào message commit.`,
   },

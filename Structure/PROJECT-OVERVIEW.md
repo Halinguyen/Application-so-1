@@ -4,7 +4,7 @@ Tài liệu cho agent ở session sau: đọc file này thay vì đọc lại to
 Viết ngày 2026-11-06 trên commit `b4ace81` (nhánh `feat/real-api-clone-mode`). Mọi điều ghi ở đây đã đối chiếu code/dữ liệu tại thời điểm đó;
 chỗ chưa xác minh được đánh dấu **[chưa xác minh]**.
 
-Quy ước đường dẫn: `APP` = `D:\Application-so-1\Application số 1\Structure\asset-detector-web`, `STRUCT` = `D:\Application-so-1\Application số 1\Structure`.
+Quy ước đường dẫn: `APP` = `D:\Application-so-1\Structure\asset-detector-web`, `STRUCT` = `D:\Application-so-1\Structure` (từ 2026-11-06 thư mục bao ngoài `Application số 1` đã bỏ: `Structure` nằm ngay gốc repo).
 Repo git nằm ở `D:\Application-so-1` (không phải trong `asset-detector-web`; thư mục `asset-detector-web/.git.bak/` là bản lưu của repo lồng cũ, bị gitignore).
 
 ---
@@ -78,7 +78,7 @@ D:\Application-so-1\
   .claude\settings.json           git   khai báo hook PreToolUse(Bash)
   .claude\hooks\check-overview-doc.mjs  git  chặn `git commit` nếu đổi mã công cụ mà chưa sửa PROJECT-OVERVIEW.md ([skip-docs] để bỏ qua)
   .gitignore                      git   (xem dưới)
-  Application số 1\Structure\
+  Structure\
     PROJECT-OVERVIEW.md           git   (file này)
     06-PLAYBOOK-mvc-to-nextjs.md        playbook chuyển .NET MVC -> Next.js (bản sao ở APP/docs/mvc-to-nextjs-playbook.md)
     08-PLAN-cicd-clone-website.md, 08a-APPENDIX-config-truth.md, 08b-APPENDIX-two-api-params.md
@@ -513,7 +513,7 @@ Stack: Next **16.3.6**, React 19.2.8, `sharp`, `@babel/parser|traverse`, `fast-g
 |---|---|
 | Hai `next dev` một thư mục | Không chạy hai server dev cùng thư mục (tool và e2e dùng cổng 3000 vs 3100); `scripts/ve-e2e.mjs` mặc định 3100 |
 | Git Bash đổi env có dấu `/` | `ROUTE_PATH=/x` thành đường dẫn Windows; truyền `ROUTE_PATH=rank` (không `/` đầu) |
-| Shell | Bash tool = Git Bash (cú pháp POSIX, `/dev/null`); đường dẫn có tiếng Việt và khoảng trắng ("Application số 1") phải bọc nháy; Git in tên dạng escape (`"Application s\341\273\221 1/..."`) — dùng `-c core.quotepath=off` |
+| Shell | Bash tool = Git Bash (cú pháp POSIX, `/dev/null`); một số tên file (vd `Trang chủ.png`) có tiếng Việt và khoảng trắng nên phải bọc nháy; Git in tên dạng escape — dùng `-c core.quotepath=off` |
 | Preview spawn | `spawn("npm", ..., shell:true)` cần cho Windows; **không** cho clone kế thừa env của tool (biến Next/Turbopack/PORT làm `next dev` con thoát im lặng) -> dùng env sạch; Next không có `--strictPort` (chỉ Vite) |
 | Preview "không phục vụ" | Từng gặp trong môi trường sandbox: API báo ready nhưng cổng từ chối kết nối, `.preview.log` rỗng (lặp lại cả trên than-ma-ao-hoa); `npm run dev -- --port N` chạy tay thì ổn. Chưa tìm nguyên nhân; xem log trong clone |
 | Một preview duy nhất | `preview-process.ts` chỉ giữ một tiến trình; đổi game thì dừng cái cũ |
@@ -556,7 +556,8 @@ Từ README/memory/plan (chưa xác minh lại từng cái trừ khi ghi chú):
 | 2026-11-06 | `c455186` | Quyết định của operator: API chỉ sinh chữ, ảnh ở rank/tin tức là ảnh tĩnh. `buildCloneSlots` không còn loại khu vực rank/news (`includeApiSections: false` để bật lại bộ lọc cũ); editor cho thay ảnh bất cứ khi nào ảnh khớp một file trong repo (kể cả ảnh JSX lấy đường dẫn từ object dữ liệu); inspector liệt kê cả ảnh đang ẩn ở cỡ màn hình hiện tại khi không có ảnh nào hiện; `ve-replace-smoke.mjs` |
 | 2026-11-06 | `7c193b5` | Banner mobile bị cắt mất bố cục: ảnh lệch tỉ lệ nhiều thì giữ trọn ảnh trên nền mờ (`keepWholePicture`), thêm lựa chọn `fit`/`crop` |
 | 2026-11-06 | `36be209` | Bỏ bảng "Màu sắc" ở màn asset; ô chữ hiển thị được có "Màu chữ" nhập theo mã màu (`textcolor:`); bỏ khoá `color:` của wizard khỏi `/api/clone` |
-| 2026-11-06 | (commit kế tiếp) | Đổi màu theo VÙNG (selector) thay vì theo mã hex toàn source; có phạm vi "mọi mục cùng loại" cho chữ do API sinh; banner mobile giữ đúng tỉ lệ ảnh gốc (`original`, `flow-image.ts`) |
+| 2026-11-06 | `9671c2d` | Đổi màu theo VÙNG (selector) thay vì theo mã hex toàn source; có phạm vi "mọi mục cùng loại" cho chữ do API sinh; banner mobile giữ đúng tỉ lệ ảnh gốc (`original`, `flow-image.ts`) |
+| 2026-11-06 | (commit kế tiếp) | Bỏ thư mục bao ngoài `Application số 1`: `Structure/` nay ở gốc repo; sửa `.gitignore`, `CLAUDE.md`, hook và đường dẫn trong tài liệu này |
 
 ## 10. Cách cập nhật tài liệu này
 

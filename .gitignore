@@ -1,5 +1,5 @@
 # Template repos (originals) and generated clones — large, not part of the tool's source
-Application số 1/Structure/game-template-repo/
+Structure/game-template-repo/
 
 # Dependencies / build output / caches
 node_modules/
@@ -31,5 +31,5 @@ Thumbs.db
 
 # Frozen template snapshots: archives are binary (keep manifest.json + clone-schemas/ in git);
 # the extracted working copy is regenerated from the archive on demand
-Application số 1/Structure/template-store/**/template.tgz
-Application số 1/Structure/template-materialized/
+Structure/template-store/**/template.tgz
+Structure/template-materialized/
