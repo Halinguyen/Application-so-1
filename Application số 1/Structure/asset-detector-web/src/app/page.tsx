@@ -1,71 +1,16 @@
 import { runDetection } from "@/detector/run";
 import { readBaseEnv } from "@/detector/base-env";
 import { readTextSlots } from "@/detector/site-text";
-import { resolveGame, GAME_REPO_MAP, getGameDisplayName, getGameIconUrl } from "@/detector/config";
+import { resolveGame, GAME_REPO_MAP, getGameDisplayName, getGameIconUrl, isFigmaHidden } from "@/detector/config";
 import { detectFramework } from "@/detector/framework-detector";
-import { readImageSize } from "@/detector/image-size";
-import { describeSection, describeSectionPosition, sectionOrder, needsVisualProof, describeResponsive } from "@/detector/section-labels";
+import { readRegistryEntry, requireTemplate } from "@/detector/template-source";
+import { buildCloneSlots } from "@/detector/clone-slots";
+import { suggestFigmaMatches } from "@/detector/figma-source";
+import { describeSection, needsVisualProof, describeResponsive } from "@/detector/section-labels";
 import Link from "next/link";
 import GamePicker, { type GameOption } from "./components/wizard/GamePicker";
 import WizardShell from "./components/wizard/WizardShell";
-import type { CloneSlot, CloneSlotTarget, CloneParam, CloneExternalSlot } from "./components/wizard/types";
-import type { DetectedAsset } from "@/detector/types";
-
-// Many assets share a file name in different folders ("title.webp" x10), which made the
-// list look like repeats. Append the folder they live in to every label that is not unique.
-function withUniqueLabels(slots: CloneSlot[]): CloneSlot[] {
-  const count = new Map<string, number>();
-  for (const s of slots) count.set(s.label, (count.get(s.label) ?? 0) + 1);
-  return slots.map((s) => {
-    if ((count.get(s.label) ?? 0) < 2) return s;
-    const folder = s.previewPath
-      .replace(/\\/g, "/")
-      .replace(/^(public|wwwroot)\//, "")
-      .replace(/^assets\//, "")
-      .split("/")
-      .slice(0, -1)
-      .filter((p) => !/^\d+$/.test(p))
-      .join("/");
-    return folder ? { ...s, label: `${s.label} · ${folder}` } : s;
-  });
-}
-
-// Splits an asset into per-device PSD-mappable targets. Tablet shares the
-// desktop design (the operator supplies only a mobile and a desktop PSD).
-// Per-breakpoint variants carry no width/height, so each target's own file is
-// measured: without a size the PSD matcher has nothing to compare and skips it.
-type SizeOf = (relPath: string) => Promise<{ width: number; height: number } | null>;
-
-async function buildTargets(a: DetectedAsset, sizeOf: SizeOf): Promise<CloneSlotTarget[]> {
-  const v = a.variants;
-  if (a.responsive === "per-breakpoint" && v) {
-    const out: CloneSlotTarget[] = [];
-    const mobile = v.mobile;
-    const desk = [v.desktop, v.tablet].filter((x): x is NonNullable<typeof x> => !!x);
-    if (mobile) {
-      out.push({ device: "mobile", label: "Điện thoại", previewPath: mobile.path, targetPaths: [mobile.path], ...(await sizeOf(mobile.path)) });
-    }
-    if (desk.length) {
-      out.push({
-        device: "desktop",
-        label: v.tablet && v.desktop ? "Máy tính + tablet" : v.desktop ? "Máy tính" : "Máy tính bảng",
-        previewPath: desk[0].path,
-        targetPaths: desk.map((x) => x.path),
-        ...(await sizeOf(desk[0].path)),
-      });
-    }
-    if (out.length) return out;
-  }
-  return [
-    {
-      device: "shared",
-      label: "Mọi thiết bị",
-      previewPath: a.canonicalPath,
-      targetPaths: a.injection?.targetPaths || [a.canonicalPath],
-      ...(a.dimensions ?? (await sizeOf(a.canonicalPath))),
-    },
-  ];
-}
+import type { CloneParam, CloneExternalSlot } from "./components/wizard/types";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -79,17 +24,6 @@ function isCloneReady(framework: string): boolean {
   return framework === "vite-spa" || framework === "nextjs";
 }
 
-// Sections whose content is now filled by the real APIs (slides / banner, news
-// posts + categories, ranking) — not static assets to replace, so the wizard
-// does not list them.
-const API_FILLED_SECTIONS = new Set(["home-banner", "banner", "home-news", "news", "tintuc", "home-rank", "rank"]);
-
-// Buttons / icons / logos inside those sections are static artwork (nav, download, prev/next)
-// that the clone must be able to replace; only the content images are API-driven.
-function isApiFilled(a: DetectedAsset): boolean {
-  return API_FILLED_SECTIONS.has(a.section) && !/^(btn|icon|logo)/i.test(a.fileName);
-}
-
 export default async function Home({
   searchParams,
 }: {
@@ -100,8 +34,9 @@ export default async function Home({
   if (!game) {
     const games: GameOption[] = await Promise.all(
       Object.keys(GAME_REPO_MAP).map(async (gameId) => {
-        const { repoPath } = resolveGame(gameId);
-        const { framework } = await detectFramework(repoPath);
+        // the manifest knows the framework: the list must not need every template on disk (it would fetch them all)
+        const known = readRegistryEntry(gameId)?.framework;
+        const framework = known ?? (await detectFramework(resolveGame(gameId).repoPath)).framework;
         return {
           gameId,
           displayName: getGameDisplayName(gameId),
@@ -111,6 +46,23 @@ export default async function Home({
       })
     );
     return <GamePicker games={games} />;
+  }
+
+  const unavailable = await requireTemplate(game);
+  if (unavailable) {
+    return (
+      <div className="wrap" style={{ paddingTop: 28 }}>
+        <header style={{ marginBottom: 8 }}>
+          <h1>{getGameDisplayName(game)}</h1>
+          <div className="subtitle" style={{ color: "var(--warn)", fontSize: 13, marginTop: 4 }} data-testid="template-unavailable">
+            Chưa lấy được mã nguồn template của game này: {unavailable}
+          </div>
+        </header>
+        <Link href="/" style={{ color: "var(--accent)" }}>
+          ← chọn game khác
+        </Link>
+      </div>
+    );
   }
 
   const { gameId, repoPath } = resolveGame(game);
@@ -136,37 +88,9 @@ export default async function Home({
   const baseEnv = await readBaseEnv(repoPath);
   const textSlots = await readTextSlots(repoPath);
 
-  // Only assets the source code actually uses (favicons are always kept: they are wired
-  // through index.html/manifest). Files that merely sit in the assets folder are listed
-  // separately so the operator is not asked to replace images nothing displays.
-  const candidates = data.assets.filter(
-    (a) => (a.metadata?.operatorEditable || a.isAutoManaged) && !a.isExternal && !isApiFilled(a)
-  );
-  const unusedAssets = candidates.filter((a) => !a.isAutoManaged && a.referenceCount === 0).map((a) => a.canonicalPath);
-  const sizeOf: SizeOf = (relPath) => readImageSize(repoPath, relPath);
-  const slots: CloneSlot[] = withUniqueLabels(await Promise.all(candidates
-    .filter((a) => a.isAutoManaged || a.referenceCount > 0)
-    .map(async (a): Promise<CloneSlot> => ({
-      id: a.id,
-      label: a.metadata?.label || a.fileName,
-      section: a.section,
-      previewPath: a.canonicalPath,
-      targetPaths: a.injection?.targetPaths || [a.canonicalPath],
-      responsive: a.responsive,
-      sectionLabel: describeSection(a.section),
-      sectionOrder: sectionOrder(a.section),
-      sectionPosition: describeSectionPosition(a.section),
-      sizeLabel: a.dimensions ? `${a.dimensions.width} × ${a.dimensions.height} px` : "",
-      needsVisualProof: needsVisualProof(a.section, a.dimensions),
-      responsiveLabel: describeResponsive(a.responsive, a.variants, a.missingBreakpoints),
-      references: a.references.map((r) => ({
-        file: r.file,
-        line: r.line,
-        usage: r.usage,
-        attribute: r.attribute,
-      })),
-      targets: await buildTargets(a, sizeOf),
-    }))));
+  const { slots, unusedAssets } = buildCloneSlots(data);
+  const figmaHidden = isFigmaHidden(gameId);
+  const figmaSuggestions = figmaHidden ? [] : await suggestFigmaMatches(gameId, data, repoPath);
 
   const externalSlots: CloneExternalSlot[] = data.assets
     .filter((a) => a.isExternal)
@@ -229,6 +153,6 @@ export default async function Home({
   const params: CloneParam[] = [...gameIdParams, ...heroVideoParams];
 
   return (
-    <WizardShell key={gameId} gameId={gameId} displayName={getGameDisplayName(gameId)} iconUrl={getGameIconUrl(gameId)} slots={slots} params={params} externalSlots={externalSlots} textSlots={textSlots} unusedAssets={unusedAssets} />
+    <WizardShell key={gameId} gameId={gameId} displayName={getGameDisplayName(gameId)} iconUrl={getGameIconUrl(gameId)} slots={slots} params={params} externalSlots={externalSlots} textSlots={textSlots} unusedAssets={unusedAssets} figmaSuggestions={figmaSuggestions} hideFigma={figmaHidden} />
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Spinner from "../Spinner";
+import EditorPanel from "./EditorPanel";
 
 interface ReplacedFile {
   targetPath: string;
@@ -27,6 +28,7 @@ export interface CloneResult {
   textReplaced: string[];
   envWritten: number;
   warnings?: string[];
+  visualEditing?: { framework: string; editable: number; skipped: number; installed: boolean; note?: string } | null;
 }
 
 export interface PreviewResult {
@@ -49,6 +51,8 @@ export default function PreviewPane({
   previewResult,
   onGenerate,
   onStartPreview,
+  visualEdit,
+  onVisualEditChange,
 }: {
   gameId: string;
   replacedCount: number;
@@ -59,6 +63,8 @@ export default function PreviewPane({
   previewResult: PreviewResult | null;
   onGenerate: () => void;
   onStartPreview: () => void;
+  visualEdit: boolean;
+  onVisualEditChange: (on: boolean) => void;
 }) {
   const [loadedUrl, setLoadedUrl] = useState<string | null>(null);
   const frameLoaded = !!previewResult?.url && loadedUrl === previewResult.url;
@@ -73,6 +79,9 @@ export default function PreviewPane({
         <button className="rescan-btn btn-loading" style={{ marginLeft: 0 }} onClick={onGenerate} disabled={submitting}>
           {submitting ? <><Spinner />Đang tạo…</> : `Tạo bản sao (${replacedCount} mục đã thay)`}
         </button>
+        <label style={{ fontSize: 12.5 }}>
+          <input data-testid="visual-edit-toggle" type="checkbox" checked={visualEdit} onChange={(e) => onVisualEditChange(e.target.checked)} /> Bật chỉnh layout (thử nghiệm: Next.js và Vite)
+        </label>
         {result && (
           <button className="chip btn-loading" onClick={onStartPreview} disabled={previewing}>
             {previewing ? <><Spinner />Đang khởi động…</> : "Xem trước"}
@@ -148,6 +157,9 @@ export default function PreviewPane({
                   {previewResult.url}
                 </a>
               </div>
+              {visualEdit && result?.visualEditing?.installed ? (
+                <EditorPanel key={previewResult.url} gameId={gameId} url={previewResult.url} />
+              ) : (
               <div className="preview-frame-wrap">
               {!frameLoaded && (
                 <div className="preview-frame-loading">
@@ -169,6 +181,7 @@ export default function PreviewPane({
                 }}
               />
               </div>
+              )}
             </>
           ) : (
             <div className="ext-note" style={{ borderColor: "var(--warn)" }}>

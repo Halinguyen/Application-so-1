@@ -2,19 +2,18 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import type { CloneSlot, CloneParam, CloneExternalSlot, CloneTextSlot, CropAnchor } from "./types";
+import type { CloneSlot, CloneParam, CloneExternalSlot, CloneTextSlot, CropAnchor, FigmaSuggestionView } from "./types";
 import Spinner from "../Spinner";
 import AssetCompareTile from "./AssetCompareTile";
 import ConfigStep from "./ConfigStep";
+import FigmaSuggestions from "./FigmaSuggestions";
 import HoverHint from "./HoverHint";
-import PsdMappingStep, { type PsdApplyEntry } from "./PsdMappingStep";
 import PreviewPane, { type CloneResult, type PreviewResult } from "./PreviewPane";
 
 const STEPS = [
-  { n: 2, label: "Ghép từ PSD" },
-  { n: 3, label: "Nội dung & hình ảnh" },
-  { n: 4, label: "Cấu hình" },
-  { n: 5, label: "Xem trước & Hoàn tất" },
+  { n: 2, label: "Nội dung & hình ảnh" },
+  { n: 3, label: "Cấu hình" },
+  { n: 4, label: "Xem trước & Hoàn tất" },
 ] as const;
 
 // Only plain strings/records are persisted — File objects can't be
@@ -28,6 +27,7 @@ interface PersistedState {
   urlValues: Record<string, string>;
   externalUrlValues: Record<string, string>;
   excludedIds: Record<string, boolean>;
+  blankIds: Record<string, boolean>;
   projectName: string;
 }
 
@@ -48,7 +48,7 @@ interface RepoResult {
 }
 
 function storageKey(gameId: string) {
-  return `wizard-state:v2:${gameId}`;
+  return `wizard-state:v3:${gameId}`;
 }
 
 function loadPersisted(gameId: string): Partial<PersistedState> {
@@ -69,6 +69,8 @@ export default function WizardShell({
   externalSlots,
   textSlots,
   unusedAssets = [],
+  figmaSuggestions = [],
+  hideFigma = false,
 }: {
   gameId: string;
   displayName?: string;
@@ -79,6 +81,10 @@ export default function WizardShell({
   textSlots: CloneTextSlot[];
   /** Repo files no source code refers to — skipped, listed for transparency. */
   unusedAssets?: string[];
+  /** Nodes of the Figma design proposed for the game's slots; empty when none was captured. */
+  figmaSuggestions?: FigmaSuggestionView[];
+  /** Temporarily show nothing that comes from the Figma design (see FIGMA_HIDDEN_GAMES in config.ts). */
+  hideFigma?: boolean;
 }) {
   const persisted = useMemo(() => loadPersisted(gameId), [gameId]);
 
@@ -86,9 +92,6 @@ export default function WizardShell({
   const [files, setFiles] = useState<Record<string, File>>({});
   const [previews, setPreviews] = useState<Record<string, string>>({});
   const [urlValues, setUrlValues] = useState<Record<string, string>>(persisted.urlValues ?? {});
-  // Images mapped from the PSD design, per slot and device (a per-breakpoint slot
-  // gets a mobile and a desktop image that replace different target files).
-  const [deviceFiles, setDeviceFiles] = useState<Record<string, Record<string, PsdApplyEntry>>>({});
   const [anchors] = useState<Record<string, CropAnchor>>({});
   const [externalFiles, setExternalFiles] = useState<Record<string, File>>({});
   const [externalPreviews, setExternalPreviews] = useState<Record<string, string>>({});
@@ -107,6 +110,8 @@ export default function WizardShell({
   // deleted from `slots`/`externalSlots` so a restore chip can bring them
   // back without re-running detection.
   const [excludedIds, setExcludedIds] = useState<Record<string, boolean>>(persisted.excludedIds ?? {});
+  // Slots whose image is blanked (a transparent image of the same size is written over it).
+  const [blankIds, setBlankIds] = useState<Record<string, boolean>>(persisted.blankIds ?? {});
   const [projectName, setProjectName] = useState<string>(persisted.projectName ?? "");
   const projectNameValid = PROJECT_NAME_RE.test(projectName);
   const [publishing, setPublishing] = useState(false);
@@ -116,16 +121,17 @@ export default function WizardShell({
   const [result, setResult] = useState<CloneResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [previewing, setPreviewing] = useState(false);
+  const [visualEdit, setVisualEdit] = useState(false);
   const [previewResult, setPreviewResult] = useState<PreviewResult | null>(null);
 
   useEffect(() => {
-    const toSave: PersistedState = { currentStep, textValues, values, urlValues, externalUrlValues, excludedIds, projectName };
+    const toSave: PersistedState = { currentStep, textValues, values, urlValues, externalUrlValues, excludedIds, blankIds, projectName };
     try {
       localStorage.setItem(storageKey(gameId), JSON.stringify(toSave));
     } catch {
       // best-effort — private-browsing/storage-full shouldn't break the wizard
     }
-  }, [gameId, currentStep, textValues, values, urlValues, externalUrlValues, excludedIds, projectName]);
+  }, [gameId, currentStep, textValues, values, urlValues, externalUrlValues, excludedIds, blankIds, projectName]);
 
   function setExcluded(id: string, excluded: boolean) {
     setExcludedIds((prev) => {
@@ -174,35 +180,7 @@ export default function WizardShell({
     );
   }, [slots]);
 
-  function dropDeviceFiles(slotId: string) {
-    setDeviceFiles((prev) => {
-      if (!prev[slotId]) return prev;
-      const next = { ...prev };
-      delete next[slotId];
-      return next;
-    });
-  }
-
-  function applyPsd(entries: PsdApplyEntry[]) {
-    const grouped: Record<string, Record<string, PsdApplyEntry>> = {};
-    for (const e of entries) (grouped[e.slotId] ??= {})[e.device] = e;
-    setDeviceFiles(grouped);
-    // The PSD image supersedes any earlier manual pick for the same slot.
-    const ids = Object.keys(grouped);
-    setFiles((prev) => { const next = { ...prev }; for (const id of ids) delete next[id]; return next; });
-    setUrlValues((prev) => { const next = { ...prev }; for (const id of ids) delete next[id]; return next; });
-    setPreviews((prev) => {
-      const next = { ...prev };
-      for (const id of ids) {
-        const pick = grouped[id].desktop ?? grouped[id].shared ?? grouped[id].mobile;
-        next[id] = URL.createObjectURL(pick.file);
-      }
-      return next;
-    });
-  }
-
   function onFilePicked(slot: CloneSlot, file: File | null) {
-    dropDeviceFiles(slot.id);
     setFiles((prev) => {
       const next = { ...prev };
       if (file) next[slot.id] = file;
@@ -220,7 +198,6 @@ export default function WizardShell({
 
   function onUrlPasted(slot: CloneSlot, raw: string) {
     const url = raw.trim();
-    if (url) dropDeviceFiles(slot.id);
     setUrlValues((prev) => {
       const next = { ...prev };
       if (url) next[slot.id] = url;
@@ -231,6 +208,17 @@ export default function WizardShell({
       setFiles((prev) => { const next = { ...prev }; delete next[slot.id]; return next; });
       setPreviews((prev) => { const next = { ...prev }; delete next[slot.id]; return next; });
     }
+  }
+
+  function toggleBlank(slot: CloneSlot) {
+    const next = !blankIds[slot.id];
+    if (next) clearSlot(slot); // a blanked slot takes no upload
+    setBlankIds((prev) => {
+      const out = { ...prev };
+      if (next) out[slot.id] = true;
+      else delete out[slot.id];
+      return out;
+    });
   }
 
   function clearSlot(slot: CloneSlot) {
@@ -282,17 +270,18 @@ export default function WizardShell({
       const form = new FormData();
       form.append("gameId", gameId);
       form.append("projectName", projectName);
+      if (visualEdit) form.append("visualEdit", "1");
       for (const slot of slots) {
         if (excludedIds[slot.id]) continue;
+        if (blankIds[slot.id]) {
+          form.append(`blank:${JSON.stringify({ targetPaths: slot.targetPaths })}`, "1");
+          continue;
+        }
         const file = files[slot.id];
         const url = urlValues[slot.id];
         const key = `file:${JSON.stringify({ targetPaths: slot.targetPaths, anchor: anchors[slot.id] || "attention" })}`;
         if (file) form.append(key, file);
         else if (url) form.append(key, url);
-        // PSD-mapped images: one entry per device so each replaces only its own targets.
-        for (const entry of Object.values(deviceFiles[slot.id] ?? {})) {
-          form.append(`file:${JSON.stringify({ targetPaths: entry.targetPaths, anchor: anchors[slot.id] || "attention" })}`, entry.file);
-        }
       }
       for (const slot of externalSlots) {
         if (excludedIds[slot.id]) continue;
@@ -346,7 +335,6 @@ export default function WizardShell({
   }
 
   const replacedCount =
-    Object.keys(deviceFiles).length +
     Object.keys(files).length +
     Object.keys(urlValues).length +
     Object.keys(externalFiles).length +
@@ -383,17 +371,7 @@ export default function WizardShell({
         ))}
       </nav>
 
-      <div style={{ display: currentStep === 2 ? "block" : "none" }}>
-        <PsdMappingStep
-          gameId={gameId}
-          slots={slots}
-          excludedIds={excludedIds}
-          onApply={applyPsd}
-          onContinue={() => setCurrentStep(3)}
-        />
-      </div>
-
-      {currentStep === 3 && (
+      {currentStep === 2 && (
         <section className="block" style={{ marginTop: 24 }}>
           {textSlots.length > 0 && (
             <div style={{ marginBottom: 28 }}>
@@ -423,7 +401,7 @@ export default function WizardShell({
             <li><strong>Khu vực</strong>: ảnh nằm ở phần nào của trang.</li>
             <li><strong>Kích thước ảnh gốc</strong>: nên chọn ảnh có cùng tỉ lệ; tool tự cắt và nén cho vừa.</li>
             <li><strong>Hiển thị / Mỗi thiết bị dùng ảnh riêng</strong>: cho biết ảnh bạn tải lên sẽ thay ở máy tính, máy tính bảng hay điện thoại.</li>
-            <li><strong>Tải ảnh mới lên</strong>: thay ảnh. <strong>Không dùng asset này</strong>: ẩn ảnh, không đưa vào bản sao (bấm ↺ ở mục "Đã ẩn" để hiện lại).</li>
+            <li><strong>Tải ảnh mới lên</strong>: thay ảnh. <strong>Không dùng asset này</strong>: ẩn ảnh, không đưa vào bản sao (bấm ↺ ở mục &quot;Đã ẩn&quot; để hiện lại).</li>
           </ul>
           {unusedAssets.length > 0 && (
             <details className="hint" style={{ margin: "0 0 14px" }}>
@@ -436,6 +414,15 @@ export default function WizardShell({
                 ))}
               </ul>
             </details>
+          )}
+          {!hideFigma && (
+            <FigmaSuggestions
+              gameId={gameId}
+              suggestions={figmaSuggestions}
+              slots={slots}
+              onApprove={(slot, file) => onFilePicked(slot, file)}
+              onRevoke={(slot) => clearSlot(slot)}
+            />
           )}
           {bySection.map(([section, sectionSlots], sectionIndex) => {
             const visibleSlots = sectionSlots.filter((s) => !excludedIds[s.id]);
@@ -457,11 +444,13 @@ export default function WizardShell({
                       slot={slot}
                       originalUrl={`/api/asset-image?path=${encodeURIComponent(slot.previewPath)}&game=${gameId}`}
                       replacedPreviewUrl={previews[slot.id] || urlValues[slot.id] || null}
-                      hasReplacement={!!files[slot.id] || !!urlValues[slot.id] || !!deviceFiles[slot.id]}
+                      hasReplacement={!!files[slot.id] || !!urlValues[slot.id]}
                       onFilePicked={(f) => onFilePicked(slot, f)}
                       onUrlPasted={(u) => onUrlPasted(slot, u)}
                       onClear={() => clearSlot(slot)}
                       onExclude={() => setExcluded(slot.id, true)}
+                      blank={!!blankIds[slot.id]}
+                      onBlank={() => toggleBlank(slot)}
                     />
                   ))}
                 </div>
@@ -580,14 +569,14 @@ export default function WizardShell({
           )}
 
           <div style={{ marginTop: 24 }}>
-            <button className="rescan-btn" style={{ marginLeft: 0 }} onClick={() => setCurrentStep(4)}>
+            <button className="rescan-btn" style={{ marginLeft: 0 }} onClick={() => setCurrentStep(3)}>
               Tiếp tục →
             </button>
           </div>
         </section>
       )}
 
-      {currentStep === 4 && (
+      {currentStep === 3 && (
         <section className="block" style={{ marginTop: 24 }}>
           <h2>Thông tin bản sao</h2>
           <div className="hint">
@@ -616,7 +605,7 @@ export default function WizardShell({
             )}
           </div>
           <div style={{ marginTop: 24, display: "flex", gap: 10 }}>
-            <button className="chip" onClick={() => setCurrentStep(3)}>
+            <button className="chip" onClick={() => setCurrentStep(2)}>
               ← Quay lại
             </button>
             <button
@@ -624,7 +613,7 @@ export default function WizardShell({
               style={{ marginLeft: 0 }}
               disabled={!projectNameValid}
               title={projectNameValid ? undefined : "Nhập tên dự án đúng định dạng [mã game]-[tên game] để tiếp tục"}
-              onClick={() => setCurrentStep(5)}
+              onClick={() => setCurrentStep(4)}
             >
               Tiếp tục →
             </button>
@@ -632,7 +621,7 @@ export default function WizardShell({
         </section>
       )}
 
-      {currentStep === 5 && (
+      {currentStep === 4 && (
         <section className="block" style={{ marginTop: 24 }}>
           <h2>Xem trước & Hoàn tất</h2>
           <PreviewPane
@@ -645,6 +634,8 @@ export default function WizardShell({
             previewResult={previewResult}
             onGenerate={generateClone}
             onStartPreview={startPreview}
+            visualEdit={visualEdit}
+            onVisualEditChange={setVisualEdit}
           />
           <div className="card" style={{ marginTop: 24 }}>
             <h3>Tạo repo trên GitHub</h3>
@@ -705,7 +696,7 @@ export default function WizardShell({
             )}
           </div>
           <div style={{ marginTop: 24 }}>
-            <button className="chip" onClick={() => setCurrentStep(4)}>
+            <button className="chip" onClick={() => setCurrentStep(3)}>
               ← Quay lại
             </button>
           </div>

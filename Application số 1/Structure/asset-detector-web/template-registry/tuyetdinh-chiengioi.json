@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "gameId": "tuyetdinh-chiengioi",
+  "repoDir": "t032-home-page",
+  "framework": "vite-spa",
+  "source": {
+    "type": "git",
+    "url": "https://source.vtvlive.vn/vtvlive-game-website/t032/t032-home-page.git",
+    "commit": "277c5ce356730cf12537127df28d8ee19c2f3717",
+    "ref": "main"
+  },
+  "notes": [
+    "working copy had 2 tracked file(s) modified that are NOT in commit 277c5ce3",
+    "1 untracked file(s) not in the commit"
+  ],
+  "generatedAt": "2026-11-05T10:42:15.951Z"
+}

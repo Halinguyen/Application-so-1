@@ -1,0 +1,29 @@
+{
+  "status": "operator da xac nhan 10/11 cap trong wizard (2026-11-02); chua xac nhan: rank/bg-rank.png (null, khong co trong wizard)",
+  "note": "Key la section/fileName. expected=null nghia la mapping khong chac, matcher KHONG duoc tu dong ap dung. float-home/qr-code.png da bo: asset khong duoc code tham chieu (0 refs), nen khong tham gia ghep.",
+  "pairs": {
+    "home-news/banner.png": "25:22",
+    "rank/bg-rank.png": null,
+    "home-banner/logo-game.png": "74:292",
+    "home-banner/logo-18.png": "6:5",
+    "home-news/btn-nap.png": "27:165",
+    "home-news/btn-fanpage.png": "27:183",
+    "home-news/btn-giftcode.png": "27:174",
+    "home-news/btn-cskh.png": "27:184",
+    "home-news/android.png": "I67:494;67:208",
+    "home-news/ios.png": "I67:494;67:214",
+    "float-home/float-right.png": "I74:387;2040:501"
+  },
+  "confirmed": [
+    "home-news/android.png",
+    "home-news/btn-cskh.png",
+    "home-news/btn-fanpage.png",
+    "home-news/btn-giftcode.png",
+    "home-news/btn-nap.png",
+    "home-news/ios.png",
+    "home-banner/logo-18.png",
+    "float-home/float-right.png",
+    "home-banner/logo-game.png",
+    "home-news/banner.png"
+  ]
+}

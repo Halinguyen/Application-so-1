@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "gameId": "thoi-khong-chi-mong",
+  "repoDir": "t022-web-web",
+  "framework": "nextjs",
+  "source": null,
+  "notes": [
+    "converted source (no git repository): push it to git, then put its url and commit here",
+    "derived from https://source.vtvlive.vn/vtvlive-game-website/t022-thoi-khong-chi-mong/t022-web.git @ 564f5b27"
+  ],
+  "generatedAt": "2026-11-05T10:42:18.020Z"
+}

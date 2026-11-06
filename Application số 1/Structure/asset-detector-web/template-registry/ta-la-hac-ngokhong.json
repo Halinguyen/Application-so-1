@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "gameId": "ta-la-hac-ngokhong",
+  "repoDir": "t031-home-page-web",
+  "framework": "nextjs",
+  "source": null,
+  "notes": [
+    "converted source (no git repository): push it to git, then put its url and commit here",
+    "derived from https://source.vtvlive.vn/vtvlive-game-website/t031-hac-ngo-khong/t031-home-page.git @ fa561b7d"
+  ],
+  "generatedAt": "2026-11-05T10:42:17.770Z"
+}

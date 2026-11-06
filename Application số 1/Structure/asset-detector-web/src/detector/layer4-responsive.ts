@@ -111,8 +111,22 @@ export async function layer4GroupResponsive(
 
     const missing = detectMissingBreakpoints(group.variants);
 
+    // The group is ONE asset: it is used when ANY of its breakpoint files is (a phone-only background referenced from the
+    // component while the 1920 file sits unused still has to be offered, or the phone page keeps the old picture).
+    const seenRefs = new Set<string>();
+    const references = [primaryAsset, ...Object.values(group.variants).map((v) => byCanonicalPath.get(v!.path))]
+      .flatMap((x) => x?.references ?? [])
+      .filter((r) => {
+        const k = `${r.file}:${r.line}`;
+        if (seenRefs.has(k)) return false;
+        seenRefs.add(k);
+        return true;
+      });
+
     const mergedAsset: DetectedAsset = {
       ...primaryAsset,
+      references,
+      referenceCount: references.length,
       id: buildResponsiveId(group),
       canonicalPath: primaryAsset.canonicalPath,      // giữ path của primary
       publicPath: primaryAsset.publicPath,

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { existsSync } from "node:fs";
 import path from "node:path";
+import { TEMPLATE_ROOT } from "@/detector/paths";
 import { GAME_REPO_MAP } from "@/detector/config";
 import { listCloneSchemas, readCloneSchema, type CloneSchema } from "@/detector/clone-schema";
 import { freezeGame } from "@/detector/freeze";
@@ -9,7 +10,7 @@ import { hashTree } from "@/detector/template-store";
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-const GAME_TEMPLATE_ROOT = path.resolve(process.cwd(), "..", "game-template-repo");
+const GAME_TEMPLATE_ROOT = TEMPLATE_ROOT;
 
 function summarize(s: CloneSchema, drift: boolean) {
   const mapped = GAME_REPO_MAP[s.gameId];

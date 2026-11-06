@@ -3,6 +3,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import fg from "fast-glob";
+import { MATERIALIZED_DIR, STORE_DIR } from "./paths";
 
 // Frozen ("đóng băng") copies of the template repos. A snapshot is an
 // immutable, content-addressed archive of one template's source (no
@@ -15,9 +16,7 @@ import fg from "fast-glob";
 //   <Structure>/template-store/<gameId>/v<N>/manifest.json  (committed)
 //   <Structure>/template-materialized/<gameId>/<repoDir>/   (extracted, cache)
 
-const STRUCTURE_ROOT = path.resolve(process.cwd(), "..");
-export const STORE_DIR = path.join(STRUCTURE_ROOT, "template-store");
-export const MATERIALIZED_DIR = path.join(STRUCTURE_ROOT, "template-materialized");
+export { STORE_DIR, MATERIALIZED_DIR };
 
 const ARCHIVE_NAME = "template.tgz";
 const MANIFEST_NAME = "manifest.json";

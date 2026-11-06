@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "gameId": "quy-mon-quan",
+  "repoDir": "homepage-va-conhan-web",
+  "framework": "nextjs",
+  "source": null,
+  "notes": [
+    "converted source (no git repository): push it to git, then put its url and commit here",
+    "derived from https://source.vtvlive.vn/vtvlive-game-website/r015-quy-mon-quan/homepage-va-conhan.git @ 842c0b04"
+  ],
+  "generatedAt": "2026-11-05T10:42:17.296Z"
+}

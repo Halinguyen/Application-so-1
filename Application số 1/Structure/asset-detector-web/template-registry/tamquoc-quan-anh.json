@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "gameId": "tamquoc-quan-anh",
+  "repoDir": "t203-homepage",
+  "framework": "vite-spa",
+  "source": {
+    "type": "git",
+    "url": "https://source.vtvlive.vn/vtvlive-game-website/t023/t203-homepage.git",
+    "commit": "a862f72131f9213f7f58e39b7a38a960354a6174",
+    "ref": "main"
+  },
+  "notes": [
+    "working copy had 2 tracked file(s) modified that are NOT in commit a862f721"
+  ],
+  "generatedAt": "2026-11-05T10:42:16.500Z"
+}

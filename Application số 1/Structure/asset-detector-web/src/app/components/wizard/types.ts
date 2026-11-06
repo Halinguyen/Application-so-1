@@ -20,24 +20,6 @@ export interface AssetReferenceHint {
   attribute?: string;
 }
 
-export type PsdDevice = "mobile" | "desktop";
-
-/**
- * One replaceable image of a slot for a given device. A per-breakpoint slot has
- * a target per device (each with its own real size); a shared slot has a single
- * "shared" target. PSD mapping works per target because the mobile and desktop
- * designs are separate PSD files.
- */
-export interface CloneSlotTarget {
-  device: PsdDevice | "shared";
-  label: string;
-  /** Repo path of the current image, used for the "original" thumbnail. */
-  previewPath: string;
-  targetPaths: string[];
-  width?: number;
-  height?: number;
-}
-
 export interface CloneSlot {
   id: string;
   label: string;
@@ -52,7 +34,21 @@ export interface CloneSlot {
   needsVisualProof: boolean;
   responsiveLabel: string;
   references: AssetReferenceHint[];
-  targets: CloneSlotTarget[];
+}
+
+export interface FigmaSuggestionView {
+  slotId: string;
+  nodeId: string;
+  nodeName: string;
+  fileKey: string;
+  score: number;
+  margin: number;
+  status: "auto" | "review" | "none";
+  reasons: string[];
+  alternatives: { nodeId: string; nodeName: string; score: number }[];
+  exportKind: "render" | "render-solid";
+  /** One of the slots the matcher was measured on against a hand-checked mapping. */
+  poc: boolean;
 }
 
 export interface CloneParam {

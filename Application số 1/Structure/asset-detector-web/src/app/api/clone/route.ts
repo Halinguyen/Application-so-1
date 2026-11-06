@@ -5,11 +5,14 @@ import path from "node:path";
 import { resolveGame, REAL_HUB_URL, REAL_RANKING_HOST } from "@/detector/config";
 import { readBaseEnv } from "@/detector/base-env";
 import { stopPreview, stopProcessesUsingDir } from "@/detector/preview-process";
-import { toDirectUrl } from "@/detector/fetch-psd-url";
+import { getUploadsDir, isRasterOrSvg, persistUpload, readUploadBuffer } from "@/detector/upload-store";
 import sharp from "sharp";
+import { writeBlankImage } from "@/detector/blank-image";
 import { resizeUploadToMatchTarget, resizeUploadToMatchRemote, type CropAnchor } from "@/detector/resize-upload";
 import { applyTextSlot } from "@/detector/site-text";
 import { ensureDependencies } from "@/detector/ensure-deps";
+import { applyVisualEditing } from "@/detector/visual-editing";
+import { requireTemplate } from "@/detector/template-source";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -30,16 +33,6 @@ export function getCloneDir(repoPath: string): string {
 // every single test run. Mirrors CLONE_DIR's own relative layout (a local
 // asset's targetPath, or "public/<localPath>" for an external one) so
 // applyPersistedUploads can just overlay it wholesale.
-function getUploadsDir(repoPath: string): string {
-  return path.join(path.dirname(repoPath), "home-page-uploads");
-}
-
-async function persistUpload(repoPath: string, relativePath: string, buf: Buffer) {
-  const dest = path.join(getUploadsDir(repoPath), relativePath);
-  await fs.mkdir(path.dirname(dest), { recursive: true });
-  await fs.writeFile(dest, buf);
-}
-
 // External assets need more than the saved file re-applied: the source
 // file(s) that hardcode the CDN URL also need the literal-string rewrite
 // redone on every fresh copyRepoSkeleton (it only lives in the wiped
@@ -142,32 +135,6 @@ async function copyRepoSkeleton(src: string, dest: string) {
   }
 }
 
-// A slot's replacement image can arrive either as an uploaded File or, when
-// the operator pastes a URL instead of picking a file, as a plain string —
-// fetched server-side (not from the browser) so it isn't subject to the
-// CDN's CORS policy.
-async function readUploadBuffer(value: FormDataEntryValue): Promise<Buffer> {
-  if (value instanceof File) {
-    return Buffer.from(await value.arrayBuffer());
-  }
-  const url = typeof value === "string" ? value.trim() : "";
-  if (!url) throw new Error("no file or URL provided");
-  if (!/^https?:\/\//i.test(url)) throw new Error(`unsupported URL: ${url}`);
-  // Drive/Dropbox share links are web pages - turn them into direct downloads.
-  const res = await fetch(toDirectUrl(url));
-  if (!res.ok) throw new Error(`could not fetch ${url} (${res.status})`);
-  // A page instead of media (login wall, unshared file) would otherwise be saved as the image.
-  if ((res.headers.get("content-type") ?? "").includes("text/html")) {
-    throw new Error(`link trả về trang web chứ không phải file ảnh (cần chia sẻ công khai hoặc dùng link tải trực tiếp): ${url}`);
-  }
-  return Buffer.from(await res.arrayBuffer());
-}
-
-async function isRasterOrSvg(buf: Buffer): Promise<boolean> {
-  if (await sharp(buf).metadata().then(() => true, () => false)) return true;
-  return /^\s*(<\?xml|<svg)/i.test(buf.subarray(0, 256).toString("utf8"));
-}
-
 /** Replaces the host of `url`, keeping its scheme and path; falls back to https://domain. */
 function withHost(url: string | undefined, domain: string): string {
   try {
@@ -182,7 +149,9 @@ export async function POST(request: NextRequest) {
   try {
     const form = await request.formData();
     const gameIdField = form.get("gameId");
-    const { repoPath } = resolveGame(typeof gameIdField === "string" ? gameIdField : undefined);
+    const unavailable = await requireTemplate(typeof gameIdField === "string" ? gameIdField : undefined);
+    if (unavailable) return NextResponse.json({ error: unavailable }, { status: 424 });
+    const { gameId, repoPath } = resolveGame(typeof gameIdField === "string" ? gameIdField : undefined);
     const CLONE_DIR = getCloneDir(repoPath);
 
     await ensureDependencies(repoPath);
@@ -246,6 +215,19 @@ export async function POST(request: NextRequest) {
             finalBytes: finalBuf.byteLength,
             resized: finalBuf !== uploadBuf,
           });
+        }
+      } else if (key.startsWith("blank:") && typeof value === "string") {
+        // "blank:<{targetPaths}>": the operator wants this image gone. A transparent image of the file's own size takes its place,
+        // so nothing around it moves; formats that cannot be transparent are left alone, with a warning.
+        const { targetPaths }: { targetPaths: string[] } = JSON.parse(key.slice("blank:".length));
+        for (const targetPath of targetPaths) {
+          const written = await writeBlankImage(repoPath, CLONE_DIR, targetPath);
+          if (typeof written === "string") {
+            warnings.push(written);
+            continue;
+          }
+          // Not persisted like an upload: the wizard sends the blank again on every build, so un-blanking really brings the image back.
+          filesReplaced.push({ targetPath, originalBytes: 0, finalBytes: written.buf.byteLength, resized: false });
         }
       } else if (key.startsWith("external:") && (value instanceof File || typeof value === "string")) {
         // External (CDN-hosted) assets have no local file to overwrite — save
@@ -337,7 +319,23 @@ export async function POST(request: NextRequest) {
       await fs.writeFile(path.join(CLONE_DIR, name), envLines.join("\n") + "\n");
     }
 
+    // Visual editing: only when a layout was saved or the operator opened the editor
+    // (otherwise nothing is added and the clone is exactly as before).
+    let visualEditing: Awaited<ReturnType<typeof applyVisualEditing>> = null;
+    try {
+      const origin = form.get("visualEdit") === "1" ? request.nextUrl.origin : null;
+      visualEditing = await applyVisualEditing(CLONE_DIR, repoPath, gameId, origin);
+      if (visualEditing?.note) warnings.push(`Chỉnh layout: ${visualEditing.note}`);
+      if (visualEditing?.conflicts.templateChanged) warnings.push("Chỉnh layout: template đã đổi so với lúc lưu layout — chưa áp dụng layout cũ.");
+      if (visualEditing && visualEditing.conflicts.missing.length) {
+        warnings.push(`Chỉnh layout: ${visualEditing.conflicts.missing.length} phần tử đã lưu không còn trong template (${visualEditing.conflicts.missing.join(", ")}) — bỏ qua.`);
+      }
+    } catch (e) {
+      warnings.push(`Chỉnh layout: không áp dụng được (${e instanceof Error ? e.message : String(e)})`);
+    }
+
     return NextResponse.json({
+      visualEditing,
       cloneDir: CLONE_DIR,
       filesReplaced,
       externalReplaced,

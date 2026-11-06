@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "gameId": "phuong-hoang-tru-tien",
+  "repoDir": "home-page",
+  "framework": "vite-spa",
+  "source": {
+    "type": "git",
+    "url": "https://source.vtvlive.vn/vtvlive-game-website/t029/home-page.git",
+    "commit": "9f8702794aaebd3deb33d0dc297221ac2f2a3981",
+    "ref": "main"
+  },
+  "notes": [
+    "working copy had 3 tracked file(s) modified that are NOT in commit 9f870279"
+  ],
+  "generatedAt": "2026-11-05T10:42:15.681Z"
+}

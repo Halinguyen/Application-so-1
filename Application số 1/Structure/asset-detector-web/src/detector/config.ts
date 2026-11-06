@@ -1,5 +1,6 @@
 import path from "node:path";
 import { existsSync } from "node:fs";
+import { TEMPLATE_ROOT } from "./paths";
 import { readCloneSchema } from "./clone-schema";
 import { materializeTemplate } from "./template-store";
 
@@ -77,17 +78,18 @@ export function getGameIconUrl(gameId: string): string | null {
     : null;
 }
 
-// Fake news-slide placeholder size per game. The default (560x450) fits the
-// Phượng Hoàng family; a game whose slide slot differs overrides it here.
-// tamquoc-quan-anh: New-page.tsx draws the slide inside frame.png (926x477)
-// with md:px-14.5 / md:py-8.5 padding -> 810x409 usable area.
-export const FAKE_SLIDE_SIZE: Record<string, { width: number; height: number }> = {
-  "tamquoc-quan-anh": { width: 810, height: 409 },
-};
-
 export const DEFAULT_GAME_ID = "phuong-hoang-tru-tien";
 
-const GAME_TEMPLATE_ROOT = path.resolve(process.cwd(), "..", "game-template-repo");
+// TEMPORARY (2026-11-05): games whose wizard does not show anything coming from the Figma design (the "Gợi ý ảnh từ
+// Figma" / import block of step 2). The server also skips computing the proposals for them. To bring it back for a
+// game, remove its id here: nothing else needs to change (snapshots and the /api/figma routes are untouched).
+const FIGMA_HIDDEN_GAMES = new Set<string>(["phuong-hoang-tru-tien"]);
+
+export function isFigmaHidden(gameId: string): boolean {
+  return FIGMA_HIDDEN_GAMES.has(gameId);
+}
+
+const GAME_TEMPLATE_ROOT = TEMPLATE_ROOT;
 
 export interface ResolvedGame {
   gameId: string;

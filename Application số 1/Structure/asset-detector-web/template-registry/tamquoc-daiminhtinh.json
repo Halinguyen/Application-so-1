@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "gameId": "tamquoc-daiminhtinh",
+  "repoDir": "t037-home-landing",
+  "framework": "vite-spa",
+  "source": {
+    "type": "git",
+    "url": "https://source.vtvlive.vn/vtvlive-game-website/t037-tam-quoc-dai-minh-tinh/t037-home-landing.git",
+    "commit": "f714e2398284e00f5cd36a77fe479ffecef2b7a1",
+    "ref": "main"
+  },
+  "notes": [
+    "working copy had 1 tracked file(s) modified that are NOT in commit f714e239"
+  ],
+  "generatedAt": "2026-11-05T10:42:16.227Z"
+}

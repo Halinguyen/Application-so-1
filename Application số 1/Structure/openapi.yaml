@@ -1,0 +1,2688 @@
+openapi: 3.0.3
+info:
+  title: H5 Game SDK – Interactive Service
+  version: 1.4.5
+  description: |
+    Contract HTTP của `sdk-game-interactive-service` — server NestJS phục vụ
+    VTV Live / Vplay H5 Game SDK.
+
+    Tài liệu mô tả **hành vi hiện tại** của code (đã được khoá bằng golden e2e
+    trong `test/golden/`). Chỗ nào hành vi còn lạ (ví dụ `/clear-cache` không
+    xác thực, Session API trả redirect 302 thay vì JSON khi không có phiên)
+    được ghi rõ bằng ⚠ thay vì sửa trên giấy.
+
+    ## Base path
+
+    Service chạy sau reverse proxy dưới tiền tố `/h5-sdk` (`APP_BASE_PATH`).
+    Proxy cắt tiền tố trước khi vào app, nên mọi path trong tài liệu này là
+    **tương đối với server URL đã gồm `/h5-sdk`**.
+
+    ## Các nhóm endpoint
+
+    | Tag | Ai gọi | Định dạng |
+    |---|---|---|
+    | Auth, Play | Trình duyệt (portal SDK mở popup/iframe) | Redirect 302 / HTML |
+    | Session API | JS trong trang `/{gameId}/play` | JSON — envelope `ApiResponseInterceptor` |
+    | Pages | Trình duyệt | HTML |
+    | Ops | Game/portal SDK, vận hành | JSON / text |
+    | Internal – Channels | Chỉ hub-cms-api (server-to-server) | JSON — envelope `ApiResponseInterceptor` |
+    | Partner – Public | Cổng đối tác, từ trình duyệt hoặc server | JSON — envelope đối tác |
+    | Partner – S2S | Cổng đối tác, **chỉ server** | JSON — envelope đối tác |
+    | Dev | Dev/QA — **không nạp khi `APP_ENV=production`** | HTML; mock WiGame: JSON — envelope WiGame |
+
+    Hướng dẫn tích hợp chi tiết cho đối tác (cách ký S2S, phân trang, ví dụ):
+    `sdk-game-lib/docs/channel_api.md`.
+
+    ## Ba kiểu envelope JSON
+
+    1. **`ApiResponseInterceptor`** (Session API, `/af-sdk-keys`, `/internal/*`):
+       thành công là `{ success: true, messages: "Thực hiện thành công.", data }`.
+       Lỗi **không** được bọc — Nest trả body mặc định `{ statusCode, message, error? }`
+       (xem schema `NestError`), riêng `/internal/*` trả `{ code, description }`
+       cho lỗi nghiệp vụ.
+    2. **Envelope đối tác** (`/partner/**`): `{ success: true, data }` hoặc
+       `{ success: false, error_code, error_description }`. Mọi lỗi — kể cả 400
+       của ValidationPipe và 429 của rate limit — đều theo envelope này.
+       Rẽ nhánh theo `error_code`, không theo `error_description`.
+    3. **Không envelope**: `/clear-cache`, `/gtm/receive-event`.
+    4. **Envelope WiGame** (chỉ mock dev `/sample/sessions*`): `{ success: true, data }`
+       hoặc `{ success: false, error: { code, message } }` — chép theo tài liệu
+       của Viettel WiGame, không phải envelope đối tác ở mục 2.
+
+    ## Redirect tới trang lỗi
+
+    Các endpoint trang (Auth, Play) và các middleware của chúng không trả lỗi
+    dạng JSON. Chúng trả **302** tới:
+
+    ```
+    {appUrl}/error?detail=<base64(JSON)>&referrer=<referrer|opener>[&replay=1]
+    ```
+
+    `detail` là Base64 (đã URL-encode) của `{ code, description, data }` —
+    xem schema `ErrorPageDetail`. `referrer` lấy từ query `referrer`, không có
+    thì `opener`, không có nữa thì là chuỗi `undefined`. `replay=1` chỉ có khi
+    lỗi đến từ bước kiểm tra `authHash` (trang lỗi hiện nút chơi lại).
+
+    ## Rate limit
+
+    `ThrottlerBehindProxyGuard` áp dụng toàn cục: `THROTTLE_LIMIT` request mỗi
+    `THROTTLE_TTL` ms (cấu hình hiện tại 180 request / 60 s), đếm theo
+    `md5(IP + User-Agent)`. Response mang header `X-RateLimit-Limit`,
+    `X-RateLimit-Remaining`, `X-RateLimit-Reset`; khi vượt ngưỡng trả `429`
+    kèm `Retry-After` (giây). Miễn trừ: `/internal/channels/**` và
+    `/gtm/receive-event`.
+
+    Body của 429 tuỳ nhóm: Partner → envelope đối tác `RATE_LIMITED`; Auth và
+    Play → redirect trang lỗi `ERR_HTTP_BAD_REQUEST` (vì `PageErrorFilter` bắt
+    cả lỗi của guard); còn lại → `NestError`.
+
+    ## Validation
+
+    `ValidationPipe` toàn cục, **không** bật `whitelist` và `transform`:
+    field thừa bị bỏ qua (không báo lỗi), và query luôn đến handler dưới dạng
+    chuỗi. Lỗi validation trên endpoint JSON trả `400` theo `NestError`
+    (`message` là mảng chuỗi); trên endpoint trang thì thành redirect lỗi
+    `ERR_HTTP_BAD_REQUEST`.
+
+    ## Cookie
+
+    Chỉ `/{gameId}/auth` và `/{gameId}/callback` dùng cookie. Hai trang này
+    chạy top-level (popup hoặc redirect) nên cookie là first-party.
+    `/{gameId}/play`, `/{gameId}/refresh-token`, `/{gameId}/logout` không set
+    cookie và không dùng session express: trang play nằm trong iframe khác
+    site, mà Safari và mọi trình duyệt trên iOS chặn cookie bên thứ ba.
+
+    | Cookie | Path | Ghi chú |
+    |---|---|---|
+    | `h5_sdk.sid` | `/` | Session express (Redis, prefix `h5-sdk:session:`), chỉ mount ở `/{gameId}/auth` và `/{gameId}/callback`. `Secure`, `SameSite=None`, `HttpOnly` |
+
+    Tên cookie có tiền tố môi trường (`local.`, `testing.`, `staging.`, …;
+    production để trống). Tên ghi trong tài liệu là tên production.
+
+    Ngoài ra, nếu trình duyệt gửi cookie `_device_id` thì server dùng nó làm
+    `deviceId` khi gọi OIDC. Service này không set cookie đó.
+
+    ## Phiên chơi
+
+    Phiên giữa `/{gameId}/play` và Session API nằm ở server, không nằm trong
+    cookie:
+
+    1. `/{gameId}/play` đăng nhập xong thì mở phiên trong Redis session, key
+       `h5-sdk:play-session:<sha256(handle)>`. TTL là
+       `PLAY_SESSION_TTL_SECONDS` (mặc định 86400 giây), gia hạn mỗi lần
+       refresh.
+    2. Trang in thẻ `<script id="H5Session" type="application/json">` chứa
+       handle và access/id token (schema `PlaySessionBootstrap`).
+    3. JS trang play gửi handle qua header `X-H5-Session` tới
+       `/{gameId}/refresh-token` và `/{gameId}/logout`.
+
+    Refresh token chỉ nằm trong Redis; không bao giờ ra HTML, cookie hay
+    response JSON.
+
+    Handle là bearer secret (32 byte ngẫu nhiên, base64url, 43 ký tự): ai có
+    handle thì refresh hoặc logout được phiên đó. Handle chỉ dùng được cho
+    đúng game đã mở phiên. Tải lại iframe không giữ phiên: `/play` đăng nhập
+    lại bằng credential trên URL.
+  contact:
+    name: VTVLive
+
+servers:
+  - url: https://game.vplay.vn/h5-sdk
+    description: Production
+  - url: https://dev-game.vplay.vn/h5-sdk
+    description: Develop
+
+# Mặc định không xác thực; endpoint cần xác thực tự khai báo `security`.
+security: []
+
+tags:
+  - name: Auth
+    description: |
+      Luồng đăng nhập OIDC VTV Live (`authorization_code`). Portal SDK mở
+      `/{gameId}/auth` trong popup hoặc chuyển hướng cả trang; provider OIDC
+      gọi lại `/{gameId}/callback`; kết quả là một `authHash` sống 60 giây,
+      chỉ mở được `/{gameId}/play` một lần và chỉ cho đúng game đó.
+
+      Middleware: `AppInfoMiddleware` → `ChannelMiddleware` → `ChannelCspMiddleware`.
+  - name: Play
+    description: |
+      Trang host iframe game. Middleware: chuỗi của Auth →
+      `AuthTokenMiddleware` → `AuthHashMiddleware`.
+  - name: Session API
+    description: |
+      JSON gọi từ JS của trang play (cùng origin). Phiên chơi đi qua header
+      `X-H5-Session`, với handle lấy từ thẻ `#H5Session` mà `/{gameId}/play` in
+      ra; không dùng cookie (xem mục *Phiên chơi*). Chạy qua cùng chuỗi
+      middleware với Play, nên khi header thiếu hoặc không trỏ tới phiên nào
+      thì **vẫn trả redirect 302 tới trang lỗi**, không phải JSON.
+  - name: Pages
+    description: Trang HTML phụ trợ (render bằng Pug).
+  - name: Ops
+    description: Endpoint vận hành và tiện ích cho SDK.
+  - name: Internal – Channels
+    description: |
+      Cửa ghi **duy nhất** vào cấu hình kênh phân phối (`dbo.DistributionChannels`),
+      chỉ hub-cms-api gọi. Bảo vệ bằng header `X-Internal-Key`, **fail closed**:
+      server chưa cấu hình `INTERNAL_API_KEY` thì từ chối mọi request. Mọi thao
+      tác ghi tự xoá cache Redis của kênh đó. Không bị rate limit.
+
+      Lỗi nghiệp vụ trả `{ code, description }` (schema `InternalError`); lỗi
+      xác thực và validation trả `NestError`.
+  - name: Partner – Public
+    description: |
+      Bề mặt đọc cho cổng đối tác, xác thực bằng `channelCode` + header `Origin`
+      so với `channel.allowedOrigins`. **Có cache 60 giây**, chỉ trả bản ghi đang
+      hoạt động.
+
+      - Không có header `Origin` được coi là gọi từ server và được chấp nhận
+        (miễn kênh đã cấu hình `allowedOrigins`).
+      - Kênh không tồn tại, bị tắt, hoặc chưa cấu hình `allowedOrigins` đều
+        trả `403 ORIGIN_NOT_ALLOWED` (không phải 404).
+      - Guard tự set `Access-Control-Allow-Origin` = origin người gọi (kể cả khi
+        trả 403) để trình duyệt đọc được body lỗi.
+      - Gọi từ trình duyệt phải là CORS "simple request": thêm header tuỳ chỉnh
+        sẽ sinh preflight `OPTIONS`, mà preflight do CORS toàn cục
+        (`ALLOW_ORIGINS`) xử lý, không biết gì về kênh.
+      - Đây không phải cơ chế bảo mật dữ liệu; cần bảo mật thì dùng S2S.
+  - name: Partner – S2S
+    description: |
+      Bề mặt đọc server-to-server, ký HMAC-SHA256. **Không cache**, trả cả bản
+      ghi đã tắt (kèm `status`, `updatedAt`) để đối tác đồng bộ.
+
+      **Chuỗi ký** — 5 dòng nối bằng `\n`:
+
+      ```
+      METHOD            # chữ in hoa
+      PATH_AND_QUERY    # nguyên văn như gửi, GỒM tiền tố /h5-sdk, không sort/encode lại
+      TIMESTAMP         # = X-Timestamp
+      NONCE             # = X-Nonce
+      RAW_BODY          # rỗng với GET
+      ```
+
+      `X-Signature = Base64URL(HMAC-SHA256(secretKey, canonical))`.
+
+      Thứ tự kiểm tra: đủ 4 header (`400 INVALID_REQUEST`) → kênh
+      (`INVALID_CHANNEL`) → timestamp (`INVALID_TIMESTAMP` / `REQUEST_EXPIRED`,
+      cửa sổ ±300 giây) → chữ ký (`INVALID_SIGNATURE`, thử lần lượt tối đa 2
+      key còn hiệu lực) → nonce (`NONCE_REUSED`, nhớ 10 phút).
+
+      Nonce chỉ bị tiêu **sau** khi chữ ký hợp lệ, và bị tiêu **trước** khi
+      handler chạy — request lỗi 500 vẫn làm mất nonce, nên mỗi lần thử lại phải
+      dùng nonce mới.
+  - name: Dev
+    description: |
+      Trang mẫu cho dev/QA. `DevModule` chỉ được nạp khi `APP_ENV !== production`;
+      ở production các path này trả 404.
+
+      `/sample/sessions*` là **mock API xác minh phiên của Viettel WiGame**
+      (`docs/raw/provider/viettel_wigame_token_verify_api.md`), dùng khi đối tác
+      chưa cấp API thật. Base URL của mock là `{server URL}/sample` (server URL
+      đã gồm `/h5-sdk`), nên PATH trong chuỗi ký là `/sessions/verify` — giống
+      endpoint thật của WiGame, **không** gồm `/h5-sdk` lẫn `/sample`, khác
+      Partner – S2S.
+
+      **Chuỗi ký** — 5 dòng nối bằng `\n`:
+
+      ```
+      METHOD            # chữ in hoa
+      PATH              # sau base URL: /sessions/verify, kèm query string
+      TIMESTAMP         # = X-Timestamp
+      NONCE             # = X-Nonce
+      SHA256_HEX(BODY)  # hash các byte body gửi đi; không body thì hash chuỗi rỗng
+      ```
+
+      `X-Signature = hex chữ thường(HMAC-SHA256(secret, chuỗi ký))`. Key/secret
+      lấy từ env `WIGAME_MOCK_PARTNER_KEY` / `WIGAME_MOCK_PARTNER_SECRET`, mặc
+      định `wgk_dev_sample` / `wgsec_dev_sample`. Khi chữ ký sai, server log
+      (warn) chuỗi ký nó tính để so.
+
+      Thứ tự kiểm tra: đủ 4 header (`MISSING_AUTH`) → key (`INVALID_KEY`) →
+      timestamp (`INVALID_TIMESTAMP` / `TIMESTAMP_EXPIRED`, ±300 giây) → định
+      dạng nonce (`INVALID_NONCE`) → chữ ký (`INVALID_SIGNATURE`) → nonce dùng
+      lại (`NONCE_REUSED`, nhớ 10 phút) → body (`400 INVALID_PARAM`) → phiên
+      (`INVALID_SESSION`). Tất cả đều 401 trừ `INVALID_PARAM`.
+
+      Phiên giả nằm trên Redis cache: `/clear-cache` không key xoá hết.
+
+paths:
+  # ---------------------------------------------------------------- Auth
+  /{gameId}/auth:
+    get:
+      tags: [Auth]
+      operationId: startAuthorization
+      summary: Bắt đầu đăng nhập OIDC VTV Live
+      description: |
+        Kiểm tra `opener` theo danh sách được phép (`channel.allowedOrigins` nếu
+        kênh đã cấu hình, ngược lại `ALLOW_OPENER`; chứa `*` thì bỏ qua), lưu
+        `{ opener, mode, source }` vào session rồi redirect tới
+        `VTVLIVE_OIDC_BASE_URL/oauth2/auth`. `state` được lưu Redis theo
+        session id.
+
+        Header `Content-Security-Policy: frame-ancestors` được ghi đè theo
+        `allowedOrigins` của kênh khi có `channelCode`.
+
+        **Mã lỗi (trong `detail` của redirect lỗi)**
+
+        | `code` | Khi nào |
+        |---|---|
+        | `MISSING_PARAM` | Thiếu `opener` hoặc `mode` |
+        | `INVALID_OPENER` | Origin của `opener` không nằm trong danh sách được phép |
+        | `GAME_NOT_SUPPORT_PLAY_ON_WEB` | Cả package lẫn app đều không có `gamePlayUrl` |
+        | `CLIENT_NOT_FOUND` | Game chưa cấu hình `clientId` |
+        | `APP_PACKAGE_NOT_FOUND` / `APP_MAINTAIN` | `appPackage` không tồn tại / đang bảo trì |
+        | `ERR_CHANNEL_NOT_FOUND` | `channelCode` không tồn tại, bị tắt hoặc dài quá 20 ký tự |
+        | `ERR_CHANNEL_EXPIRED` | Kênh đã quá `ExpirationDate` (hết hạn hợp đồng) |
+        | `ERR_CHANNEL_APP_PACKAGE_NOT_ALLOWED` | `appPackage` không được phân phối trên kênh |
+        | `ERR_SERVER` | Lỗi hạ tầng khi đọc cấu hình kênh |
+        | `ERR_HTTP_BAD_REQUEST` | Query không qua validation |
+      parameters:
+        - $ref: '#/components/parameters/GameId'
+        - name: opener
+          in: query
+          description: |
+            Trang portal mở luồng đăng nhập. `mode=popup`: origin của cửa sổ cha
+            (nhận `postMessage`). `mode=redirect`: URL đầy đủ để quay về, sẽ
+            được gắn thêm `authHash` và `source`. Về mặt DTO là optional, nhưng
+            thiếu thì trả `MISSING_PARAM`.
+          schema:
+            type: string
+            format: uri
+          example: https://portal.example.vn/games/101
+        - name: mode
+          in: query
+          description: Thiếu thì trả `MISSING_PARAM`.
+          schema:
+            type: string
+            enum: [popup, redirect]
+        - name: appPackage
+          in: query
+          schema:
+            type: string
+            maxLength: 125
+          example: com.vtvlive.game101.web
+        - $ref: '#/components/parameters/ChannelCodeQuery'
+        - name: source
+          in: query
+          description: Chuỗi tuỳ ý của portal, được trả lại nguyên văn ở callback.
+          schema:
+            type: string
+            maxLength: 1024
+        - name: switchAccount
+          in: query
+          description: '`yes` → gửi `prompt=consent select_account` để người chơi chọn lại tài khoản.'
+          schema:
+            type: string
+            enum: ['yes', 'no']
+      responses:
+        '302':
+          description: |
+            Thành công: `Location` là URL authorize của OIDC, với
+            `protocol=oauth2`, `response_type=code`, `client_id`,
+            `redirect_uri={appUrl}/{gameId}/callback`, `scope`, `state`,
+            `prompt=consent` (hoặc `consent select_account`),
+            `response_mode=query`.
+
+            Thất bại: `Location` là trang lỗi — xem mục *Redirect tới trang lỗi*.
+          headers:
+            Location:
+              $ref: '#/components/headers/Location'
+            Set-Cookie:
+              $ref: '#/components/headers/SessionSetCookie'
+            Content-Security-Policy:
+              $ref: '#/components/headers/ContentSecurityPolicy'
+        '404':
+          $ref: '#/components/responses/GameNotFound'
+
+  /{gameId}/callback:
+    get:
+      tags: [Auth]
+      operationId: handleAuthCallback
+      summary: Callback của OIDC provider
+      description: |
+        Provider OIDC redirect về đây (không phải endpoint để portal gọi).
+        Kiểm `state` (so với Redis theo session id) và `iss` (so với
+        `VTVLIVE_OIDC_ISSUER`), rồi sinh `authHash` ngẫu nhiên (32 byte,
+        base64url, 43 ký tự) và lưu `{ code, exp, gameId }` vào Redis với TTL
+        60 giây. `state` bị xoá — gọi lại callback lần hai trả `INVALID_STATE`.
+
+        - `mode=popup` → 200, render `views/callback.pug`, trang này
+          `postMessage` `authHash` + `source` về `opener` rồi đóng popup.
+        - `mode=redirect` → 302 về `opener?authHash=…&source=…`.
+
+        Mọi lỗi ở đây có `autoClose=true` (popup tự đóng).
+
+        | `code` | Khi nào |
+        |---|---|
+        | *(giá trị `error` của provider)* | Provider trả `error` — `description` là `error_description` |
+        | `INVALID_CALLBACK` | Thiếu `code`, `state` hoặc `iss` |
+        | `INVALID_ISSUER` | `iss` không nằm trong allowlist |
+        | `INVALID_STATE` | `state` không khớp hoặc đã dùng |
+        | `MISSING_PARAM` | Session không còn `opener`/`mode`/`source` từ bước `/auth` |
+      parameters:
+        - $ref: '#/components/parameters/GameId'
+        - name: code
+          in: query
+          schema: { type: string, minLength: 1, maxLength: 512 }
+        - name: state
+          in: query
+          schema: { type: string, minLength: 1, maxLength: 512 }
+        - name: iss
+          in: query
+          schema: { type: string, minLength: 1, maxLength: 512 }
+        - name: error
+          in: query
+          schema: { type: string, minLength: 1, maxLength: 512 }
+          example: access_denied
+        - name: error_description
+          in: query
+          schema: { type: string, minLength: 1, maxLength: 512 }
+      security:
+        - SessionCookie: []
+      responses:
+        '200':
+          description: '`mode=popup` — trang HTML chuyển `authHash` về cửa sổ cha.'
+          content:
+            text/html:
+              schema: { type: string }
+        '302':
+          description: |
+            `mode=redirect` — `Location` là `opener` gắn thêm
+            `authHash=<43 ký tự base64url>&source=<source>`. Hoặc redirect tới
+            trang lỗi.
+          headers:
+            Location:
+              $ref: '#/components/headers/Location'
+        '404':
+          $ref: '#/components/responses/GameNotFound'
+
+  # ---------------------------------------------------------------- Play
+  /{gameId}/play:
+    get:
+      tags: [Play]
+      operationId: playGame
+      summary: Trang chơi game (host iframe)
+      description: |
+        Trang portal nhúng trong iframe. Khi tải trang, trình duyệt không gửi
+        header `X-H5-Session`, nên mỗi lần tải (kể cả tải lại iframe) là một
+        lần **đăng nhập mới** bằng credential trên query (`authToken` hoặc
+        `authHash`).
+
+        Đăng nhập xong, server mở phiên chơi trong Redis và in thẻ
+        `<script id="H5Session" type="application/json">` vào trang (schema
+        `PlaySessionBootstrap`, xem mục *Phiên chơi*). Server không set cookie
+        và không in token ra thẻ `<meta>` cho luồng nào, kể cả `telco`.
+
+        Khi OIDC không trả refresh token, hoặc Redis lỗi lúc mở phiên,
+        `sessionHandle` là `null`. Người chơi vẫn vào game bằng token trong
+        trang; chỉ refresh và logout không chạy.
+
+        `authHash` từ `/callback` chỉ mở được `/play` **một lần**, và chỉ cho
+        đúng game đã đăng nhập. Lần thứ hai (ví dụ tải lại iframe) không gửi
+        lại code lên OIDC mà trả `INVALID_AUTH_DATA` kèm `replay=1`: trang lỗi
+        hiện nút chơi lại để portal đăng nhập lại qua `/auth`.
+
+        **Chọn luồng đăng nhập**
+
+        | Credential | Kênh đã cấu hình | Không kênh / kênh chưa cấu hình |
+        |---|---|---|
+        | `authToken` | Grant duy nhất ngoài `authorization_code` của kênh; `provider` gửi Identity lấy từ kênh | `token_exchange` (không gửi provider) |
+        | `provider` + `authHash` (SDK cũ) | Như trên — `provider` bị bỏ qua | `vtvlive`→`token_exchange`, `mobifone`→`telco`, `hiplay`→`social`, `my-mobifone`→`telco` (provider `mobifone`; chỉ cho bundle cũ — SDK mới gửi `channelCode=my-mobifone`), khác → `ERR_AUTH_FAILED` |
+        | chỉ `authHash` (từ `/callback`) | `authorization_code` nếu kênh cho phép | `authorization_code` |
+
+        Có `authToken` thì `authHash` và `provider` bị bỏ qua. Giá trị rỗng
+        tính như không gửi.
+
+        **Mã lỗi (redirect lỗi)**
+
+        | `code` | Khi nào | `replay=1` |
+        |---|---|---|
+        | `MISSING_AUTH_HASH` | Không có `authToken` lẫn `authHash` | ✓ |
+        | `INVALID_AUTH_DATA` | `authHash` không có trong Redis, đã được dùng, hoặc thuộc game khác | ✓ |
+        | `AUTH_EXPIRED` | `authHash` quá `exp` (lúc cấp + 70 giây). Thực tế gần như không gặp: Redis xoá key sau 60 giây, trước mốc này | ✓ |
+        | `GAME_NOT_SUPPORT_PLAY_ON_WEB` | Không có `gamePlayUrl` | |
+        | `CLIENT_NOT_FOUND`, `APP_PACKAGE_NOT_FOUND`, `APP_MAINTAIN` | Cấu hình game/package | |
+        | `ERR_CHANNEL_NOT_FOUND`, `ERR_CHANNEL_APP_PACKAGE_NOT_ALLOWED` | Kênh không hợp lệ / không phân phối package | |
+        | `ERR_CHANNEL_EXPIRED` | Kênh đã quá `ExpirationDate` (hết hạn hợp đồng) | |
+        | `ERR_CHANNEL_AUTH_GRANT_NOT_ALLOWED` | Kênh không cho phép luồng đăng nhập được yêu cầu | |
+        | `ERR_INVALID_CONFIG` | Cột `AllowedAuthGrants` của kênh không hợp lệ | |
+        | `ERR_AUTH_FAILED` | SDK cũ gửi `provider` lạ (không kênh), hoặc OIDC không trả token | |
+        | `ERR_ACCOUNT_NOT_REGISTER` | Tài khoản chưa đăng ký dịch vụ — `data` kèm thông tin game | |
+        | `ERR_HTTP_BAD_REQUEST`, `ERR_SERVER`, `ERR_UNKNOWN` | Validation / MSSQL / lỗi khác | |
+      parameters:
+        - $ref: '#/components/parameters/GameId'
+        - name: appPackage
+          in: query
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 125 }
+          example: com.vtvlive.game101.web
+        - name: referrer
+          in: query
+          required: true
+          description: |
+            URL **tuyệt đối** của trang portal đang nhúng iframe. Dùng làm
+            `parentOrigin` cho `postMessage`. URL tương đối sẽ gây lỗi khi dựng
+            view (redirect `ERR_UNKNOWN`). Lúc đó phiên chơi đã được mở và vẫn
+            nằm trong Redis tới khi hết TTL.
+          schema: { type: string, format: uri, minLength: 1, maxLength: 1024 }
+          example: https://portal.example.vn/games/101
+        - name: authToken
+          in: query
+          description: Token của cổng cho mọi luồng portal (`token_exchange`/`telco`/`social`).
+          schema: { type: string, minLength: 1, maxLength: 8192 }
+        - name: authHash
+          in: query
+          description: |
+            Hash từ `/callback` (`authorization_code`), dùng một lần và chỉ cho
+            đúng game đã đăng nhập. SDK cũ còn dùng nó để chở token cổng khi
+            kèm `provider`.
+          schema: { type: string, minLength: 1, maxLength: 8192 }
+        - $ref: '#/components/parameters/ChannelCodeQuery'
+        - name: provider
+          in: query
+          deprecated: true
+          description: |
+            Chỉ để nhận diện SDK cũ (gửi kèm `authHash`). Kênh đã cấu hình thì
+            bị bỏ qua; không còn so khớp với cấu hình kênh.
+          schema: { type: string, minLength: 1, maxLength: 50 }
+        - name: source
+          in: query
+          schema: { type: string, minLength: 1, maxLength: 1024 }
+        - name: channelAppName
+          in: query
+          description: Tên app của portal (luồng `telco`). Mặc định tên game.
+          schema: { type: string, maxLength: 125 }
+        - name: channelAppType
+          in: query
+          description: Mặc định `web`.
+          schema: { type: string, enum: [web, app] }
+        - name: channelGameName
+          in: query
+          description: Tên game phía portal (luồng `telco`). Mặc định tên game.
+          schema: { type: string, maxLength: 125 }
+        - name: providerAppName
+          in: query
+          deprecated: true
+          description: Tên cũ của `channelAppName`; gửi cả hai thì tên mới thắng.
+          schema: { type: string, maxLength: 125 }
+        - name: providerAppType
+          in: query
+          deprecated: true
+          description: Tên cũ của `channelAppType`.
+          schema: { type: string, enum: [web, app] }
+        - name: providerGameName
+          in: query
+          deprecated: true
+          description: Tên cũ của `channelGameName`.
+          schema: { type: string, maxLength: 125 }
+      responses:
+        '200':
+          description: |
+            Trang `views/play.pug`, có thẻ `#H5Session` (schema
+            `PlaySessionBootstrap`). Không có `Set-Cookie`, không có thẻ meta
+            token.
+          headers:
+            Cache-Control:
+              description: '`no-store` — HTML chứa access token và id token.'
+              schema: { type: string, enum: [no-store] }
+            Content-Security-Policy:
+              $ref: '#/components/headers/ContentSecurityPolicy'
+          content:
+            text/html:
+              schema: { type: string }
+        '302':
+          $ref: '#/components/responses/ErrorPageRedirect'
+        '404':
+          $ref: '#/components/responses/GameNotFound'
+
+  # ---------------------------------------------------------------- Session API
+  /{gameId}/refresh-token:
+    post:
+      tags: [Session API]
+      operationId: refreshToken
+      summary: Làm mới token bằng refresh token của phiên chơi
+      description: |
+        Dùng refresh token của phiên chơi mà header `X-H5-Session` trỏ tới.
+        Field `refreshToken` trong body **không** được dùng.
+
+        Khi thành công, server xoay refresh token mới vào phiên, gia hạn TTL
+        và chỉ trả `id_token`, `access_token`, `expires_in`. Refresh token không
+        bao giờ ra trình duyệt. Không set cookie.
+
+        Refresh thất bại theo nghiệp vụ vẫn trả **201** với `success: true` —
+        lỗi nằm trong `data.error`:
+
+        | `data.error` | Khi nào |
+        |---|---|
+        | `MISSING_REFRESH_TOKEN` | Không có phiên dùng được, nhưng query mang token cổng (`authToken`, hoặc `provider` + `authHash` của SDK cũ). Ví dụ: header trỏ tới phiên của một credential khác — refresh token của phiên đó không được dùng |
+        | `SESSION_EXPIRED` | OIDC không cấp token mới; phiên giữ refresh token cũ |
+
+        ⚠ Không có phiên dùng được và query cũng không mang credential nào →
+        middleware trả **302** tới trang lỗi (`MISSING_AUTH_HASH`, `replay=1`),
+        không phải JSON. "Không có phiên dùng được" là khi header thiếu, handle
+        không tồn tại hoặc đã logout, hoặc handle thuộc game khác.
+
+        OIDC trả lỗi hoặc không trả lời → `500` theo `NestError`.
+      parameters:
+        - $ref: '#/components/parameters/GameId'
+      security:
+        - PlaySession: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '201':
+          description: Kết quả refresh (thành công hoặc lỗi nghiệp vụ trong `data`).
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        oneOf:
+                          - $ref: '#/components/schemas/TokenResponse'
+                          - $ref: '#/components/schemas/RefreshTokenFailure'
+              examples:
+                ok:
+                  summary: Refresh thành công
+                  value:
+                    success: true
+                    messages: Thực hiện thành công.
+                    data:
+                      id_token: eyJhbGciOi...
+                      access_token: eyJhbGciOi...
+                      expires_in: 1800
+                expired:
+                  summary: Refresh token hết hạn
+                  value:
+                    success: true
+                    messages: Thực hiện thành công.
+                    data:
+                      error: SESSION_EXPIRED
+                      error_description: Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại
+        '302':
+          $ref: '#/components/responses/ErrorPageRedirect'
+        '404':
+          $ref: '#/components/responses/GameNotFound'
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+        '500':
+          $ref: '#/components/responses/NestInternalError'
+
+  /{gameId}/logout:
+    post:
+      tags: [Session API]
+      operationId: logout
+      summary: Đăng xuất
+      description: |
+        Revoke với OIDC refresh token của phiên chơi mà header `X-H5-Session`
+        trỏ tới, rồi xoá phiên. Sau đó handle không dùng được nữa: gọi
+        `/{gameId}/refresh-token` với handle đó sẽ nhận 302 `MISSING_AUTH_HASH`.
+        Không set hay xoá cookie nào.
+
+        Lần vào `/play` kế tiếp đăng nhập lại bằng credential trên URL, như mọi
+        lần tải trang.
+
+        ⚠ Header thiếu hoặc không trỏ tới phiên nào, và query không mang
+        credential → **302** tới trang lỗi (`MISSING_AUTH_HASH`, `replay=1`).
+      parameters:
+        - $ref: '#/components/parameters/GameId'
+      security:
+        - PlaySession: []
+      responses:
+        '201':
+          description: Luôn `data.success = true`, kể cả khi không revoke được.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/LogoutResult'
+              example:
+                success: true
+                messages: Thực hiện thành công.
+                data: { success: true }
+        '302':
+          $ref: '#/components/responses/ErrorPageRedirect'
+        '404':
+          $ref: '#/components/responses/GameNotFound'
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+
+  # ---------------------------------------------------------------- Pages
+  /error:
+    get:
+      tags: [Pages]
+      operationId: errorPage
+      summary: Trang lỗi
+      description: |
+        Đích của mọi redirect lỗi. `detail` hỏng (không phải Base64/JSON) vẫn
+        render trang với `code = UNKNOWN_ERROR`.
+      parameters:
+        - name: detail
+          in: query
+          required: true
+          description: Base64 của JSON `ErrorPageDetail`.
+          schema: { type: string, maxLength: 1000 }
+        - name: replay
+          in: query
+          description: '`1` → hiện nút chơi lại.'
+          schema: { type: string, enum: ['1', '0'] }
+        - name: autoClose
+          in: query
+          schema: { type: string, enum: ['1', '0'] }
+        - name: referrer
+          in: query
+          description: URL trang portal; origin của nó được dùng để `postMessage`.
+          schema: { type: string, minLength: 1, maxLength: 1024 }
+      responses:
+        '200':
+          description: HTML trang lỗi.
+          content:
+            text/html:
+              schema: { type: string }
+        '400':
+          $ref: '#/components/responses/NestBadRequest'
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+
+  /check-permission:
+    get:
+      tags: [Pages]
+      operationId: checkPermission
+      summary: Trang kiểm tra quyền truy cập storage/cookie trong iframe
+      parameters:
+        - name: referrer
+          in: query
+          description: Origin của portal, trả về view dưới tên `parentOrigin`.
+          schema: { type: string }
+      responses:
+        '200':
+          description: HTML.
+          content:
+            text/html:
+              schema: { type: string }
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+
+  /sms/qr-code/{qrCode}:
+    get:
+      tags: [Pages]
+      operationId: smsQrCode
+      summary: Trang QR code soạn SMS
+      parameters:
+        - name: qrCode
+          in: path
+          required: true
+          description: |
+            Base64 của chuỗi JSON (có thể đã URL-encode) `{ "phone": "...", "message": "..." }`.
+            Sai cú pháp vẫn trả 200, trang hiện "Lỗi cú pháp".
+          schema: { type: string }
+          example: eyJwaG9uZSI6IjkwMjkiLCJtZXNzYWdlIjoiREsgRzEwMSJ9
+      responses:
+        '200':
+          description: HTML.
+          content:
+            text/html:
+              schema: { type: string }
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+
+  # ---------------------------------------------------------------- Ops
+  /af-sdk-keys:
+    post:
+      tags: [Ops]
+      operationId: getAppsflyerSdkKeys
+      summary: Lấy key AppsFlyer SDK của một app package
+      description: |
+        Đọc thẳng `extendedData` của package, **không** kiểm tra bảo trì.
+        Không cần xác thực. Tham số nằm trên query dù method là `POST`.
+      parameters:
+        - name: appPackage
+          in: query
+          required: true
+          schema: { type: string }
+          example: com.vtvlive.game101.web
+      responses:
+        '201':
+          description: Key AppsFlyer. Field vắng mặt nếu package chưa cấu hình.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/AppsflyerSdkKeys'
+              example:
+                success: true
+                messages: Thực hiện thành công.
+                data:
+                  AFSdkWebDevKey: af-dev-key
+                  AFSdkBannerKey: af-banner-key
+        '404':
+          description: Package không tồn tại.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NestError'
+              example:
+                statusCode: 404
+                message: App package not found
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+
+  /clear-cache:
+    get:
+      tags: [Ops]
+      operationId: clearCache
+      summary: Xoá cache Redis
+      description: |
+        Có `key` → xoá đúng key đó (key đã md5, ví dụ các key
+        `h5-sdk:getAppInfo:*`). Không có `key` → **reset toàn bộ** cache Redis.
+
+        ⚠ Endpoint **không có xác thực** và bị rate limit như endpoint thường.
+        Không để lộ qua proxy công khai nếu chưa có lớp bảo vệ khác.
+      parameters:
+        - name: key
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          description: Echo lại `key`; `{}` khi reset toàn bộ.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClearCacheResult'
+              examples:
+                oneKey:
+                  value: { key: 5d41402abc4b2a76b9719d911017c592 }
+                all:
+                  value: {}
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+
+  /gtm/receive-event:
+    post:
+      tags: [Ops]
+      operationId: gtmReceiveEvent
+      summary: Nhận event từ GTM server (chỉ ghi log)
+      description: Body và header được ghi log nguyên văn. Không rate limit.
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        '201':
+          description: Luôn trả chuỗi `ok`.
+          content:
+            text/html:
+              schema: { type: string, enum: [ok] }
+
+  # ---------------------------------------------------------------- Internal
+  /internal/channels:
+    get:
+      tags: [Internal – Channels]
+      operationId: listChannels
+      summary: Liệt kê kênh phân phối
+      security:
+        - InternalKey: []
+      responses:
+        '200':
+          description: Mọi kênh, kể cả kênh bị tắt. Secret S2S bị che, chỉ trả số lượng.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ChannelSummary'
+        '401':
+          $ref: '#/components/responses/NestUnauthorized'
+    post:
+      tags: [Internal – Channels]
+      operationId: createChannel
+      summary: Tạo (hoặc ghi đè) kênh
+      description: |
+        Cùng SP upsert với `PUT` — `code` đã tồn tại thì ghi đè toàn bộ.
+        Xem cảnh báo *replace toàn phần* ở `PUT /internal/channels/{code}`.
+      security:
+        - InternalKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertChannelRequest'
+            example:
+              code: newch
+              name: New Channel
+              status: 1
+              allowedAuthGrants: [{ grantType: authorization_code }]
+              allowedOrigins: ['https://portal.newch.vn']
+      responses:
+        '201':
+          $ref: '#/components/responses/ChannelCodeResult'
+        '400':
+          $ref: '#/components/responses/InternalBadRequest'
+        '401':
+          $ref: '#/components/responses/NestUnauthorized'
+
+  /internal/channels/{code}:
+    parameters:
+      - $ref: '#/components/parameters/ChannelCodePath'
+    get:
+      tags: [Internal – Channels]
+      operationId: getChannel
+      summary: Lấy một kênh
+      security:
+        - InternalKey: []
+      responses:
+        '200':
+          description: Cấu hình kênh.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ChannelSummary'
+        '401':
+          $ref: '#/components/responses/NestUnauthorized'
+        '404':
+          $ref: '#/components/responses/InternalChannelNotFound'
+    put:
+      tags: [Internal – Channels]
+      operationId: upsertChannel
+      summary: Cập nhật (hoặc tạo) kênh — replace toàn phần
+      description: |
+        Upsert: `code` chưa tồn tại thì tạo mới. `code` trên path là nguồn sự
+        thật; `code` trong body vẫn **bắt buộc** (DTO dùng chung) nhưng bị bỏ qua.
+
+        ⚠ **Replace toàn phần, không phải partial update.** Field optional vắng
+        mặt bị ghi thành rỗng trong DB: `icon`, `paymentPageMode` → `null`;
+        `allowedPaymentMethods`, `allowedOrigins`, `tags` → `[]`; `integratedPlayPage`,
+        `partnerContact`, `vliveContact`, `contractNumber`, `contractNote`,
+        `effectiveDate`, `expirationDate` → `null`. `allowedAuthGrants` là
+        field bắt buộc: vắng mặt hoặc `null` → `400`. Làm rỗng
+        `allowedOrigins` **không phải no-op**: opener policy và CSP rơi về
+        `ALLOW_OPENER` / `ALLOW_EMBED_IFRAME` toàn cục (có môi trường là `*`),
+        và API Partner – Public của kênh bắt đầu trả `403`. Client phải luôn gửi
+        đủ giá trị hiện tại của mọi field.
+      security:
+        - InternalKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpsertChannelRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/ChannelCodeResult'
+        '400':
+          $ref: '#/components/responses/InternalBadRequest'
+        '401':
+          $ref: '#/components/responses/NestUnauthorized'
+
+  /internal/channels/{code}/app-packages:
+    parameters:
+      - $ref: '#/components/parameters/ChannelCodePath'
+    get:
+      tags: [Internal – Channels]
+      operationId: listChannelAppPackages
+      summary: Liệt kê app package đang được phân phối trên kênh
+      description: Chỉ trả mapping đang bật (`Status = 1`).
+      security:
+        - InternalKey: []
+      responses:
+        '200':
+          description: Danh sách mapping.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ChannelAppPackage'
+        '401':
+          $ref: '#/components/responses/NestUnauthorized'
+    post:
+      tags: [Internal – Channels]
+      operationId: addChannelAppPackage
+      summary: Bật phân phối một app package trên kênh
+      description: |
+        Upsert mapping với `Status = 1` — gọi lại sau khi `DELETE` sẽ bật lại
+        đúng mapping cũ. `packageName`/`appId` do SP tự tra từ `dbo.AppPackages`.
+
+        `partnerGameId` là **replace**: vắng mặt / `null` / `""` sẽ xoá giá trị
+        đang lưu. Caller phải luôn gửi giá trị hiện tại của mapping.
+      security:
+        - InternalKey: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddChannelAppPackageRequest'
+      responses:
+        '201':
+          description: Mapping vừa lưu.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/SavedChannelAppPackage'
+        '400':
+          $ref: '#/components/responses/NestBadRequest'
+        '401':
+          $ref: '#/components/responses/NestUnauthorized'
+        '404':
+          description: '`appPackageId` không có trong `dbo.AppPackages`.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+              example:
+                code: APP_PACKAGE_NOT_FOUND
+                description: Không tìm thấy app package
+        '409':
+          description: |
+            `partnerGameId` đã gán cho app package khác trên cùng kênh (kể cả
+            mapping đã tắt).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+              example:
+                code: PARTNER_GAME_ID_DUPLICATE
+                description: partnerGameId đã được gán cho app package khác trên kênh này
+
+  /internal/channels/{code}/app-packages/lookup:
+    parameters:
+      - $ref: '#/components/parameters/ChannelCodePath'
+    get:
+      tags: [Internal – Channels]
+      operationId: lookupChannelAppPackageByPartnerGameId
+      summary: Tra cứu app package theo mã game phía cổng đối tác
+      description: |
+        Chỉ thấy mapping đang bật (`Status = 1`). So khớp chính xác, phân biệt
+        hoa thường. Đọc từ cache danh sách package của kênh (10 phút); mọi lần
+        ghi qua `/internal/channels/**` đều xoá cache đó.
+      security:
+        - InternalKey: []
+      parameters:
+        - name: partnerGameId
+          in: query
+          required: true
+          schema: { type: string, minLength: 1, maxLength: 125 }
+          example: game-01
+      responses:
+        '200':
+          description: Package đang gắn `partnerGameId` này.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PartnerGameAppPackage'
+        '400':
+          $ref: '#/components/responses/NestBadRequest'
+        '401':
+          $ref: '#/components/responses/NestUnauthorized'
+        '404':
+          description: Không có mapping đang bật nào gắn `partnerGameId` này.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+              example:
+                code: APP_PACKAGE_NOT_FOUND
+                description: Không tìm thấy app package
+
+  /internal/channels/{code}/app-packages/{appPackageId}:
+    parameters:
+      - $ref: '#/components/parameters/ChannelCodePath'
+      - name: appPackageId
+        in: path
+        required: true
+        schema: { type: integer, minimum: 1 }
+    delete:
+      tags: [Internal – Channels]
+      operationId: disableChannelAppPackage
+      summary: Tắt phân phối một app package (xoá mềm)
+      description: |
+        Đặt `Status = 0`, không xoá dòng. Mapping không tồn tại trả
+        `rowsAffected: 0` (vẫn 200).
+      security:
+        - InternalKey: []
+      responses:
+        '200':
+          description: Số dòng bị ảnh hưởng.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RowsAffected'
+              example:
+                success: true
+                messages: Thực hiện thành công.
+                data: { rowsAffected: 1 }
+        '400':
+          description: '`appPackageId` không phải số nguyên (ParseIntPipe).'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NestError'
+              example:
+                statusCode: 400
+                message: Validation failed (numeric string is expected)
+                error: Bad Request
+        '401':
+          $ref: '#/components/responses/NestUnauthorized'
+
+  /internal/channels/{code}/rotate-secret:
+    parameters:
+      - $ref: '#/components/parameters/ChannelCodePath'
+    post:
+      tags: [Internal – Channels]
+      operationId: rotateChannelSecret
+      summary: Cấp secret key S2S mới
+      description: |
+        Sinh key mới (32 byte ngẫu nhiên, hex 64 ký tự) và đặt lên đầu danh
+        sách; giữ **tối đa 2** key — key cũ nhất bị loại. Key cũ còn lại vẫn
+        hiệu lực cho tới lần xoay kế tiếp (grace period cho đối tác).
+
+        `secretKey` **chỉ trả về đúng một lần** trong response này; không có
+        endpoint nào đọc lại được.
+      security:
+        - InternalKey: []
+      responses:
+        '201':
+          description: Key mới và số key đang hiệu lực.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/RotateSecretResult'
+        '401':
+          $ref: '#/components/responses/NestUnauthorized'
+        '404':
+          $ref: '#/components/responses/InternalChannelNotFound'
+
+  /internal/channels/{code}/transactions:
+    parameters:
+      - $ref: '#/components/parameters/ChannelCodePath'
+    get:
+      tags: [Internal – Channels]
+      operationId: listChannelTransactions
+      summary: Lịch sử giao dịch của một kênh (CMS)
+      description: |
+        Giao dịch có `GameTransactions.channelCode` = `{code}`, sắp **tăng dần
+        theo `id`**, phân trang cursor chỉ đi tới. Kênh đã tắt hay hết hạn vẫn
+        xem được; kênh không tồn tại trả 404.
+
+        - `total` (số dòng khớp bộ lọc) **chỉ có ở trang đầu** (không gửi
+          `nextCursor`); các trang sau trả `total: null` — CMS giữ con số của
+          trang đầu.
+        - Trang kế: gửi lại đúng `nextCursor` cùng **bộ lọc y như cũ**.
+          `nextCursor: null` là hết.
+        - Tham số rỗng (`?status=`) nghĩa là không lọc. `status` là bộ lọc
+          nhị phân: `1` = thành công, `0` = thất bại (mọi `status` khác 1, gồm
+          cả mã lỗi âm). Trường `status` trong response giữ giá trị gốc.
+        - `fromTime`/`toTime` **bắt buộc có offset**, bao gồm cả hai mốc.
+        - Giao dịch tạo trước khi phía DB áp dụng `SP_GameTransaction_Create`
+          bản ghi kênh đều mang `vtvlive`, kể cả của kênh khác.
+
+        Không qua `ApiResponseInterceptor` (không log payload) nhưng envelope
+        giống hệt. Không cache, không rate limit.
+      security:
+        - InternalKey: []
+      parameters:
+        - name: appId
+          in: query
+          schema: { type: integer, minimum: 1 }
+        - name: uid
+          in: query
+          description: So khớp chính xác.
+          schema: { type: string, maxLength: 50 }
+        - name: status
+          in: query
+          description: '`1` = thành công, `0` = thất bại (`status` khác 1).'
+          schema: { type: integer, enum: [0, 1] }
+        - name: fromTime
+          in: query
+          schema: { type: string, format: date-time }
+          example: '2026-10-01T00:00:00+07:00'
+        - name: toTime
+          in: query
+          schema: { type: string, format: date-time }
+          example: '2026-10-31T23:59:59.999+07:00'
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+        - name: nextCursor
+          in: query
+          description: Giá trị mờ lấy từ response trước. Bỏ trống ở trang đầu.
+          schema: { type: string, maxLength: 500 }
+      responses:
+        '200':
+          description: Một trang giao dịch.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiEnvelope'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/ChannelTransactionsPage'
+        '400':
+          description: Tham số sai (`limit`, cursor, `appId`, `uid`, `status`, ngày thiếu offset, `fromTime` sau `toTime`).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+              example:
+                code: INVALID_REQUEST
+                description: fromTime must be an ISO 8601 datetime with offset
+        '401':
+          $ref: '#/components/responses/NestUnauthorized'
+        '404':
+          $ref: '#/components/responses/InternalChannelNotFound'
+
+  # ---------------------------------------------------------------- Partner – Public
+  /partner/v1/games:
+    get:
+      tags: [Partner – Public]
+      operationId: partnerPublicGetGames
+      summary: Danh sách game được phân phối cho kênh
+      description: |
+        Mỗi dòng là một bản phát hành (game × nền tảng) **đang hoạt động**; một
+        game có thể xuất hiện nhiều dòng. Cache 60 giây.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/PartnerChannelCode'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Danh sách bản phát hành.
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/AccessControlAllowOrigin'
+            Vary:
+              $ref: '#/components/headers/VaryOrigin'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PartnerSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PartnerGame'
+              example:
+                success: true
+                data:
+                  - gameId: 36
+                    gameName: Bát Lượng Nhân
+                    gameIcon: https://static-cmshub.vtvlive.vn/36/icon.png
+                    gameDescription: Game nhập vai
+                    gameWidth: '0'
+                    gameHeight: '0'
+                    gamePlayUrl: https://game.example.vn/batluongnhan/play
+                    appPackage: batluongnhan.vplay.w
+                    appPackageGameIcon: ''
+                    platform: web
+        '400':
+          $ref: '#/components/responses/PartnerInvalidRequest'
+        '403':
+          $ref: '#/components/responses/PartnerOriginNotAllowed'
+        '429':
+          $ref: '#/components/responses/PartnerRateLimited'
+        '500':
+          $ref: '#/components/responses/PartnerInternalError'
+
+  /partner/v1/game-items:
+    get:
+      tags: [Partner – Public]
+      operationId: partnerPublicGetGameItems
+      summary: Danh sách gói bán của một bản phát hành trên kênh
+      description: |
+        Gói bán cấu hình riêng cho từng cặp (kênh, `gameId`, `appPackage`).
+        `paymentMethods` được lọc theo `allowedPaymentMethods` của kênh (mảng
+        rỗng = không lọc); gói hết phương thức vẫn được trả về. Chỉ trả gói đang
+        hoạt động. Cache 60 giây.
+      security: []
+      parameters:
+        - $ref: '#/components/parameters/PartnerChannelCode'
+        - $ref: '#/components/parameters/PartnerGameId'
+        - $ref: '#/components/parameters/PartnerAppPackage'
+        - $ref: '#/components/parameters/Origin'
+      responses:
+        '200':
+          description: Danh sách gói.
+          headers:
+            Access-Control-Allow-Origin:
+              $ref: '#/components/headers/AccessControlAllowOrigin'
+            Vary:
+              $ref: '#/components/headers/VaryOrigin'
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PartnerSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PartnerProduct'
+              example:
+                success: true
+                data:
+                  - ID: t019.vplay.w.voucher20
+                    name: 6 Kim Phiếu
+                    image: https://static-cmshub.vtvlive.vn/22/payment/f02e040ee264f5ff3ec8958be880d862-6.png
+                    description: Nạp nhận 6 Kim Phiếu
+                    price: 20000
+                    amount: 170
+                    sort: 1
+                    rules:
+                      - { key: SERVER_OP, operator: gte, value: '18597656322' }
+                    paymentMethods:
+                      - ID: 78280
+                        code: VNPAY
+                        name: Cổng thanh toán VNPAY
+                        image: https://static-cmshub.vtvlive.vn/0/payment-method/f9e9458884b20407e67000ca3a993e65-vnpay.png
+                        price: 20000
+                        amount: 170
+                        currencyCode: VND
+                        note: ''
+                        sort: 0
+        '400':
+          $ref: '#/components/responses/PartnerInvalidRequest'
+        '403':
+          $ref: '#/components/responses/PartnerForbidden'
+        '429':
+          $ref: '#/components/responses/PartnerRateLimited'
+        '500':
+          $ref: '#/components/responses/PartnerInternalError'
+
+  # ---------------------------------------------------------------- Partner – S2S
+  /partner/s2s/v1/games:
+    get:
+      tags: [Partner – S2S]
+      operationId: partnerS2sGetGames
+      summary: Danh sách game (bản S2S)
+      description: |
+        Như bản public nhưng không cache, trả cả bản phát hành đã tắt, kèm
+        `status` và `updatedAt`. Kênh lấy từ `X-Channel`; `channelCode` trên
+        query (nếu có) bị bỏ qua.
+      security:
+        - S2sChannel: []
+          S2sTimestamp: []
+          S2sNonce: []
+          S2sSignature: []
+      responses:
+        '200':
+          description: Danh sách bản phát hành.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PartnerSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PartnerGameS2s'
+        '400':
+          $ref: '#/components/responses/PartnerInvalidRequest'
+        '401':
+          $ref: '#/components/responses/PartnerS2sUnauthorized'
+        '429':
+          $ref: '#/components/responses/PartnerRateLimited'
+        '500':
+          $ref: '#/components/responses/PartnerInternalError'
+
+  /partner/s2s/v1/game-items:
+    get:
+      tags: [Partner – S2S]
+      operationId: partnerS2sGetGameItems
+      summary: Danh sách gói bán (bản S2S)
+      description: Như bản public nhưng không cache, trả cả gói đã tắt, kèm `status` và `updatedAt`.
+      security:
+        - S2sChannel: []
+          S2sTimestamp: []
+          S2sNonce: []
+          S2sSignature: []
+      parameters:
+        - $ref: '#/components/parameters/PartnerGameId'
+        - $ref: '#/components/parameters/PartnerAppPackage'
+      responses:
+        '200':
+          description: Danh sách gói.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PartnerSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PartnerProductS2s'
+        '400':
+          $ref: '#/components/responses/PartnerInvalidRequest'
+        '401':
+          $ref: '#/components/responses/PartnerS2sUnauthorized'
+        '403':
+          $ref: '#/components/responses/PartnerChannelNotAllowed'
+        '429':
+          $ref: '#/components/responses/PartnerRateLimited'
+        '500':
+          $ref: '#/components/responses/PartnerInternalError'
+
+  /partner/s2s/v1/transactions:
+    get:
+      tags: [Partner – S2S]
+      operationId: partnerS2sGetTransactions
+      summary: Lịch sử giao dịch để đối soát
+      description: |
+        Luôn giới hạn trong kênh đã ký. Phân trang keyset theo cursor.
+
+        - Vòng lặp phải dừng khi `nextCursor === null` — trang cuối vừa đủ
+          `limit` bản ghi vẫn trả cursor, lần gọi kế tiếp mới ra
+          `items: []`, `nextCursor: null`.
+        - `fromTime`/`toTime` là ISO 8601. **Không có offset thì hiểu là UTC**;
+          chỉ có ngày thì là `00:00:00Z` của ngày đó, kể cả với `toTime`
+          (bộ lọc là `createdAt <= toTime`). Lấy trọn ngày D:
+          `fromTime=D&toTime=D+1`.
+        - Nên truyền `fromTime` ngay lần gọi đầu; không có thì truy vấn quét từ
+          giao dịch đầu tiên của kênh.
+        - Kênh của giao dịch là kênh của gói tại thời điểm mua
+          (`GameTransactions.channelCode`). Giao dịch tạo trước khi phía DB áp
+          dụng bản ghi kênh đều thuộc `vtvlive`.
+      security:
+        - S2sChannel: []
+          S2sTimestamp: []
+          S2sNonce: []
+          S2sSignature: []
+      parameters:
+        - name: limit
+          in: query
+          description: Số nguyên thập phân 1–200.
+          schema: { type: integer, minimum: 1, maximum: 200, default: 50 }
+        - name: nextCursor
+          in: query
+          description: Chuỗi opaque lấy từ `data.nextCursor` của lần gọi trước. Cursor rác → `400`.
+          schema: { type: string, maxLength: 500 }
+        - name: fromTime
+          in: query
+          schema: { type: string, maxLength: 40 }
+          example: '2026-08-13T00:00:00+07:00'
+        - name: toTime
+          in: query
+          schema: { type: string, maxLength: 40 }
+          example: '2026-08-14T00:00:00+07:00'
+      responses:
+        '200':
+          description: Một trang giao dịch.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PartnerSuccess'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/PartnerTransactionsPage'
+              example:
+                success: true
+                data:
+                  items:
+                    - transId: '30567343'
+                      platform: web
+                      itemId: batluongnhan.vplay.w.voucher500
+                      itemType: 1
+                      itemName: 150 Kim Phiếu
+                      itemAmount: 4250
+                      itemAppAmount: '150'
+                      accountId: '2688340562'
+                      accountName: tentaikhoan
+                      gameId: 36
+                      gameName: null
+                      serverId: '2010099'
+                      serverName: null
+                      characterId: '4249736029799'
+                      characterName: null
+                      status: 1
+                      errorMsg: success
+                      createdAt: '2026-08-13T07:22:51.100Z'
+                  nextCursor: eyJpZCI6MzA1NjczNDN9
+        '400':
+          $ref: '#/components/responses/PartnerInvalidRequest'
+        '401':
+          $ref: '#/components/responses/PartnerS2sUnauthorized'
+        '429':
+          $ref: '#/components/responses/PartnerRateLimited'
+        '500':
+          $ref: '#/components/responses/PartnerInternalError'
+
+  # ---------------------------------------------------------------- Dev
+  /sample:
+    get:
+      tags: [Dev]
+      operationId: devSampleRootPopup
+      summary: Portal mẫu dùng portal-popup-sdk
+      responses:
+        '200':
+          $ref: '#/components/responses/Html'
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+  /sample/root/single:
+    get:
+      tags: [Dev]
+      operationId: devSampleRootSingle
+      summary: Portal mẫu dùng portal-single-sdk
+      parameters:
+        - name: gameId
+          in: query
+          schema: { type: integer }
+        - name: appPackage
+          in: query
+          schema: { type: string }
+      responses:
+        '200':
+          $ref: '#/components/responses/Html'
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+  /sample/portal-mobifone/t019:
+    get:
+      tags: [Dev]
+      operationId: devSamplePortalMobifone
+      summary: Portal mẫu MobiFone
+      responses:
+        '200':
+          $ref: '#/components/responses/Html'
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+  /sample/game:
+    get:
+      tags: [Dev]
+      operationId: devSampleGame
+      summary: Game mẫu dùng game SDK
+      responses:
+        '200':
+          $ref: '#/components/responses/Html'
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+  /sample/sessions:
+    post:
+      tags: [Dev]
+      operationId: devWigameIssueSession
+      summary: Mock WiGame — cấp session_token giả
+      description: |
+        Thay cổng WiGame cấp token khi người chơi bấm chơi; không có trong tài
+        liệu đối tác, không ký. Truyền cùng `openid` qua nhiều lần để giả lập một
+        người chơi quay lại.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                openid:
+                  type: string
+                  maxLength: 128
+                  description: Mặc định `wg_` + 24 hex ngẫu nhiên.
+                display_name:
+                  type: string
+                  maxLength: 128
+                  description: Mặc định `Người chơi WiGame`.
+                game_id:
+                  type: string
+                  maxLength: 128
+                  description: Mặc định `00000000-0000-4000-8000-000000000001`.
+                ttl_seconds:
+                  type: integer
+                  minimum: 1
+                  maximum: 86400
+                  default: 3600
+      responses:
+        '201':
+          description: Đã cấp token.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success: { type: boolean, enum: [true] }
+                  data:
+                    allOf:
+                      - $ref: '#/components/schemas/WigameSession'
+                      - type: object
+                        required: [session_token]
+                        properties:
+                          session_token: { type: string, example: wgs_Q2x1… }
+        '400':
+          $ref: '#/components/responses/WigameInvalidParam'
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+  /sample/sessions/verify:
+    post:
+      tags: [Dev]
+      operationId: devWigameVerifySession
+      summary: Mock WiGame — xác minh phiên người chơi
+      description: Theo tài liệu WiGame; cách ký xem tag Dev.
+      parameters:
+        - { name: X-Partner-Key, in: header, required: true, schema: { type: string } }
+        - { name: X-Timestamp, in: header, required: true, schema: { type: string, example: '1760000000' } }
+        - { name: X-Nonce, in: header, required: true, schema: { type: string, pattern: '^[A-Za-z0-9_-]{8,64}$' } }
+        - { name: X-Signature, in: header, required: true, schema: { type: string, pattern: '^[0-9a-f]{64}$' } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [session_token]
+              properties:
+                session_token: { type: string, example: wgs_Q2x1… }
+      responses:
+        '200':
+          description: Phiên hợp lệ. Gọi lại được tới khi hết hạn (token không dùng một lần).
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [success, data]
+                properties:
+                  success: { type: boolean, enum: [true] }
+                  data:
+                    $ref: '#/components/schemas/WigameSession'
+        '400':
+          $ref: '#/components/responses/WigameInvalidParam'
+        '401':
+          description: |
+            `MISSING_AUTH`, `INVALID_KEY`, `INVALID_TIMESTAMP`, `TIMESTAMP_EXPIRED`,
+            `INVALID_NONCE`, `INVALID_SIGNATURE`, `NONCE_REUSED`, `INVALID_SESSION`.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WigameError'
+              example:
+                success: false
+                error:
+                  code: INVALID_SESSION
+                  message: Token phiên không hợp lệ hoặc đã hết hạn
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+  /test-view:
+    get:
+      tags: [Dev]
+      operationId: devTestView
+      summary: Trang kiểm tra layout
+      responses:
+        '200':
+          $ref: '#/components/responses/Html'
+        '429':
+          $ref: '#/components/responses/NestTooManyRequests'
+
+components:
+  securitySchemes:
+    SessionCookie:
+      type: apiKey
+      in: cookie
+      name: h5_sdk.sid
+      description: |
+        Session express (Redis). Ngoài production tên có tiền tố môi trường,
+        ví dụ `staging.h5_sdk.sid`. Tạo bởi `/{gameId}/auth`, đọc ở
+        `/{gameId}/callback`; các route khác không dùng.
+    PlaySession:
+      type: apiKey
+      in: header
+      name: X-H5-Session
+      description: |
+        Handle phiên chơi: `sessionHandle` trong thẻ `#H5Session` của
+        `/{gameId}/play` (43 ký tự base64url).
+
+        - Chỉ hợp lệ cho đúng game đã mở phiên.
+        - Hết hiệu lực khi logout, hoặc sau `PLAY_SESSION_TTL_SECONDS` không
+          refresh.
+        - Handle sai định dạng hoặc không tồn tại được coi như không có phiên.
+    InternalKey:
+      type: apiKey
+      in: header
+      name: X-Internal-Key
+      description: |
+        Khoá dùng chung với hub-cms-api (`INTERNAL_API_KEY`). So sánh
+        constant-time. Thiếu, sai, hoặc server chưa cấu hình khoá → `401`.
+    S2sChannel:
+      type: apiKey
+      in: header
+      name: X-Channel
+      description: Mã kênh (`channelCode`) VTVLive cấp.
+    S2sTimestamp:
+      type: apiKey
+      in: header
+      name: X-Timestamp
+      description: Unix epoch tính bằng **giây** (1–11 chữ số), lệch tối đa ±300 giây so với server.
+    S2sNonce:
+      type: apiKey
+      in: header
+      name: X-Nonce
+      description: Duy nhất cho mỗi request (khuyến nghị 16–32 byte hex/Base64URL). Server nhớ 10 phút.
+    S2sSignature:
+      type: apiKey
+      in: header
+      name: X-Signature
+      description: '`Base64URL(HMAC-SHA256(secretKey, canonical))` — xem mô tả tag Partner – S2S.'
+
+  parameters:
+    GameId:
+      name: gameId
+      in: path
+      required: true
+      description: ID game (`dbo.Apps.id`).
+      schema: { type: integer, minimum: 1 }
+      example: 101
+    ChannelCodeQuery:
+      name: channelCode
+      in: query
+      description: |
+        Mã kênh phân phối. Có giá trị thì kênh phải tồn tại, đang bật, và
+        (nếu kênh đã có mapping) phân phối `appPackage`. Không truyền = hành vi
+        trước khi có cấu hình kênh.
+      schema: { type: string, minLength: 1, maxLength: 20 }
+      example: mobifone
+    ChannelCodePath:
+      name: code
+      in: path
+      required: true
+      description: Mã kênh.
+      schema: { type: string, maxLength: 20 }
+      example: mobifone
+    PartnerChannelCode:
+      name: channelCode
+      in: query
+      required: true
+      description: Mã kênh. Phải xuất hiện đúng một lần (lặp tham số → `400`).
+      schema: { type: string, minLength: 1, maxLength: 20 }
+      example: mobifone
+    PartnerGameId:
+      name: gameId
+      in: query
+      required: true
+      description: Chỉ gồm chữ số thập phân, trong khoảng INT32 dương (không dấu, không phần lẻ).
+      schema: { type: integer, minimum: 1, maximum: 2147483647 }
+      example: 36
+    PartnerAppPackage:
+      name: appPackage
+      in: query
+      required: true
+      description: Bản phát hành cần lấy gói. Thiếu sẽ không đoán được bộ gói nên bị từ chối.
+      schema: { type: string, minLength: 1, maxLength: 125 }
+      example: batluongnhan.vplay.w
+    Origin:
+      name: Origin
+      in: header
+      required: false
+      description: |
+        Trình duyệt tự gửi. So khớp (không phân biệt hoa thường, bỏ `/` cuối)
+        với `channel.allowedOrigins`. Vắng mặt = gọi từ server.
+      schema: { type: string }
+      example: https://portal.example.vn
+
+  headers:
+    Location:
+      description: URL đích của redirect.
+      schema: { type: string, format: uri }
+    SessionSetCookie:
+      description: Cookie session `h5_sdk.sid` (path `/`, `Secure`, `SameSite=None`).
+      schema: { type: string }
+    ContentSecurityPolicy:
+      description: |
+        Do Helmet đặt; `frame-ancestors` lấy từ `ALLOW_OPENER`, hoặc từ
+        `allowedOrigins` của kênh khi request có `channelCode`.
+      schema: { type: string }
+    AccessControlAllowOrigin:
+      description: Echo lại header `Origin` của request (chỉ có khi request có `Origin`).
+      schema: { type: string }
+    VaryOrigin:
+      description: '`Origin` — chỉ có khi request có `Origin`.'
+      schema: { type: string, enum: [Origin] }
+    RetryAfter:
+      description: Số giây cần chờ trước khi gọi lại.
+      schema: { type: integer }
+
+  responses:
+    Html:
+      description: Trang HTML.
+      content:
+        text/html:
+          schema: { type: string }
+    GameNotFound:
+      description: '`gameId` không tồn tại (do `AppInfoMiddleware` trả, không qua trang lỗi).'
+      content:
+        text/html:
+          schema: { type: string, enum: [Game not found] }
+    ErrorPageRedirect:
+      description: |
+        Redirect tới `{appUrl}/error?detail=…&referrer=…[&replay=1]`. Giải mã
+        `detail` (URL-decode rồi Base64-decode) được `ErrorPageDetail`.
+      headers:
+        Location:
+          $ref: '#/components/headers/Location'
+    NestBadRequest:
+      description: Validation thất bại.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NestError'
+          example:
+            statusCode: 400
+            message: [detail should not be empty]
+            error: Bad Request
+    NestUnauthorized:
+      description: Thiếu hoặc sai `X-Internal-Key`, hoặc server chưa cấu hình `INTERNAL_API_KEY`.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NestError'
+          example:
+            statusCode: 401
+            message: Unauthorized
+    NestTooManyRequests:
+      description: Vượt rate limit.
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NestError'
+          example:
+            statusCode: 429
+            message: 'ThrottlerException: Too Many Requests'
+    NestInternalError:
+      description: Lỗi không được bắt (ví dụ OIDC trả lỗi khi refresh).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NestError'
+          example:
+            statusCode: 500
+            message: Internal server error
+    ChannelCodeResult:
+      description: Mã kênh đã lưu.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiEnvelope'
+              - type: object
+                properties:
+                  data:
+                    type: object
+                    required: [code]
+                    properties:
+                      code: { type: string }
+          example:
+            success: true
+            messages: Thực hiện thành công.
+            data: { code: newch }
+    InternalBadRequest:
+      description: |
+        Body không qua validation (`NestError`, `message` là mảng) hoặc lỗi
+        nghiệp vụ khác của catalog (`InternalError`).
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/NestError'
+              - $ref: '#/components/schemas/InternalError'
+          example:
+            statusCode: 400
+            message:
+              - 'allowedAuthGrants không hợp lệ: telco bắt buộc provider 1-50 ký tự'
+            error: Bad Request
+    InternalChannelNotFound:
+      description: Kênh không tồn tại.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InternalError'
+          example:
+            code: ERR_CHANNEL_NOT_FOUND
+            description: Kênh phân phối không tồn tại
+    PartnerInvalidRequest:
+      description: |
+        `INVALID_REQUEST` — thiếu/sai tham số (kể cả `limit` ngoài 1–200,
+        `nextCursor` hỏng, thời gian không phải ISO 8601), hoặc thiếu hẳn một
+        trong 4 header S2S (`error_description` nêu tên header).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PartnerError'
+          examples:
+            param:
+              value:
+                success: false
+                error_code: INVALID_REQUEST
+                error_description: Invalid request parameters
+            header:
+              value:
+                success: false
+                error_code: INVALID_REQUEST
+                error_description: X-Signature is required
+    PartnerOriginNotAllowed:
+      description: |
+        `ORIGIN_NOT_ALLOWED` — origin chưa đăng ký, kênh không tồn tại/bị tắt,
+        hoặc kênh chưa cấu hình `allowedOrigins`. Kênh không tồn tại, bị tắt,
+        hoặc đã hết hạn hợp đồng cũng trả mã này (không lộ trạng thái kênh cho người gọi ẩn danh).
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/AccessControlAllowOrigin'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PartnerError'
+          example:
+            success: false
+            error_code: ORIGIN_NOT_ALLOWED
+            error_description: Request origin is not registered for this channel
+    PartnerForbidden:
+      description: |
+        `ORIGIN_NOT_ALLOWED` (xem `/partner/v1/games`) hoặc
+        `CHANNEL_NOT_ALLOWED` — cặp `gameId`/`appPackage` không tồn tại hoặc
+        không được phân phối cho kênh. Hai trường hợp này cố ý gộp chung để
+        không dò được kênh khác được phân phối gì; `404 NOT_FOUND` hiện không
+        bao giờ được trả.
+      headers:
+        Access-Control-Allow-Origin:
+          $ref: '#/components/headers/AccessControlAllowOrigin'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PartnerError'
+          example:
+            success: false
+            error_code: CHANNEL_NOT_ALLOWED
+            error_description: Channel is not allowed to access this resource
+    PartnerChannelNotAllowed:
+      description: '`CHANNEL_NOT_ALLOWED` — cặp `gameId`/`appPackage` không tồn tại hoặc không được phân phối cho kênh.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PartnerError'
+          example:
+            success: false
+            error_code: CHANNEL_NOT_ALLOWED
+            error_description: Channel is not allowed to access this resource
+    PartnerS2sUnauthorized:
+      description: |
+        Lỗi xác thực S2S:
+
+        | `error_code` | Nguyên nhân |
+        |---|---|
+        | `INVALID_CHANNEL` | `X-Channel` không tồn tại hoặc bị tắt |
+        | `CHANNEL_EXPIRED` | Kênh của `X-Channel` đã hết hạn hợp đồng |
+        | `INVALID_TIMESTAMP` | `X-Timestamp` sai định dạng |
+        | `REQUEST_EXPIRED` | `X-Timestamp` lệch quá ±5 phút |
+        | `INVALID_SIGNATURE` | Chữ ký không khớp key nào còn hiệu lực |
+        | `NONCE_REUSED` | `X-Nonce` đã dùng |
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PartnerError'
+          example:
+            success: false
+            error_code: INVALID_SIGNATURE
+            error_description: Invalid request signature
+    WigameInvalidParam:
+      description: '`INVALID_PARAM` — thiếu hoặc sai tham số body.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WigameError'
+          example:
+            success: false
+            error:
+              code: INVALID_PARAM
+              message: Thiếu hoặc sai session_token
+    PartnerRateLimited:
+      description: '`RATE_LIMITED` — vượt rate limit toàn cục.'
+      headers:
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PartnerError'
+          example:
+            success: false
+            error_code: RATE_LIMITED
+            error_description: Too many requests
+    PartnerInternalError:
+      description: '`INTERNAL_ERROR` — lỗi phía VTVLive; chi tiết chỉ được ghi log.'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PartnerError'
+          example:
+            success: false
+            error_code: INTERNAL_ERROR
+            error_description: Internal server error
+
+  schemas:
+    # ------------------------------------------------ Envelopes & errors
+    ApiEnvelope:
+      type: object
+      description: Envelope thành công của `ApiResponseInterceptor`.
+      required: [success, messages, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        messages:
+          type: string
+          enum: [Thực hiện thành công.]
+        data:
+          description: Dữ liệu của endpoint.
+    NestError:
+      type: object
+      description: Body lỗi mặc định của NestJS.
+      required: [statusCode, message]
+      properties:
+        statusCode:
+          type: integer
+        message:
+          oneOf:
+            - type: string
+            - type: array
+              items: { type: string }
+        error:
+          type: string
+          example: Bad Request
+    ChannelTransactionsPage:
+      type: object
+      required: [items, nextCursor, total]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/ChannelTransaction' }
+        nextCursor: { type: string, nullable: true }
+        total:
+          type: integer
+          nullable: true
+          description: Chỉ có ở trang đầu; `null` ở các trang có cursor.
+    ChannelTransaction:
+      type: object
+      description: Một dòng `GameTransactions`, giữ tên cột DB và giữ `null`.
+      properties:
+        id: { type: integer, example: 15234001 }
+        transId: { type: string }
+        partnerTransId: { type: string, nullable: true }
+        transType: { type: string, example: web }
+        platform: { type: string }
+        itemId: { type: string }
+        itemType: { type: integer }
+        itemCategoryId: { type: integer, nullable: true }
+        itemName: { type: string, nullable: true }
+        itemAmount: { type: integer, nullable: true }
+        itemAppAmount: { type: integer, nullable: true }
+        itemGiftcode: { type: string, nullable: true }
+        uid: { type: string }
+        username: { type: string, nullable: true }
+        appId: { type: integer }
+        appName: { type: string, nullable: true }
+        serverId: { type: string }
+        serverName: { type: string, nullable: true }
+        characterId: { type: string }
+        characterName: { type: string, nullable: true }
+        status: { type: integer, description: 'Giá trị gốc. `1` = thành công, khác 1 = thất bại (`0` hoặc mã lỗi âm).' }
+        errorMsg: { type: string, nullable: true }
+        createdAt:
+          type: string
+          nullable: true
+          description: Giờ VN kèm offset.
+          example: '2026-10-21T10:15:30.123+07:00'
+        createdBy: { type: string, nullable: true }
+        retryCount: { type: integer, nullable: true }
+        channelCode: { type: string, example: mobi }
+    InternalError:
+      type: object
+      description: Lỗi nghiệp vụ của `/internal/channels/**`.
+      required: [code, description]
+      properties:
+        code:
+          type: string
+          example: ERR_CHANNEL_NOT_FOUND
+        description:
+          type: string
+    ErrorPageDetail:
+      type: object
+      description: |
+        Nội dung đã giải mã của tham số `detail` trên trang lỗi:
+        `JSON.parse(base64Decode(decodeURIComponent(detail)))`.
+      required: [code, description, data]
+      properties:
+        code:
+          type: string
+          example: MISSING_AUTH_HASH
+        description:
+          type: string
+          example: Thiếu dữ liệu xác thực
+        data:
+          type: array
+          description: Dữ liệu phụ để trang lỗi hiển thị (ví dụ `ERR_ACCOUNT_NOT_REGISTER` kèm thông tin game).
+          items:
+            type: object
+            required: [key, value]
+            properties:
+              key: { type: string }
+              value: {}
+    PartnerSuccess:
+      type: object
+      description: Envelope thành công của API đối tác — đúng hai field.
+      required: [success, data]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+        data:
+          description: Dữ liệu nghiệp vụ.
+    WigameSession:
+      type: object
+      description: Phiên người chơi WiGame (mock dev).
+      required: [openid, display_name, game_id, expires_at]
+      properties:
+        openid:
+          type: string
+          example: wg_3f9a…
+          description: Khoá định danh cố định của người chơi giữa các lần chơi.
+        display_name: { type: string, example: Nguyễn Văn A }
+        game_id: { type: string, example: d71dc184-… }
+        expires_at: { type: string, example: '2026-10-07T21:00:00+07:00' }
+    WigameError:
+      type: object
+      description: Envelope lỗi của API WiGame (mock dev).
+      required: [success, error]
+      properties:
+        success: { type: boolean, enum: [false] }
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }
+    PartnerError:
+      type: object
+      description: Envelope lỗi của API đối tác.
+      required: [success, error_code, error_description]
+      properties:
+        success:
+          type: boolean
+          enum: [false]
+        error_code:
+          $ref: '#/components/schemas/PartnerErrorCode'
+        error_description:
+          type: string
+          description: Chỉ để debug — nội dung có thể thay đổi, không rẽ nhánh theo field này.
+    PartnerErrorCode:
+      type: string
+      description: |
+        Mã lỗi là một phần của hợp đồng. `NOT_FOUND` được giữ cho tương lai,
+        hiện không bao giờ được trả.
+      enum:
+        - INVALID_REQUEST
+        - INVALID_CHANNEL
+        - CHANNEL_EXPIRED
+        - INVALID_TIMESTAMP
+        - REQUEST_EXPIRED
+        - NONCE_REUSED
+        - INVALID_SIGNATURE
+        - ORIGIN_NOT_ALLOWED
+        - CHANNEL_NOT_ALLOWED
+        - NOT_FOUND
+        - RATE_LIMITED
+        - INTERNAL_ERROR
+
+    # ------------------------------------------------ Session API
+    PlaySessionBootstrap:
+      type: object
+      description: |
+        JSON trong thẻ `<script id="H5Session" type="application/json">` của
+        `/{gameId}/play`.
+
+        - `<`, `>`, `&`, U+2028, U+2029 được escape thành `\uXXXX` để token
+          không đóng được thẻ.
+        - `play.js` đọc xong thì gỡ thẻ khỏi DOM.
+        - Không chứa refresh token.
+      required: [sessionHandle, accessToken, idToken, expiresIn]
+      properties:
+        sessionHandle:
+          type: string
+          nullable: true
+          pattern: '^[A-Za-z0-9_-]{43}$'
+          description: |
+            Gửi lại qua header `X-H5-Session`. `null` khi OIDC không trả
+            refresh token, hoặc Redis lỗi lúc mở phiên.
+        accessToken: { type: string, nullable: true }
+        idToken: { type: string, nullable: true }
+        expiresIn:
+          type: integer
+          nullable: true
+          description: Thời gian sống của access token, giây.
+          example: 3600
+    RefreshTokenRequest:
+      type: object
+      description: |
+        Field được validate nhưng **không** được dùng — refresh token luôn lấy
+        từ phiên chơi trong Redis. Body rỗng hợp lệ (`play.js` gửi body rỗng).
+        Field thừa (ví dụ `provider` cũ) bị bỏ qua.
+      properties:
+        refreshToken:
+          type: string
+          maxLength: 125
+    TokenResponse:
+      type: object
+      description: Không có `refresh_token` — refresh token chỉ nằm trong phiên chơi.
+      required: [id_token, access_token, expires_in]
+      properties:
+        id_token: { type: string }
+        access_token: { type: string }
+        expires_in:
+          type: integer
+          description: Thời gian sống của access token, giây.
+          example: 1800
+    RefreshTokenFailure:
+      type: object
+      required: [error, error_description]
+      properties:
+        error:
+          type: string
+          enum: [MISSING_REFRESH_TOKEN, SESSION_EXPIRED]
+        error_description:
+          type: string
+          example: Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại
+    LogoutResult:
+      type: object
+      required: [success]
+      properties:
+        success:
+          type: boolean
+          enum: [true]
+
+    # ------------------------------------------------ Ops
+    AppsflyerSdkKeys:
+      type: object
+      properties:
+        AFSdkWebDevKey: { type: string }
+        AFSdkBannerKey: { type: string }
+    ClearCacheResult:
+      type: object
+      properties:
+        key:
+          type: string
+          description: Key đã xoá; vắng mặt khi reset toàn bộ.
+
+    # ------------------------------------------------ Internal – Channels
+    AuthGrantType:
+      type: string
+      enum: [authorization_code, token_exchange, telco, social]
+    ChannelSummary:
+      type: object
+      description: Cấu hình kênh; `s2sSecretKeys` không bao giờ được trả, chỉ có `secretKeyCount`.
+      required:
+        - code
+        - name
+        - status
+        - allowedAuthGrants
+        - allowedPaymentMethods
+        - allowedOrigins
+        - secretKeyCount
+      properties:
+        code: { type: string, example: mobifone }
+        name: { type: string, example: MobiFone }
+        status:
+          type: integer
+          enum: [0, 1]
+          description: 1 = đang bật.
+        icon:
+          type: string
+          nullable: true
+        allowedAuthGrants:
+          type: array
+          nullable: true
+          description: |
+            Mảng rỗng = kênh chưa cấu hình. `null` = cột trong DB hỏng, hoặc SP
+            chưa trả cột (chưa chạy `002`/`003`), xem `allowedAuthGrantsError`
+            (request `/play` của kênh này bị chặn bằng `ERR_INVALID_CONFIG`).
+          items:
+            $ref: '#/components/schemas/AuthGrantConfig'
+        allowedAuthGrantsError:
+          type: string
+          nullable: true
+        paymentPageMode:
+          $ref: '#/components/schemas/PaymentPageMode'
+        allowedPaymentMethods:
+          type: array
+          description: Mã phương thức thanh toán được phép. Mảng rỗng = không lọc.
+          items: { type: string }
+          example: [VNPAY]
+        allowedOrigins:
+          type: array
+          description: Origin portal được phép (opener, CSP `frame-ancestors`, API Partner – Public).
+          items: { type: string }
+          example: ['https://portal.mobifone.vn']
+        secretKeyCount:
+          type: integer
+          minimum: 0
+          maximum: 2
+        tags:
+          type: array
+          items: { type: string }
+          example: ['mobile', 'web']
+        integratedPlayPage:
+          type: string
+          nullable: true
+          enum: ['partner_host,partner_domain', 'partner_host,vlive_domain', 'vlive_host,vlive_domain', null]
+        partnerContact: { type: string, nullable: true }
+        vliveContact: { type: string, nullable: true }
+        contractNumber: { type: string, nullable: true }
+        contractNote: { type: string, nullable: true }
+        effectiveDate:
+          type: string
+          nullable: true
+          description: Giờ VN kèm offset. Không ảnh hưởng logic.
+          example: '2026-01-01T00:00:00.000+07:00'
+        expirationDate:
+          type: string
+          nullable: true
+          description: >-
+            Giờ VN kèm offset. Quá mốc này kênh bị chặn (ERR_CHANNEL_EXPIRED). null = không hết hạn.
+            Kênh hết hạn ngay SAU thời điểm đã lưu: "còn hạn hết ngày 31/12/2026" phải gửi `2026-12-31T23:59:59.999+07:00` (không phải `T00:00:00`). Khi PUT, CMS gửi lại NGUYÊN VĂN giá trị đọc từ GET nếu người vận hành không sửa — không cho đi qua date picker chỉ có ngày.
+          example: '2026-12-31T23:59:59.999+07:00'
+    UpsertChannelRequest:
+      type: object
+      description: >-
+        Replace toàn phần — field optional vắng mặt bị ghi thành `null`/`[]`.
+        Chuỗi rỗng `''` được chấp nhận và lưu thành `null` cho `integratedPlayPage`,
+        các field văn bản (`partnerContact`, `vliveContact`, `contractNumber`, `contractNote`)
+        và cả hai field ngày (`effectiveDate`, `expirationDate`).
+      required: [code, name, status, allowedAuthGrants]
+      properties:
+        code:
+          type: string
+          minLength: 1
+          maxLength: 20
+          description: Với `PUT` vẫn bắt buộc nhưng bị path ghi đè.
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        status:
+          type: integer
+          enum: [0, 1]
+        icon:
+          type: string
+          maxLength: 500
+          description: Vắng mặt → `null`.
+        allowedAuthGrants:
+          type: array
+          description: |
+            Bắt buộc - vắng mặt hoặc `null` → `400`. Mảng rỗng = kênh chưa cấu
+            hình. Tối đa **một** grant ngoài `authorization_code`; không lặp
+            `grantType`.
+          items:
+            $ref: '#/components/schemas/AuthGrantConfig'
+        paymentPageMode:
+          $ref: '#/components/schemas/PaymentPageMode'
+        allowedPaymentMethods:
+          type: array
+          items: { type: string }
+          description: Vắng mặt → `[]` (không lọc).
+        allowedOrigins:
+          type: array
+          description: |
+            Mỗi phần tử là `*` hoặc `scheme://host[:port]` (không path, không
+            `/` cuối). Vắng mặt → `[]` — xem cảnh báo ở `PUT`.
+          items:
+            type: string
+            pattern: '^(\*|[a-zA-Z][a-zA-Z0-9+.-]*://[a-zA-Z0-9.-]+(:\d+)?)$'
+        tags:
+          type: array
+          maxItems: 20
+          uniqueItems: true
+          items: { type: string, minLength: 1, maxLength: 50 }
+          description: Vắng mặt → ghi [] (PUT replace toàn phần).
+        integratedPlayPage:
+          type: string
+          enum: ['partner_host,partner_domain', 'partner_host,vlive_domain', 'vlive_host,vlive_domain']
+        partnerContact: { type: string, maxLength: 255 }
+        vliveContact: { type: string, maxLength: 255 }
+        contractNumber: { type: string, maxLength: 50, pattern: '^[\x20-\x7E]*$' }
+        contractNote: { type: string, maxLength: 1000 }
+        effectiveDate:
+          type: string
+          description: ISO 8601 BẮT BUỘC có offset (Z hoặc ±hh:mm); phải ≤ expirationDate.
+          example: '2026-01-01T00:00:00.000+07:00'
+        expirationDate:
+          type: string
+          description: >-
+            ISO 8601 BẮT BUỘC có offset. ⚠ Vắng mặt trong PUT = xoá hạn → kênh không bao giờ hết hạn.
+            Kênh hết hạn ngay SAU thời điểm đã lưu: "còn hạn hết ngày 31/12/2026" phải gửi `2026-12-31T23:59:59.999+07:00` (không phải `T00:00:00`). Khi PUT, CMS gửi lại NGUYÊN VĂN giá trị đọc từ GET nếu người vận hành không sửa — không cho đi qua date picker chỉ có ngày.
+          example: '2026-12-31T23:59:59.999+07:00'
+    AuthGrantConfig:
+      type: object
+      required: [grantType]
+      additionalProperties: false
+      properties:
+        grantType:
+          $ref: '#/components/schemas/AuthGrantType'
+        provider:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: |
+            Provider key bên Identity. Bắt buộc với `telco`/`social`; không
+            được có với `authorization_code`/`token_exchange`.
+      example: { grantType: telco, provider: mobifone }
+    PaymentPageMode:
+      type: string
+      nullable: true
+      enum: [popup, post_message]
+      description: |
+        Nơi mở trang nạp. `popup` = popup billing của VTVLive trong trang play;
+        `post_message` = đẩy `open_payment_page` lên cổng. `null` = `post_message`.
+        PUT là replace toàn phần — vắng mặt bị ghi `null`.
+    ChannelAppPackage:
+      type: object
+      required: [appPackageId, appPackageName, appId, partnerGameId]
+      properties:
+        appPackageId: { type: integer, example: 9 }
+        appPackageName: { type: string, example: com.vtvlive.game101.web }
+        appId: { type: integer, example: 101 }
+        partnerGameId:
+          type: string
+          nullable: true
+          maxLength: 125
+          description: Mã game phía cổng đối tác; `null` = chưa gán.
+          example: game-01
+    AddChannelAppPackageRequest:
+      type: object
+      required: [appPackageId]
+      properties:
+        appPackageId:
+          type: integer
+          minimum: 1
+          description: '`dbo.AppPackages.id`.'
+        partnerGameId:
+          type: string
+          nullable: true
+          maxLength: 125
+          description: |
+            Mã game phía cổng đối tác, duy nhất trong một kênh. Replace:
+            vắng mặt / `null` / `""` xoá giá trị đang lưu.
+          example: game-01
+    SavedChannelAppPackage:
+      type: object
+      required: [id, appPackageName, appId, partnerGameId]
+      properties:
+        id:
+          type: integer
+          description: '`appPackageId` vừa lưu.'
+        appPackageName: { type: string }
+        appId: { type: integer }
+        partnerGameId: { type: string, nullable: true }
+    PartnerGameAppPackage:
+      type: object
+      required: [appId, appPackageId, appPackageName]
+      properties:
+        appId: { type: integer, example: 101 }
+        appPackageId: { type: integer, example: 9 }
+        appPackageName: { type: string, example: com.vtvlive.game101.web }
+    RowsAffected:
+      type: object
+      required: [rowsAffected]
+      properties:
+        rowsAffected:
+          type: integer
+          minimum: 0
+    RotateSecretResult:
+      type: object
+      required: [secretKey, keyCount]
+      properties:
+        secretKey:
+          type: string
+          pattern: '^[0-9a-f]{64}$'
+          description: Chỉ trả về một lần; phải chuyển cho đối tác qua kênh an toàn.
+        keyCount:
+          type: integer
+          minimum: 1
+          maximum: 2
+
+    # ------------------------------------------------ Partner
+    PartnerGame:
+      type: object
+      description: Một bản phát hành của một game trên kênh.
+      required:
+        - gameId
+        - gameName
+        - gameIcon
+        - gameDescription
+        - gameWidth
+        - gameHeight
+        - gamePlayUrl
+        - appPackage
+        - appPackageGameIcon
+        - platform
+      properties:
+        gameId: { type: integer }
+        gameName: { type: string }
+        gameIcon: { type: string, format: uri }
+        gameDescription: { type: string }
+        gameWidth:
+          type: string
+          description: Chiều rộng khung chơi đề xuất (pixel, dạng chuỗi). `"0"` = không có khuyến nghị.
+          example: '0'
+        gameHeight:
+          type: string
+          description: Chiều cao khung chơi đề xuất (pixel, dạng chuỗi). `"0"` = không có khuyến nghị.
+          example: '0'
+        gamePlayUrl: { type: string, format: uri }
+        appPackage: { type: string }
+        appPackageGameIcon:
+          type: string
+          description: Hiện **luôn là chuỗi rỗng**. Hiển thị theo mẫu `appPackageGameIcon || gameIcon`.
+        platform:
+          type: string
+          example: web
+    PartnerGameS2s:
+      allOf:
+        - $ref: '#/components/schemas/PartnerGame'
+        - $ref: '#/components/schemas/S2sSyncFields'
+    PartnerRule:
+      type: object
+      description: |
+        Điều kiện áp dụng gói — **chỉ để hiển thị**, server kiểm tra lúc mua.
+        Nhiều điều kiện là AND.
+      required: [key, operator, value]
+      properties:
+        key:
+          type: string
+          description: 'Hiện có: `SERVER_OP` (số ngày từ khi mở server), `EVENT_WHEEL_TURN` (số lượt quay).'
+          example: SERVER_OP
+        operator:
+          type: string
+          enum: [eq, neq, gt, gte, lt, lte, in, nin]
+        value:
+          type: string
+          description: Luôn là chuỗi, kể cả điều kiện dạng số.
+    PartnerPaymentMethod:
+      type: object
+      required: [ID, code, name, image, price, amount, currencyCode, note, sort]
+      properties:
+        ID: { type: integer }
+        code: { type: string, example: VNPAY }
+        name: { type: string }
+        image: { type: string, format: uri }
+        price:
+          type: number
+          description: Giá thực tế theo tiền tệ thật khi trả bằng phương thức này.
+        amount:
+          type: number
+          description: Giá thực tế theo OnG khi trả bằng phương thức này.
+        currencyCode: { type: string, example: VND }
+        note: { type: string }
+        sort: { type: integer }
+    PartnerProduct:
+      type: object
+      required: [ID, name, image, description, price, amount, sort, rules, paymentMethods]
+      properties:
+        ID:
+          type: string
+          example: t019.vplay.w.voucher20
+        name: { type: string }
+        image: { type: string, format: uri }
+        description: { type: string }
+        price:
+          type: number
+          description: Giá mặc định (tiền tệ thật) để hiển thị; lúc thanh toán dùng giá trong `paymentMethods[]`.
+        amount:
+          type: number
+          description: Giá mặc định theo OnG.
+        sort:
+          type: integer
+          description: Thứ tự hiển thị đề xuất, tăng dần.
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartnerRule'
+        paymentMethods:
+          type: array
+          description: Đã lọc theo `allowedPaymentMethods` của kênh; có thể rỗng.
+          items:
+            $ref: '#/components/schemas/PartnerPaymentMethod'
+    PartnerProductS2s:
+      allOf:
+        - $ref: '#/components/schemas/PartnerProduct'
+        - $ref: '#/components/schemas/S2sSyncFields'
+    S2sSyncFields:
+      type: object
+      required: [status, updatedAt]
+      properties:
+        status:
+          type: integer
+          description: Trạng thái phân phối; `0` = đã tắt (vẫn trả để đối tác cập nhật CSDL).
+        updatedAt:
+          type: string
+          description: Thời điểm cập nhật gần nhất (ISO 8601).
+    PartnerTransaction:
+      type: object
+      required:
+        - transId
+        - platform
+        - itemId
+        - itemType
+        - itemName
+        - itemAmount
+        - itemAppAmount
+        - accountId
+        - accountName
+        - gameId
+        - gameName
+        - serverId
+        - serverName
+        - characterId
+        - characterName
+        - status
+        - errorMsg
+        - createdAt
+      properties:
+        transId: { type: string }
+        platform: { type: string, example: web }
+        itemId:
+          type: string
+          description: Khớp `ID` của `PartnerProduct`.
+        itemType: { type: integer }
+        itemName:
+          type: string
+          description: Tên gói tại thời điểm mua.
+        itemAmount:
+          type: number
+          description: Giá theo OnG.
+        itemAppAmount:
+          type: string
+          description: Giá theo item trong game.
+        accountId: { type: string }
+        accountName: { type: string }
+        gameId: { type: integer }
+        gameName: { type: string, nullable: true }
+        serverId: { type: string }
+        serverName: { type: string, nullable: true }
+        characterId: { type: string }
+        characterName: { type: string, nullable: true }
+        status:
+          type: integer
+          description: '`1` = thành công, khác `1` = thất bại.'
+        errorMsg: { type: string }
+        createdAt:
+          type: string
+          format: date-time
+    PartnerTransactionsPage:
+      type: object
+      required: [items, nextCursor]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PartnerTransaction'
+        nextCursor:
+          type: string
+          nullable: true
+          description: '`null` = hết dữ liệu. Chuỗi opaque — không tự dựng hay giải mã.'

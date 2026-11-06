@@ -30,8 +30,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files: real values never; the example files are the contract and ARE committed (the Docker build copies
+# deploy/<env>/.env.example to .env)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -42,3 +44,14 @@ next-env.d.ts
 
 # detection result cache (see src/detector/detect-cache.ts)
 /.cache/
+
+# figma renders cache + operator verdicts
+/.figma-cache/
+/.figma-review/
+
+# working data of the tool: templates fetched from git, clones, uploads, layouts, schemas (see src/detector/paths.ts)
+/data/
+
+# logs and local leftovers
+*.log
+.git.bak/

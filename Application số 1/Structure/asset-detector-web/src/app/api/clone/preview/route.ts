@@ -5,6 +5,7 @@ import { existsSync, openSync, closeSync } from "node:fs";
 import path from "node:path";
 import { getCloneDir } from "../route";
 import { resolveGame } from "@/detector/config";
+import { requireTemplate } from "@/detector/template-source";
 import { detectFramework } from "@/detector/framework-detector";
 import { getPreview, setPreview, stopPreview } from "@/detector/preview-process";
 
@@ -51,6 +52,8 @@ function previewUrl(request: NextRequest, port: number): string {
 }
 
 export async function POST(request: NextRequest) {
+  const unavailable = await requireTemplate(request.nextUrl.searchParams.get("game"));
+  if (unavailable) return NextResponse.json({ error: unavailable }, { status: 424 });
   const { gameId, repoPath } = resolveGame(request.nextUrl.searchParams.get("game"));
   const CLONE_DIR = getCloneDir(repoPath);
   if (!existsSync(CLONE_DIR)) {

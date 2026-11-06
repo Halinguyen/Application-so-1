@@ -1,0 +1,3 @@
+@Library('jenkins-libs') _
+// PLACEHOLDERS: confirm domain / namespace / service_name before first run.
+VTVliveVplayNodeJSautodev(domain:"<DEV_DOMAIN>",container_port:"3000",service_path:"/",namespace:"<NAMESPACE>",service_name:"<SERVICE_NAME>")

@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "gameId": "samkok-tamquoc",
+  "repoDir": "t028-samkok-tam-qu-c-home-and-landing-web",
+  "framework": "nextjs",
+  "source": null,
+  "notes": [
+    "converted source (no git repository): push it to git, then put its url and commit here",
+    "derived from https://source.vtvlive.vn/vtvlive-game-website/t028-samkok-tam-qu-c/t028-samkok-tam-qu-c-home-and-landing.git @ e79941b8"
+  ],
+  "generatedAt": "2026-11-05T10:42:17.528Z"
+}

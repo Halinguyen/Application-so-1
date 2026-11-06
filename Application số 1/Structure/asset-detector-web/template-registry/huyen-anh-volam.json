@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "gameId": "huyen-anh-volam",
+  "repoDir": "t027-huyen-anh-vo-lam-homepage-web",
+  "framework": "nextjs",
+  "source": null,
+  "notes": [
+    "converted source (no git repository): push it to git, then put its url and commit here",
+    "derived from https://source.vtvlive.vn/vtvlive-game-website/t027-huyen-anh-vo-lam/t027-huyen-anh-vo-lam-homepage.git @ 8fb40bf1"
+  ],
+  "generatedAt": "2026-11-05T10:42:17.056Z"
+}

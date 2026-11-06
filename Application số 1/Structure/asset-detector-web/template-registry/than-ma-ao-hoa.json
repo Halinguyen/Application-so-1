@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "gameId": "than-ma-ao-hoa",
+  "repoDir": "t018-than-ma-website",
+  "framework": "nextjs",
+  "source": {
+    "type": "git",
+    "url": "https://source.vtvlive.vn/vtvlive-game-website/t018-than-ma-website.git",
+    "commit": "e3a47700cab1942912747880d9e976e3e0dcfca3",
+    "ref": "main"
+  },
+  "notes": [
+    "working copy had 3 tracked file(s) modified that are NOT in commit e3a47700",
+    "1 untracked file(s) not in the commit"
+  ],
+  "generatedAt": "2026-11-05T10:42:16.807Z"
+}

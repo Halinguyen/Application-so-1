@@ -13,6 +13,8 @@ export default function AssetCompareTile({
   onUrlPasted,
   onClear,
   onExclude,
+  blank = false,
+  onBlank,
 }: {
   slot: CloneSlot;
   originalUrl: string;
@@ -22,6 +24,9 @@ export default function AssetCompareTile({
   onUrlPasted: (url: string) => void;
   onClear: () => void;
   onExclude: () => void;
+  /** The image is replaced by a transparent one of the same size: it disappears from the clone without moving anything. */
+  blank?: boolean;
+  onBlank?: () => void;
 }) {
   const [showingAfter, setShowingAfter] = useState(true);
   const [urlDraft, setUrlDraft] = useState("");
@@ -51,7 +56,7 @@ export default function AssetCompareTile({
   return (
     <HoverHint
       className="tile compare-tile"
-      style={hasReplacement ? { outline: "2px solid var(--accent)" } : undefined}
+      style={hasReplacement || blank ? { outline: "2px solid var(--accent)" } : undefined}
       hint={hint}
     >
       <div className="thumb">
@@ -105,6 +110,16 @@ export default function AssetCompareTile({
             style={{ fontSize: 10, color: "var(--muted)", background: "none", border: "none", cursor: "pointer", padding: 0, marginTop: 2 }}
           >
             bỏ thay đổi
+          </button>
+        )}
+        {onBlank && (
+          <button
+            type="button"
+            className="tile-btn"
+            onClick={onBlank}
+            title="Thay bằng ảnh trong suốt cùng kích thước: ảnh biến mất khỏi bản sao, bố cục giữ nguyên"
+          >
+            {blank ? "Bỏ làm trống" : "Làm trống ảnh (ẩn)"}
           </button>
         )}
         <button

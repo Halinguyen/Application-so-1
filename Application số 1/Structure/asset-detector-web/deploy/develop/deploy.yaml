@@ -1,0 +1,172 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${SERVICE_NAME}
+  namespace: ${NAMESPACE}
+data:
+  .env: |-
+    # Non-secret config. Tokens come from the Secret below (envFrom).
+    TEMPLATE_SOURCE=live
+    TEMPLATE_GIT_USER=oauth2
+    GITHUB_ORG=
+    GITHUB_BRANCH=
+    TEMPLATE_ROOT=/data/templates
+    TEMPLATE_STORE_DIR=/data/template-store
+    TEMPLATE_CACHE_DIR=/data/cache
+    CLONE_SCHEMAS_DIR=/data/clone-schemas
+    TEMPLATE_REGISTRY_DIR=./template-registry
+    ALLOWED_DEV_ORIGINS=
+
+---
+# Placeholders only. Do NOT commit real tokens: create/replace the real Secret
+# out-of-band (kubectl / vault).
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${SERVICE_NAME}-secret
+  namespace: ${NAMESPACE}
+type: Opaque
+stringData:
+  FIGMA_TOKEN: "<FIGMA_TOKEN>"
+  GITHUB_TOKEN: "<GITHUB_TOKEN>"
+  TEMPLATE_GIT_TOKEN: "<TEMPLATE_GIT_TOKEN>"
+
+---
+# Templates, clones, uploads and layouts are written at runtime.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ${SERVICE_NAME}-data
+  namespace: ${NAMESPACE}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  # PLACEHOLDER: set to a storage class that exists in the DEV cluster
+  storageClassName: <STORAGE_CLASS>
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: ${SERVICE_NAME}
+  namespace: ${NAMESPACE}
+
+spec:
+  selector:
+    matchLabels:
+      service: ${SERVICE_NAME}
+
+  # Single writer on the RWO volume
+  replicas: 1
+  strategy:
+    type: Recreate
+
+  template:
+    metadata:
+      labels:
+        service: ${SERVICE_NAME}
+        logger: nlog
+
+    spec:
+      terminationGracePeriodSeconds: 60
+
+      # Image runs as uid 1000 (node); make the PVC writable by it
+      securityContext:
+        fsGroup: 1000
+
+      containers:
+        - name: ${SERVICE_NAME}
+          image: ${IMAGE}
+
+          env:
+            - name: TZ
+              value: Etc/GMT-7
+
+          envFrom:
+            - secretRef:
+                name: ${SERVICE_NAME}-secret
+
+          # NOTE: only the tool's own port is exposed. Preview servers started by
+          # the tool listen on random ports inside the pod and are NOT reachable
+          # through this Ingress (open design point, see README "Việc còn mở").
+          ports:
+            - containerPort: ${CONTAINER_PORT}
+
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: ${CONTAINER_PORT}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: ${CONTAINER_PORT}
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            failureThreshold: 6
+
+          # GUESS: sized generously for `npm install` of template repos; tune after observing.
+          resources:
+            requests:
+              cpu: "500m"
+              memory: 1Gi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+
+          volumeMounts:
+            - name: ${SERVICE_NAME}
+              mountPath: /usr/src/app/.env
+              subPath: .env
+            - name: data
+              mountPath: /data
+
+      imagePullSecrets:
+        - name: registry
+      restartPolicy: Always
+      volumes:
+        - name: ${SERVICE_NAME}
+          configMap:
+            name: ${SERVICE_NAME}
+        - name: data
+          persistentVolumeClaim:
+            claimName: ${SERVICE_NAME}-data
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${SERVICE_NAME}
+  namespace: ${NAMESPACE}
+spec:
+  ports:
+    - port: ${CONTAINER_PORT}
+      protocol: TCP
+  selector:
+    service: ${SERVICE_NAME}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ${SERVICE_NAME}
+  namespace: ${NAMESPACE}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - host: ${DOMAIN}
+      http:
+        paths:
+          - path: ${SERVICE_PATH}
+            pathType: Prefix
+            backend:
+              service:
+                name: ${SERVICE_NAME}
+                port:
+                  number: ${CONTAINER_PORT}

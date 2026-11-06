@@ -1,0 +1,18 @@
+node_modules
+.next
+.git
+.git.bak
+dev.log
+*.log
+tsconfig.tsbuildinfo
+.figma-cache
+.figma-review
+scripts/
+src/**/*.test.ts
+vitest.config.ts
+# env files: never ship local secrets; the .env.example files are needed by the build
+.env*
+!.env.example
+**/.env*
+!**/.env.example
+# NOT excluded on purpose (needed at runtime): public/ (incl. public/ve), src/detector/figma-snapshots, package*.json

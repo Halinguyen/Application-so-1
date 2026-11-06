@@ -44,5 +44,4 @@ giải nén snapshot ra, sửa, rồi chốt lại. Version cũ giữ nguyên đ
 ## Giới hạn hiện tại
 
 - Danh sách game trong wizard vẫn lấy từ `GAME_REPO_MAP` (config.ts); game chỉ có schema mà chưa có dòng ở đó chưa hiện.
-- Mapping PSD hiện nằm trong wizard (chưa lưu vào schema).
 - Cần `tar` trong PATH (Git for Windows hoặc Windows 10+ đều có).

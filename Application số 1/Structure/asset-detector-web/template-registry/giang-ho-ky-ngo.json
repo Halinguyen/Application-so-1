@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "gameId": "giang-ho-ky-ngo",
+  "repoDir": "t030-giang-ho-ky-ngo-website-web",
+  "framework": "nextjs",
+  "source": null,
+  "notes": [
+    "converted source (no git repository): push it to git, then put its url and commit here",
+    "derived from https://source.vtvlive.vn/vtvlive-game-website/t030-giang-ho-ky-ngo/t030-giang-ho-ky-ngo-website.git @ d69a86e1"
+  ],
+  "generatedAt": "2026-11-05T10:42:18.277Z"
+}

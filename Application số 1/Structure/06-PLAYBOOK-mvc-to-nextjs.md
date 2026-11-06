@@ -187,5 +187,5 @@ Dùng chung cho mọi game, detector nhận theo **tên biến env**, không the
 - Template đọc link YouTube từ **một biến env kết thúc bằng `HERO_VIDEO_URL`** (`NEXT_PUBLIC_HERO_VIDEO_URL`, `VITE_APP_HERO_VIDEO_URL`…) và chỉ render nút khi link hợp lệ.
 - Detector tìm biến đó trong `src/` → wizard hiện 1 ô "Link YouTube" (không bắt buộc) → clone ghi vào `.env.local`. Để trống = ẩn nút.
 - Khai báo `…HERO_VIDEO_URL=` (rỗng) trong `deploy/develop/.env.example`.
-- Mẫu cài đặt: `ta-la-hac-ngokhong` → `src/components/landing/HeroVideo.tsx` (popup YouTube; nút xuất từ PSD `trang 1`).
+- Mẫu cài đặt: `ta-la-hac-ngokhong` → `src/components/landing/HeroVideo.tsx` (popup YouTube).
 - Template chưa có biến này thì không hiện gì.

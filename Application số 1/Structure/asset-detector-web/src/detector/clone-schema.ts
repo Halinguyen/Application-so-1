@@ -1,5 +1,6 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { SCHEMA_DIR } from "./paths";
 import type { DetectionResult, FrameworkInfo } from "./types";
 import type { TemplateRef } from "./template-store";
 
@@ -12,7 +13,7 @@ import type { TemplateRef } from "./template-store";
 //   frozen — snapshot re-extracted and re-detected to the same result; the
 //            live template folder may be deleted.
 
-export const SCHEMA_DIR = path.resolve(process.cwd(), "..", "clone-schemas");
+export { SCHEMA_DIR };
 export const CURRENT_SCHEMA_VERSION = 1;
 
 export type SchemaStatus = "draft" | "frozen";
